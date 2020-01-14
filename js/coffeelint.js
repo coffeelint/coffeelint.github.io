@@ -1,35 +1,320 @@
-!function(e){if("object"==typeof exports&&"undefined"!=typeof module)module.exports=e();else if("function"==typeof define&&define.amd)define([],e);else{var f;"undefined"!=typeof window?f=window:"undefined"!=typeof global?f=global:"undefined"!=typeof self&&(f=self),f.coffeelint=e()}}(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+(function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.coffeelint = f()}})(function(){var define,module,exports;return (function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c="function"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error("Cannot find module '"+i+"'");throw a.code="MODULE_NOT_FOUND",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u="function"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(require,module,exports){
+module.exports={
+  "name": "@coffeelint/cli",
+  "description": "Lint your CoffeeScript",
+  "version": "2.1.0",
+  "homepage": "http://www.coffeelint.org",
+  "keywords": [
+    "lint",
+    "coffeescript",
+    "coffee-script"
+  ],
+  "author": "Matthew Perpick <clutchski@gmail.com>",
+  "main": "./lib/coffeelint.js",
+  "engines": {
+    "npm": ">=1.3.7",
+    "node": ">=6.9.1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/coffeelint/coffeelint.git"
+  },
+  "bin": {
+    "coffeelint": "./bin/coffeelint"
+  },
+  "dependencies": {
+    "coffeescript": "2.4.1",
+    "glob": "^7.1.6",
+    "ignore": "^3.0.9",
+    "optimist": "^0.6.1",
+    "resolve": "^0.6.3",
+    "strip-json-comments": "^1.0.2"
+  },
+  "devDependencies": {
+    "browserify": "^16.5.0",
+    "coffeeify": "^3.0.1",
+    "vows": "^0.8.3",
+    "underscore": "^1.9.2"
+  },
+  "license": "MIT",
+  "scripts": {
+    "pretest": "cake compile",
+    "test": "node ./vowsrunner.js --spec test/*.coffee test/*.litcoffee",
+    "testrule": "npm run compile && node ./vowsrunner.js --spec",
+    "posttest": "npm run lint",
+    "lint": "cake compile && node ./bin/coffeelint .",
+    "lint-csv": "cake compile && node ./bin/coffeelint --reporter csv .",
+    "lint-jslint": "cake compile && node ./bin/coffeelint --reporter jslint .",
+    "compile": "cake compile"
+  }
+}
 
-/*
-CoffeeLint
+},{}],2:[function(require,module,exports){
+var ASTApi, ASTLinter, BaseLinter, hasChildren, node_children,
+  hasProp = {}.hasOwnProperty;
 
-Copyright (c) 2011 Matthew Perpick.
-CoffeeLint is freely distributable under the MIT license.
- */
+BaseLinter = require('./base_linter.coffee');
+
+node_children = {
+  Class: ['variable', 'parent', 'body'],
+  Code: ['params', 'body'],
+  For: ['body', 'source', 'guard', 'step'],
+  If: ['condition', 'body', 'elseBody'],
+  Obj: ['properties'],
+  Op: ['first', 'second'],
+  Switch: ['subject', 'cases', 'otherwise'],
+  Try: ['attempt', 'recovery', 'ensure'],
+  Value: ['base', 'properties'],
+  While: ['condition', 'guard', 'body']
+};
+
+hasChildren = function(node, children) {
+  var ref;
+  return (node != null ? (ref = node.children) != null ? ref.length : void 0 : void 0) === children.length && (node != null ? node.children.every(function(elem, i) {
+    return elem === children[i];
+  }) : void 0);
+};
+
+ASTApi = class ASTApi {
+  constructor(config1) {
+    this.config = config1;
+  }
+
+  getNodeName(node) {
+    var children, name, ref;
+    name = node != null ? (ref = node.constructor) != null ? ref.name : void 0 : void 0;
+    if (node_children[name]) {
+      return name;
+    } else {
+      for (name in node_children) {
+        if (!hasProp.call(node_children, name)) continue;
+        children = node_children[name];
+        if (hasChildren(node, children)) {
+          return name;
+        }
+      }
+    }
+  }
+
+};
+
+// A class that performs static analysis of the abstract
+// syntax tree.
+module.exports = ASTLinter = class ASTLinter extends BaseLinter {
+  constructor(source, config, rules, CoffeeScript) {
+    super(source, config, rules);
+    this.CoffeeScript = CoffeeScript;
+    this.astApi = new ASTApi(this.config);
+  }
+
+  // This uses lintAST instead of lintNode because I think it makes it a bit
+  // more clear that the rule needs to walk the AST on its own.
+  acceptRule(rule) {
+    return typeof rule.lintAST === 'function';
+  }
+
+  lint() {
+    var coffeeError, err, errors, j, len, ref, rule, v;
+    errors = [];
+    try {
+      this.node = this.CoffeeScript.nodes(this.source);
+    } catch (error) {
+      coffeeError = error;
+      // If for some reason you shut off the 'coffeescript_error' rule err
+      // will be null and should NOT be added to errors
+      err = this._parseCoffeeScriptError(coffeeError);
+      if (err != null) {
+        errors.push(err);
+      }
+      return errors;
+    }
+    ref = this.rules;
+    for (j = 0, len = ref.length; j < len; j++) {
+      rule = ref[j];
+      this.astApi.createError = (attrs = {}) => {
+        return this.createError(rule.rule.name, attrs);
+      };
+      // HACK: Push the local errors object into the plugin. This is a
+      // temporary solution until I have a way for it to really return
+      // multiple errors.
+      rule.errors = errors;
+      v = this.normalizeResult(rule, rule.lintAST(this.node, this.astApi));
+      if (v != null) {
+        return v;
+      }
+    }
+    return errors;
+  }
+
+  _parseCoffeeScriptError(coffeeError) {
+    var attrs, lineNumber, match, message, rule;
+    rule = this.config['coffeescript_error'];
+    message = coffeeError.toString();
+    // Parse the line number
+    lineNumber = -1;
+    if (coffeeError.location != null) {
+      lineNumber = coffeeError.location.first_line + 1;
+    } else {
+      match = /line (\d+)/.exec(message);
+      if ((match != null ? match.length : void 0) > 1) {
+        lineNumber = parseInt(match[1], 10);
+      }
+    }
+    attrs = {
+      message: message,
+      level: rule.level,
+      lineNumber: lineNumber
+    };
+    return this.createError('coffeescript_error', attrs);
+  }
+
+};
+
+
+},{"./base_linter.coffee":3}],3:[function(require,module,exports){
+// Patch the source properties onto the destination.
+var BaseLinter, defaults, extend;
+
+extend = function(destination, ...sources) {
+  var i, k, len, source, v;
+  for (i = 0, len = sources.length; i < len; i++) {
+    source = sources[i];
+    (function() {
+      var results;
+      results = [];
+      for (k in source) {
+        v = source[k];
+        results.push(destination[k] = v);
+      }
+      return results;
+    })();
+  }
+  return destination;
+};
+
+// Patch any missing attributes from defaults to source.
+defaults = function(source, defaults) {
+  return extend({}, defaults, source);
+};
+
+module.exports = BaseLinter = class BaseLinter {
+  constructor(source1, config, rules) {
+    this.source = source1;
+    this.config = config;
+    this.setupRules(rules);
+  }
+
+  isObject(obj) {
+    return obj === Object(obj);
+  }
+
+  // Create an error object for the given rule with the given
+  // attributes.
+  createError(ruleName, attrs = {}) {
+    var level;
+    // Level should default to what's in the config, but can be overridden.
+    if (attrs.level == null) {
+      attrs.level = this.config[ruleName].level;
+    }
+    level = attrs.level;
+    if (level !== 'ignore' && level !== 'warn' && level !== 'error') {
+      throw new Error(`unknown level ${level} for rule: ${ruleName}`);
+    }
+    if (level === 'error' || level === 'warn') {
+      attrs.rule = ruleName;
+      return defaults(attrs, this.config[ruleName]);
+    } else {
+      return null;
+    }
+  }
+
+  acceptRule(rule) {
+    throw new Error('acceptRule needs to be overridden in the subclass');
+  }
+
+  // Only rules that have a level of error or warn will even get constructed.
+  setupRules(rules) {
+    var RuleConstructor, level, name, results, rule;
+    this.rules = [];
+    results = [];
+    for (name in rules) {
+      RuleConstructor = rules[name];
+      level = this.config[name].level;
+      if (level === 'error' || level === 'warn') {
+        rule = new RuleConstructor(this, this.config);
+        if (this.acceptRule(rule)) {
+          results.push(this.rules.push(rule));
+        } else {
+          results.push(void 0);
+        }
+      } else if (level !== 'ignore') {
+        throw new Error(`unknown level ${level} for rule: ${rule}`);
+      } else {
+        results.push(void 0);
+      }
+    }
+    return results;
+  }
+
+  normalizeResult(p, result) {
+    if (result === true) {
+      return this.createError(p.rule.name);
+    }
+    if (this.isObject(result)) {
+      return this.createError(p.rule.name, result);
+    }
+  }
+
+};
+
+
+},{}],4:[function(require,module,exports){
+  /*
+  CoffeeLint
+
+  Copyright (c) 2011 Matthew Perpick.
+  CoffeeLint is freely distributable under the MIT license.
+  */
 var ASTLinter, CoffeeScript, ERROR, ErrorReport, IGNORE, LexicalLinter, LineLinter, RULES, WARN, _rules, cache, coffeelint, defaults, difference, extend, hasSyntaxError, mergeDefaultConfig, nodeRequire, packageJSON, sameJSON, union,
-  slice = [].slice,
-  indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
+  indexOf = [].indexOf,
+  slice = [].slice;
 
+// Coffeelint's namespace.
+// Browserify wrapps this file in a UMD that will set window.coffeelint to
+// exports
 coffeelint = exports;
 
+// Hide from browserify
 nodeRequire = require;
 
 if (typeof window !== "undefined" && window !== null) {
+  // If we're in the browser assume CoffeeScript is already loaded.
   CoffeeScript = window.CoffeeScript;
 }
 
+// By using nodeRequire it prevents browserify from finding this dependency.
+// If it isn't hidden there is an error attempting to inline CoffeeScript.
+// if browserify uses `-i` to ignore the dependency it creates an empty shim
+// which breaks NodeJS
+// https://github.com/substack/node-browserify/issues/471
+
+// Atom has a `window`, but not a `window.CoffeeScript`. Calling `nodeRequire`
+// here should fix Atom without breaking anything else.
 if (CoffeeScript == null) {
-  CoffeeScript = nodeRequire('coffee-script');
+  CoffeeScript = nodeRequire('coffeescript');
 }
 
 if (CoffeeScript == null) {
   throw new Error('Unable to find CoffeeScript');
 }
 
+// Browserify will inline the file at compile time.
 packageJSON = require('./../package.json');
 
+// The current version of Coffeelint.
 coffeelint.VERSION = packageJSON.version;
 
+// CoffeeLint error levels.
 ERROR = 'error';
 
 WARN = 'warn';
@@ -38,23 +323,30 @@ IGNORE = 'ignore';
 
 coffeelint.RULES = RULES = require('./rules.coffee');
 
-extend = function() {
-  var destination, j, k, len, source, sources, v;
-  destination = arguments[0], sources = 2 <= arguments.length ? slice.call(arguments, 1) : [];
+// Patch the source properties onto the destination.
+extend = function(destination, ...sources) {
+  var j, k, len, source, v;
   for (j = 0, len = sources.length; j < len; j++) {
     source = sources[j];
-    for (k in source) {
-      v = source[k];
-      destination[k] = v;
-    }
+    (function() {
+      var results;
+      results = [];
+      for (k in source) {
+        v = source[k];
+        results.push(destination[k] = v);
+      }
+      return results;
+    })();
   }
   return destination;
 };
 
+// Patch any missing attributes from defaults to source.
 defaults = function(source, defaults) {
   return extend({}, defaults, source);
 };
 
+// Helper to add rules to disabled list
 union = function(a, b) {
   var c, j, len, len1, n, results, x;
   c = {};
@@ -73,6 +365,7 @@ union = function(a, b) {
   return results;
 };
 
+// Helper to remove rules from disabled list
 difference = function(a, b) {
   var j, len, results, x;
   results = [];
@@ -91,14 +384,17 @@ LexicalLinter = require('./lexical_linter.coffee');
 
 ASTLinter = require('./ast_linter.coffee');
 
+// Cache instance, disabled by default
 cache = null;
 
+// Merge default and user configuration.
 mergeDefaultConfig = function(userConfig) {
   var config, rule, ruleConfig, ruleLoader;
   try {
+    // When run from the browser it may not be able to find the ruleLoader.
     ruleLoader = nodeRequire('./ruleLoader');
     ruleLoader.loadFromConfig(coffeelint, userConfig);
-  } catch (_error) {}
+  } catch (error) {}
   config = {};
   if (userConfig.coffeelint) {
     config.coffeelint = userConfig.coffeelint;
@@ -128,8 +424,12 @@ coffeelint.trimConfig = function(userConfig) {
       delete config._coffeescript;
       newConfig[rule] = config;
     } else if ((config.level === (ref = dConfig.level) && ref === 'ignore')) {
+      // If the rule is going to be ignored and would be by default it
+      // doesn't matter what you may have configured
       void 0;
     } else if (config.level === 'ignore') {
+      // If the rule is being ignored you don't need the rest of the
+      // config.
       newConfig[rule] = {
         level: 'ignore'
       };
@@ -157,30 +457,34 @@ coffeelint.trimConfig = function(userConfig) {
 coffeelint.invertLiterate = function(source) {
   var j, len, line, newSource, ref;
   source = CoffeeScript.helpers.invertLiterate(source);
+  // Strip the first 4 spaces or a tab from every line.
+  // After this the markdown is commented and all of the other code
+  // should be at their natural location.
   newSource = '';
   ref = source.split('\n');
   for (j = 0, len = ref.length; j < len; j++) {
     line = ref[j];
     if (line.match(/^#/)) {
+      // strip trailing space
       line = line.replace(/\s*$/, '');
     }
-    line = line.replace(/^\s{4}/g, '');
-    newSource += line + "\n";
+    // Strip the first 4 spaces or a tab of every line. This is how Markdown
+    // indicates code, so in the end this pulls everything back to where it
+    // would be indented if it hadn't been written in literate style.
+    line = line.replace(/^[ ]{4}|^\t/g, '');
+    newSource += `${line}\n`;
   }
   return newSource;
 };
 
 _rules = {};
 
-coffeelint.registerRule = function(RuleConstructor, ruleName) {
+coffeelint.registerRule = function(RuleConstructor, ruleName = void 0) {
   var e, name, p, ref, ref1;
-  if (ruleName == null) {
-    ruleName = void 0;
-  }
   p = new RuleConstructor;
   name = (p != null ? (ref = p.rule) != null ? ref.name : void 0 : void 0) || '(unknown)';
   e = function(msg) {
-    throw new Error("Invalid rule: " + name + " " + msg);
+    throw new Error(`Invalid rule: ${name} ${msg}`);
   };
   if (p.rule == null) {
     e('Rules must provide rule attribute with a default configuration.');
@@ -189,7 +493,7 @@ coffeelint.registerRule = function(RuleConstructor, ruleName) {
     e('Rule defaults require a name');
   }
   if ((ruleName != null) && ruleName !== p.rule.name) {
-    e("Mismatched rule name: " + ruleName);
+    e(`Mismatched rule name: ${ruleName}`);
   }
   if (p.rule.message == null) {
     e('Rule defaults require a message');
@@ -207,6 +511,7 @@ coffeelint.registerRule = function(RuleConstructor, ruleName) {
   } else if (typeof p.lintLine !== 'function' && typeof p.lintAST !== 'function') {
     e('Rules must implement lintToken, lintLine, or lintAST');
   }
+  // Capture the default options for the new rule.
   RULES[p.rule.name] = p.rule;
   return _rules[p.rule.name] = RuleConstructor;
 };
@@ -222,6 +527,7 @@ coffeelint.getRules = function() {
   return output;
 };
 
+// These all need to be explicitly listed so they get picked up by browserify.
 coffeelint.registerRule(require('./rules/arrow_spacing.coffee'));
 
 coffeelint.registerRule(require('./rules/braces_spacing.coffee'));
@@ -298,9 +604,11 @@ coffeelint.registerRule(require('./rules/no_private_function_fat_arrows.coffee')
 
 hasSyntaxError = function(source) {
   try {
+    // If there are syntax errors this will abort the lexical and line
+    // linters.
     CoffeeScript.tokens(source);
     return false;
-  } catch (_error) {}
+  } catch (error) {}
   return true;
 };
 
@@ -310,14 +618,20 @@ coffeelint.getErrorReport = function() {
   return new ErrorReport(coffeelint);
 };
 
-coffeelint.lint = function(source, userConfig, literate) {
+// Check the source against the given configuration and return an array
+// of any errors found. An error is an object with the following
+// properties:
+
+//   {
+//       rule :      'Name of the violated rule',
+//       lineNumber: 'Number of the line that caused the violation',
+//       level:      'The error level of the violated rule',
+//       message:    'Information about the violated rule',
+//       context:    'Optional details about why the rule was violated'
+//   }
+
+coffeelint.lint = function(source, userConfig = {}, literate = false) {
   var allErrors, astErrors, cmd, config, disabled, disabledEntirely, disabledInitially, disabledLine, e, errors, i, inlineConfig, j, l, len, len1, lexErrors, lexicalLinter, lineErrors, lineLinter, m, n, name, nextLine, o, ref, ref1, ref2, ref3, ref4, ref5, ref6, ref7, ref8, regex, rule, ruleLoader, rules, set, sourceLength, tokensByLine, transform;
-  if (userConfig == null) {
-    userConfig = {};
-  }
-  if (literate == null) {
-    literate = false;
-  }
   errors = [];
   if (cache != null) {
     cache.setConfig(userConfig);
@@ -338,47 +652,68 @@ coffeelint.lint = function(source, userConfig, literate) {
         ruleLoader = nodeRequire('./ruleLoader');
         transform = ruleLoader.require(m);
         source = transform(source);
-      } catch (_error) {}
+      } catch (error) {}
     }
+    // NOTE: This can have false negatives. For example if your transformer
+    // changes one line into two early in the file and later condenses two
+    // into one you'll end up with the same length and not get the warning
+    // even though everything in between will be off by one.
     if (sourceLength !== source.split('\n').length && config.transform_messes_up_line_numbers.level !== 'ignore') {
       errors.push(extend({
         lineNumber: 1,
-        context: "File was transformed from " + sourceLength + " lines to " + (source.split("\n").length) + " lines"
+        context: `File was transformed from ${sourceLength} lines to ${(source.split("\n").length)} lines`
       }, config.transform_messes_up_line_numbers));
     }
   }
   if ((userConfig != null ? (ref3 = userConfig.coffeelint) != null ? ref3.coffeescript : void 0 : void 0) != null) {
     CoffeeScript = ruleLoader.require(userConfig.coffeelint.coffeescript);
   }
+// coffeescript_error is unique because it's embedded in the ASTLinter. It
+// indicates a syntax error and would not work well as a stand alone rule.
+
+// Why can't JSON just support comments?
   for (name in userConfig) {
     if (name !== 'coffeescript_error' && name !== '_comment') {
       if (_rules[name] == null) {
+        // TODO: Figure out a good way to notify the user that they have
+        // configured a rule that doesn't exist. throwing an Error was
+        // definitely a mistake. I probably need a good way to generate lint
+        // warnings for configuration.
         void 0;
       }
     }
   }
+  // disabledInitially is to prevent the rule from becoming active before
+  // the actual inlined comment appears
   disabledInitially = [];
   ref4 = source.split('\n');
+  // Check ahead for inline enabled rules
   for (n = 0, len1 = ref4.length; n < len1; n++) {
     l = ref4[n];
-    ref5 = LineLinter.getDirective(l) || [], regex = ref5[0], set = ref5[1], rule = ref5[ref5.length - 1];
+    ref5 = LineLinter.getDirective(l) || [], [regex, set] = ref5, [rule] = slice.call(ref5, -1);
     if ((set === 'enable' || set === 'enable-line') && ((ref6 = config[rule]) != null ? ref6.level : void 0) === 'ignore') {
       disabledInitially.push(rule);
       config[rule].level = 'error';
     }
   }
+  // Do AST linting first so all compile errors are caught.
   astErrors = new ASTLinter(source, config, _rules, CoffeeScript).lint();
   errors = errors.concat(astErrors);
+  // only do further checks if the syntax is okay, otherwise they just fail
+  // with syntax error exceptions
   if (!hasSyntaxError(source)) {
+    // Do lexical linting.
     lexicalLinter = new LexicalLinter(source, config, _rules, CoffeeScript);
     lexErrors = lexicalLinter.lint();
     errors = errors.concat(lexErrors);
+    // Do line linting.
     tokensByLine = lexicalLinter.tokensByLine;
     lineLinter = new LineLinter(source, config, _rules, tokensByLine, literate);
     lineErrors = lineLinter.lint();
     errors = errors.concat(lineErrors);
     inlineConfig = lineLinter.inlineConfig;
   } else {
+    // default this so it knows what to do
     inlineConfig = {
       enable: {},
       disable: {},
@@ -386,16 +721,18 @@ coffeelint.lint = function(source, userConfig, literate) {
       'disable-line': {}
     };
   }
+  // Sort by line number and return.
   errors.sort(function(a, b) {
     return a.lineNumber - b.lineNumber;
   });
+  // Create a list of all errors
   disabledEntirely = (function() {
     var len2, map, o, ref7, result;
     result = [];
     map = {};
     ref7 = errors || [];
     for (o = 0, len2 = ref7.length; o < len2; o++) {
-      name = ref7[o].name;
+      ({name} = ref7[o]);
       if (!map[name]) {
         result.push(name);
         map[name] = true;
@@ -403,11 +740,12 @@ coffeelint.lint = function(source, userConfig, literate) {
     }
     return result;
   })();
+  // Disable/enable rules for inline blocks
   allErrors = errors;
   errors = [];
   disabled = disabledInitially;
   nextLine = 0;
-  for (i = o = 0, ref7 = source.split('\n').length; 0 <= ref7 ? o < ref7 : o > ref7; i = 0 <= ref7 ? ++o : --o) {
+  for (i = o = 0, ref7 = source.split('\n').length; (0 <= ref7 ? o < ref7 : o > ref7); i = 0 <= ref7 ? ++o : --o) {
     disabledLine = disabled;
     for (cmd in inlineConfig) {
       rules = inlineConfig[cmd][i];
@@ -446,6 +784,7 @@ coffeelint.lint = function(source, userConfig, literate) {
         })[cmd]();
       }
     }
+    // advance line and append relevant messages
     while (nextLine === i && allErrors.length > 0) {
       nextLine = allErrors[0].lineNumber - 1;
       e = allErrors[0];
@@ -468,301 +807,21 @@ coffeelint.setCache = function(obj) {
 };
 
 
-
-},{"./../package.json":2,"./ast_linter.coffee":3,"./error_report.coffee":5,"./lexical_linter.coffee":6,"./line_linter.coffee":7,"./rules.coffee":8,"./rules/arrow_spacing.coffee":9,"./rules/braces_spacing.coffee":10,"./rules/camel_case_classes.coffee":11,"./rules/colon_assignment_spacing.coffee":12,"./rules/cyclomatic_complexity.coffee":13,"./rules/duplicate_key.coffee":14,"./rules/empty_constructor_needs_parens.coffee":15,"./rules/ensure_comprehensions.coffee":16,"./rules/eol_last.coffee":17,"./rules/indentation.coffee":18,"./rules/line_endings.coffee":19,"./rules/max_line_length.coffee":20,"./rules/missing_fat_arrows.coffee":21,"./rules/newlines_after_classes.coffee":22,"./rules/no_backticks.coffee":23,"./rules/no_debugger.coffee":24,"./rules/no_empty_functions.coffee":25,"./rules/no_empty_param_list.coffee":26,"./rules/no_implicit_braces.coffee":27,"./rules/no_implicit_parens.coffee":28,"./rules/no_interpolation_in_single_quotes.coffee":29,"./rules/no_nested_string_interpolation.coffee":30,"./rules/no_plusplus.coffee":31,"./rules/no_private_function_fat_arrows.coffee":32,"./rules/no_stand_alone_at.coffee":33,"./rules/no_tabs.coffee":34,"./rules/no_this.coffee":35,"./rules/no_throwing_strings.coffee":36,"./rules/no_trailing_semicolons.coffee":37,"./rules/no_trailing_whitespace.coffee":38,"./rules/no_unnecessary_double_quotes.coffee":39,"./rules/no_unnecessary_fat_arrows.coffee":40,"./rules/non_empty_constructor_needs_parens.coffee":41,"./rules/prefer_english_operator.coffee":42,"./rules/space_operators.coffee":43,"./rules/spacing_after_comma.coffee":44,"./rules/transform_messes_up_line_numbers.coffee":45}],2:[function(require,module,exports){
-module.exports={
-  "name": "coffeelint",
-  "description": "Lint your CoffeeScript",
-  "version": "1.15.0",
-  "homepage": "http://www.coffeelint.org",
-  "keywords": [
-    "lint",
-    "coffeescript",
-    "coffee-script"
-  ],
-  "author": "Matthew Perpick <clutchski@gmail.com>",
-  "main": "./lib/coffeelint.js",
-  "engines": {
-    "npm": ">=1.3.7",
-    "node": ">=0.8.0"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git://github.com/clutchski/coffeelint.git"
-  },
-  "bin": {
-    "coffeelint": "./bin/coffeelint"
-  },
-  "dependencies": {
-    "browserify": "~8.1.0",
-    "coffee-script": "^1.9.1",
-    "coffeeify": "~1.0.0",
-    "glob": "^4.0.0",
-    "ignore": "^2.2.15",
-    "optimist": "^0.6.1",
-    "resolve": "^0.6.3",
-    "strip-json-comments": "^1.0.2"
-  },
-  "devDependencies": {
-    "vows": ">=0.6.0",
-    "underscore": ">=1.4.4"
-  },
-  "license": "MIT",
-  "scripts": {
-    "pretest": "cake compile",
-    "test": "./vowsrunner.js --spec test/*.coffee test/*.litcoffee",
-    "testrule": "npm run compile && ./vowsrunner.js --spec",
-    "posttest": "npm run lint",
-    "prepublish": "cake prepublish",
-    "postpublish": "cake postpublish",
-    "publish": "cake publish",
-    "install": "cake install",
-    "lint": "cake compile && ./bin/coffeelint .",
-    "lint-csv": "cake compile && ./bin/coffeelint --csv .",
-    "lint-jslint": "cake compile && ./bin/coffeelint --jslint .",
-    "compile": "cake compile"
-  }
-}
-
-},{}],3:[function(require,module,exports){
-var ASTApi, ASTLinter, BaseLinter, hasChildren, node_children,
-  hasProp = {}.hasOwnProperty,
-  extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
-
-BaseLinter = require('./base_linter.coffee');
-
-node_children = {
-  Class: ['variable', 'parent', 'body'],
-  Code: ['params', 'body'],
-  For: ['body', 'source', 'guard', 'step'],
-  If: ['condition', 'body', 'elseBody'],
-  Obj: ['properties'],
-  Op: ['first', 'second'],
-  Switch: ['subject', 'cases', 'otherwise'],
-  Try: ['attempt', 'recovery', 'ensure'],
-  Value: ['base', 'properties'],
-  While: ['condition', 'guard', 'body']
-};
-
-hasChildren = function(node, children) {
-  var ref;
-  return (node != null ? (ref = node.children) != null ? ref.length : void 0 : void 0) === children.length && (node != null ? node.children.every(function(elem, i) {
-    return elem === children[i];
-  }) : void 0);
-};
-
-ASTApi = (function() {
-  function ASTApi(config1) {
-    this.config = config1;
-  }
-
-  ASTApi.prototype.getNodeName = function(node) {
-    var children, name, ref;
-    name = node != null ? (ref = node.constructor) != null ? ref.name : void 0 : void 0;
-    if (node_children[name]) {
-      return name;
-    } else {
-      for (name in node_children) {
-        if (!hasProp.call(node_children, name)) continue;
-        children = node_children[name];
-        if (hasChildren(node, children)) {
-          return name;
-        }
-      }
-    }
-  };
-
-  return ASTApi;
-
-})();
-
-module.exports = ASTLinter = (function(superClass) {
-  extend(ASTLinter, superClass);
-
-  function ASTLinter(source, config, rules, CoffeeScript) {
-    this.CoffeeScript = CoffeeScript;
-    ASTLinter.__super__.constructor.call(this, source, config, rules);
-    this.astApi = new ASTApi(this.config);
-  }
-
-  ASTLinter.prototype.acceptRule = function(rule) {
-    return typeof rule.lintAST === 'function';
-  };
-
-  ASTLinter.prototype.lint = function() {
-    var coffeeError, err, errors, j, len, ref, rule, v;
-    errors = [];
-    try {
-      this.node = this.CoffeeScript.nodes(this.source);
-    } catch (_error) {
-      coffeeError = _error;
-      err = this._parseCoffeeScriptError(coffeeError);
-      if (err != null) {
-        errors.push(err);
-      }
-      return errors;
-    }
-    ref = this.rules;
-    for (j = 0, len = ref.length; j < len; j++) {
-      rule = ref[j];
-      this.astApi.createError = (function(_this) {
-        return function(attrs) {
-          if (attrs == null) {
-            attrs = {};
-          }
-          return _this.createError(rule.rule.name, attrs);
-        };
-      })(this);
-      rule.errors = errors;
-      v = this.normalizeResult(rule, rule.lintAST(this.node, this.astApi));
-      if (v != null) {
-        return v;
-      }
-    }
-    return errors;
-  };
-
-  ASTLinter.prototype._parseCoffeeScriptError = function(coffeeError) {
-    var attrs, lineNumber, match, message, rule;
-    rule = this.config['coffeescript_error'];
-    message = coffeeError.toString();
-    lineNumber = -1;
-    if (coffeeError.location != null) {
-      lineNumber = coffeeError.location.first_line + 1;
-    } else {
-      match = /line (\d+)/.exec(message);
-      if ((match != null ? match.length : void 0) > 1) {
-        lineNumber = parseInt(match[1], 10);
-      }
-    }
-    attrs = {
-      message: message,
-      level: rule.level,
-      lineNumber: lineNumber
-    };
-    return this.createError('coffeescript_error', attrs);
-  };
-
-  return ASTLinter;
-
-})(BaseLinter);
-
-
-
-},{"./base_linter.coffee":4}],4:[function(require,module,exports){
-var BaseLinter, defaults, extend,
-  slice = [].slice;
-
-extend = function() {
-  var destination, i, k, len, source, sources, v;
-  destination = arguments[0], sources = 2 <= arguments.length ? slice.call(arguments, 1) : [];
-  for (i = 0, len = sources.length; i < len; i++) {
-    source = sources[i];
-    for (k in source) {
-      v = source[k];
-      destination[k] = v;
-    }
-  }
-  return destination;
-};
-
-defaults = function(source, defaults) {
-  return extend({}, defaults, source);
-};
-
-module.exports = BaseLinter = (function() {
-  function BaseLinter(source1, config, rules) {
-    this.source = source1;
-    this.config = config;
-    this.setupRules(rules);
-  }
-
-  BaseLinter.prototype.isObject = function(obj) {
-    return obj === Object(obj);
-  };
-
-  BaseLinter.prototype.createError = function(ruleName, attrs) {
-    var level;
-    if (attrs == null) {
-      attrs = {};
-    }
-    if (attrs.level == null) {
-      attrs.level = this.config[ruleName].level;
-    }
-    level = attrs.level;
-    if (level !== 'ignore' && level !== 'warn' && level !== 'error') {
-      throw new Error("unknown level " + level + " for rule: " + ruleName);
-    }
-    if (level === 'error' || level === 'warn') {
-      attrs.rule = ruleName;
-      return defaults(attrs, this.config[ruleName]);
-    } else {
-      return null;
-    }
-  };
-
-  BaseLinter.prototype.acceptRule = function(rule) {
-    throw new Error('acceptRule needs to be overridden in the subclass');
-  };
-
-  BaseLinter.prototype.setupRules = function(rules) {
-    var RuleConstructor, level, name, results, rule;
-    this.rules = [];
-    results = [];
-    for (name in rules) {
-      RuleConstructor = rules[name];
-      level = this.config[name].level;
-      if (level === 'error' || level === 'warn') {
-        rule = new RuleConstructor(this, this.config);
-        if (this.acceptRule(rule)) {
-          results.push(this.rules.push(rule));
-        } else {
-          results.push(void 0);
-        }
-      } else if (level !== 'ignore') {
-        throw new Error("unknown level " + level + " for rule: " + rule);
-      } else {
-        results.push(void 0);
-      }
-    }
-    return results;
-  };
-
-  BaseLinter.prototype.normalizeResult = function(p, result) {
-    if (result === true) {
-      return this.createError(p.rule.name);
-    }
-    if (this.isObject(result)) {
-      return this.createError(p.rule.name, result);
-    }
-  };
-
-  return BaseLinter;
-
-})();
-
-
-
-},{}],5:[function(require,module,exports){
+},{"./../package.json":1,"./ast_linter.coffee":2,"./error_report.coffee":5,"./lexical_linter.coffee":6,"./line_linter.coffee":7,"./rules.coffee":8,"./rules/arrow_spacing.coffee":9,"./rules/braces_spacing.coffee":10,"./rules/camel_case_classes.coffee":11,"./rules/colon_assignment_spacing.coffee":12,"./rules/cyclomatic_complexity.coffee":13,"./rules/duplicate_key.coffee":14,"./rules/empty_constructor_needs_parens.coffee":15,"./rules/ensure_comprehensions.coffee":16,"./rules/eol_last.coffee":17,"./rules/indentation.coffee":18,"./rules/line_endings.coffee":19,"./rules/max_line_length.coffee":20,"./rules/missing_fat_arrows.coffee":21,"./rules/newlines_after_classes.coffee":22,"./rules/no_backticks.coffee":23,"./rules/no_debugger.coffee":24,"./rules/no_empty_functions.coffee":25,"./rules/no_empty_param_list.coffee":26,"./rules/no_implicit_braces.coffee":27,"./rules/no_implicit_parens.coffee":28,"./rules/no_interpolation_in_single_quotes.coffee":29,"./rules/no_nested_string_interpolation.coffee":30,"./rules/no_plusplus.coffee":31,"./rules/no_private_function_fat_arrows.coffee":32,"./rules/no_stand_alone_at.coffee":33,"./rules/no_tabs.coffee":34,"./rules/no_this.coffee":35,"./rules/no_throwing_strings.coffee":36,"./rules/no_trailing_semicolons.coffee":37,"./rules/no_trailing_whitespace.coffee":38,"./rules/no_unnecessary_double_quotes.coffee":39,"./rules/no_unnecessary_fat_arrows.coffee":40,"./rules/non_empty_constructor_needs_parens.coffee":41,"./rules/prefer_english_operator.coffee":42,"./rules/space_operators.coffee":43,"./rules/spacing_after_comma.coffee":44,"./rules/transform_messes_up_line_numbers.coffee":45}],5:[function(require,module,exports){
+// A summary of errors in a CoffeeLint run.
 var ErrorReport;
 
-module.exports = ErrorReport = (function() {
-  function ErrorReport(coffeelint) {
+module.exports = ErrorReport = class ErrorReport {
+  constructor(coffeelint) {
     this.coffeelint = coffeelint;
     this.paths = {};
   }
 
-  ErrorReport.prototype.lint = function(filename, source, config, literate) {
-    if (config == null) {
-      config = {};
-    }
-    if (literate == null) {
-      literate = false;
-    }
+  lint(filename, source, config = {}, literate = false) {
     return this.paths[filename] = this.coffeelint.lint(source, config, literate);
-  };
+  }
 
-  ErrorReport.prototype.getExitCode = function() {
+  getExitCode() {
     var path;
     for (path in this.paths) {
       if (this.pathHasError(path)) {
@@ -770,9 +829,9 @@ module.exports = ErrorReport = (function() {
       }
     }
     return 0;
-  };
+  }
 
-  ErrorReport.prototype.getSummary = function() {
+  getSummary() {
     var error, errorCount, errors, i, len, path, pathCount, ref, warningCount;
     pathCount = errorCount = warningCount = 0;
     ref = this.paths;
@@ -789,26 +848,22 @@ module.exports = ErrorReport = (function() {
         }
       }
     }
-    return {
-      errorCount: errorCount,
-      warningCount: warningCount,
-      pathCount: pathCount
-    };
-  };
+    return {errorCount, warningCount, pathCount};
+  }
 
-  ErrorReport.prototype.getErrors = function(path) {
+  getErrors(path) {
     return this.paths[path];
-  };
+  }
 
-  ErrorReport.prototype.pathHasWarning = function(path) {
+  pathHasWarning(path) {
     return this._hasLevel(path, 'warn');
-  };
+  }
 
-  ErrorReport.prototype.pathHasError = function(path) {
+  pathHasError(path) {
     return this._hasLevel(path, 'error');
-  };
+  }
 
-  ErrorReport.prototype.hasError = function() {
+  hasError() {
     var path;
     for (path in this.paths) {
       if (this.pathHasError(path)) {
@@ -816,9 +871,9 @@ module.exports = ErrorReport = (function() {
       }
     }
     return false;
-  };
+  }
 
-  ErrorReport.prototype._hasLevel = function(path, level) {
+  _hasLevel(path, level) {
     var error, i, len, ref;
     ref = this.paths[path];
     for (i = 0, len = ref.length; i < len; i++) {
@@ -828,58 +883,59 @@ module.exports = ErrorReport = (function() {
       }
     }
     return false;
-  };
+  }
 
-  return ErrorReport;
-
-})();
-
+};
 
 
 },{}],6:[function(require,module,exports){
 var BaseLinter, LexicalLinter, TokenApi,
-  extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
-  hasProp = {}.hasOwnProperty,
-  indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
+  indexOf = [].indexOf;
 
 TokenApi = (function() {
-  function TokenApi(CoffeeScript, source, config1, tokensByLine) {
-    this.config = config1;
-    this.tokensByLine = tokensByLine;
-    this.tokens = CoffeeScript.tokens(source);
-    this.lines = source.split('\n');
-    this.tokensByLine = {};
-  }
-
-  TokenApi.prototype.i = 0;
-
-  TokenApi.prototype.peek = function(n) {
-    if (n == null) {
-      n = 1;
+  class TokenApi {
+    constructor(CoffeeScript, source, config1, tokensByLine) {
+      this.config = config1;
+      this.tokensByLine = tokensByLine;
+      this.tokens = CoffeeScript.tokens(source);
+      this.lines = source.split('\n');
+      this.tokensByLine = {}; // A map of tokens by line.
     }
-    return this.tokens[this.i + n] || null;
+
+
+    // Return the token n places away from the current token.
+    peek(n = 1) {
+      return this.tokens[this.i + n] || null;
+    }
+
   };
+
+  TokenApi.prototype.i = 0; // The index of the current token we're linting.
 
   return TokenApi;
 
-})();
+}).call(this);
 
 BaseLinter = require('./base_linter.coffee');
 
-module.exports = LexicalLinter = (function(superClass) {
-  extend(LexicalLinter, superClass);
 
-  function LexicalLinter(source, config, rules, CoffeeScript) {
-    LexicalLinter.__super__.constructor.call(this, source, config, rules);
+// A class that performs checks on the output of CoffeeScript's lexer.
+
+module.exports = LexicalLinter = class LexicalLinter extends BaseLinter {
+  constructor(source, config, rules, CoffeeScript) {
+    super(source, config, rules);
     this.tokenApi = new TokenApi(CoffeeScript, source, this.config, this.tokensByLine);
+    // This needs to be available on the LexicalLinter so it can be passed
+    // to the LineLinter when this finishes running.
     this.tokensByLine = this.tokenApi.tokensByLine;
   }
 
-  LexicalLinter.prototype.acceptRule = function(rule) {
+  acceptRule(rule) {
     return typeof rule.lintToken === 'function';
-  };
+  }
 
-  LexicalLinter.prototype.lint = function() {
+  // Return a list of errors encountered in the given source.
+  lint() {
     var error, errors, i, j, k, len, len1, ref, ref1, token;
     errors = [];
     ref = this.tokenApi.tokens;
@@ -893,22 +949,34 @@ module.exports = LexicalLinter = (function(superClass) {
       }
     }
     return errors;
-  };
+  }
 
-  LexicalLinter.prototype.lintToken = function(token) {
-    var base, errors, j, len, lineNumber, ref, ref1, ref2, rule, type, v, value;
-    type = token[0], value = token[1], (ref = token[2], lineNumber = ref.first_line);
+  // Return an error if the given token fails a lint check, false otherwise.
+  lintToken(token) {
+    var base, errors, j, len, lineNumber, ref, ref1, rule, type, v, value;
+    [
+      type,
+      value,
+      {
+        first_line: lineNumber
+      }
+    ] = token;
     if ((base = this.tokensByLine)[lineNumber] == null) {
       base[lineNumber] = [];
     }
     this.tokensByLine[lineNumber].push(token);
+    // CoffeeScript loses line numbers of interpolations and multi-line
+    // regexes, so fake it by using the last line number we know.
     this.lineNumber = lineNumber || this.lineNumber || 0;
     this.tokenApi.lineNumber = this.lineNumber;
+    // Multiple rules might run against the same token to build context.
+    // Every rule should run even if something has already produced an
+    // error for the same token.
     errors = [];
-    ref1 = this.rules;
-    for (j = 0, len = ref1.length; j < len; j++) {
-      rule = ref1[j];
-      if (!(ref2 = token[0], indexOf.call(rule.tokens, ref2) >= 0)) {
+    ref = this.rules;
+    for (j = 0, len = ref.length; j < len; j++) {
+      rule = ref[j];
+      if (!(ref1 = token[0], indexOf.call(rule.tokens, ref1) >= 0)) {
         continue;
       }
       v = this.normalizeResult(rule, rule.lintToken(token, this.tokenApi));
@@ -917,145 +985,144 @@ module.exports = LexicalLinter = (function(superClass) {
       }
     }
     return errors;
-  };
+  }
 
-  LexicalLinter.prototype.createError = function(ruleName, attrs) {
-    if (attrs == null) {
-      attrs = {};
-    }
+  createError(ruleName, attrs = {}) {
     if (attrs.lineNumber == null) {
       attrs.lineNumber = this.lineNumber;
     }
     attrs.lineNumber += 1;
     attrs.line = this.tokenApi.lines[attrs.lineNumber - 1];
-    return LexicalLinter.__super__.createError.call(this, ruleName, attrs);
-  };
+    return super.createError(ruleName, attrs);
+  }
 
-  return LexicalLinter;
-
-})(BaseLinter);
+};
 
 
-
-},{"./base_linter.coffee":4}],7:[function(require,module,exports){
-var BaseLinter, LineApi, LineLinter, configShortcuts, configStatement,
-  extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
-  hasProp = {}.hasOwnProperty;
+},{"./base_linter.coffee":3}],7:[function(require,module,exports){
+var BaseLinter, LineApi, LineLinter, configShortcuts, configStatement;
 
 LineApi = (function() {
-  function LineApi(source, config1, tokensByLine1, literate1) {
-    this.config = config1;
-    this.tokensByLine = tokensByLine1;
-    this.literate = literate1;
-    this.line = null;
-    this.lines = source.split('\n');
-    this.lineCount = this.lines.length;
-    this.context = {
-      "class": {
-        inClass: false,
-        lastUnemptyLineInClass: null,
-        classIndents: null
+  class LineApi {
+    constructor(source, config1, tokensByLine1, literate1) {
+      this.config = config1;
+      this.tokensByLine = tokensByLine1;
+      this.literate = literate1;
+      this.line = null;
+      this.lines = source.split('\n');
+      this.lineCount = this.lines.length;
+      // maintains some contextual information
+      //   inClass: bool; in class or not
+      //   lastUnemptyLineInClass: null or lineNumber, if the last not-empty
+      //                     line was in a class it holds its number
+      //   classIndents: the number of indents within a class
+      this.context = {
+        class: {
+          inClass: false,
+          lastUnemptyLineInClass: null,
+          classIndents: null
+        }
+      };
+    }
+
+    isLiterate() {
+      return this.literate;
+    }
+
+    // maintain the contextual information for class-related stuff
+    maintainClassContext(line) {
+      if (this.context.class.inClass) {
+        if (this.lineHasToken('INDENT')) {
+          this.context.class.classIndents++;
+        } else if (this.lineHasToken('OUTDENT')) {
+          this.context.class.classIndents--;
+          if (this.context.class.classIndents === 0) {
+            this.context.class.inClass = false;
+            this.context.class.classIndents = null;
+          }
+        }
+        if (!line.match(/^\s*$/)) {
+          this.context.class.lastUnemptyLineInClass = this.lineNumber;
+        }
+      } else {
+        if (!line.match(/\\s*/)) {
+          this.context.class.lastUnemptyLineInClass = null;
+        }
+        if (this.lineHasToken('CLASS')) {
+          this.context.class.inClass = true;
+          this.context.class.lastUnemptyLineInClass = this.lineNumber;
+          this.context.class.classIndents = 0;
+        }
       }
-    };
-  }
+      return null;
+    }
+
+    isLastLine() {
+      return this.lineNumber === this.lineCount - 1;
+    }
+
+    // Return true if the given line actually has tokens.
+    // Optional parameter to check for a specific token type and line number.
+    lineHasToken(tokenType = null, lineNumber = null) {
+      var i, len, token, tokens;
+      lineNumber = lineNumber != null ? lineNumber : this.lineNumber;
+      if (tokenType == null) {
+        return this.tokensByLine[lineNumber] != null;
+      } else {
+        tokens = this.tokensByLine[lineNumber];
+        if (tokens == null) {
+          return null;
+        }
+        for (i = 0, len = tokens.length; i < len; i++) {
+          token = tokens[i];
+          if (token[0] === tokenType) {
+            return true;
+          }
+        }
+        return false;
+      }
+    }
+
+    // Return tokens for the given line number.
+    getLineTokens() {
+      return this.tokensByLine[this.lineNumber] || [];
+    }
+
+  };
 
   LineApi.prototype.lineNumber = 0;
 
-  LineApi.prototype.isLiterate = function() {
-    return this.literate;
-  };
-
-  LineApi.prototype.maintainClassContext = function(line) {
-    if (this.context["class"].inClass) {
-      if (this.lineHasToken('INDENT')) {
-        this.context["class"].classIndents++;
-      } else if (this.lineHasToken('OUTDENT')) {
-        this.context["class"].classIndents--;
-        if (this.context["class"].classIndents === 0) {
-          this.context["class"].inClass = false;
-          this.context["class"].classIndents = null;
-        }
-      }
-      if (!line.match(/^\s*$/)) {
-        this.context["class"].lastUnemptyLineInClass = this.lineNumber;
-      }
-    } else {
-      if (!line.match(/\\s*/)) {
-        this.context["class"].lastUnemptyLineInClass = null;
-      }
-      if (this.lineHasToken('CLASS')) {
-        this.context["class"].inClass = true;
-        this.context["class"].lastUnemptyLineInClass = this.lineNumber;
-        this.context["class"].classIndents = 0;
-      }
-    }
-    return null;
-  };
-
-  LineApi.prototype.isLastLine = function() {
-    return this.lineNumber === this.lineCount - 1;
-  };
-
-  LineApi.prototype.lineHasToken = function(tokenType, lineNumber) {
-    var i, len, token, tokens;
-    if (tokenType == null) {
-      tokenType = null;
-    }
-    if (lineNumber == null) {
-      lineNumber = null;
-    }
-    lineNumber = lineNumber != null ? lineNumber : this.lineNumber;
-    if (tokenType == null) {
-      return this.tokensByLine[lineNumber] != null;
-    } else {
-      tokens = this.tokensByLine[lineNumber];
-      if (tokens == null) {
-        return null;
-      }
-      for (i = 0, len = tokens.length; i < len; i++) {
-        token = tokens[i];
-        if (token[0] === tokenType) {
-          return true;
-        }
-      }
-      return false;
-    }
-  };
-
-  LineApi.prototype.getLineTokens = function() {
-    return this.tokensByLine[this.lineNumber] || [];
-  };
-
   return LineApi;
 
-})();
+}).call(this);
 
 BaseLinter = require('./base_linter.coffee');
 
+// Some repeatedly used regular expressions.
 configStatement = /coffeelint:\s*((disable|enable)(-line)?)(?:=([\w\s,]*))?/;
 
+// TODO: make this user (and / or api) configurable
 configShortcuts = [[/\#.*noqa/, 'coffeelint: disable-line']];
 
-module.exports = LineLinter = (function(superClass) {
-  extend(LineLinter, superClass);
 
-  LineLinter.getDirective = function(line) {
-    var i, len, ref, replacement, shortcut;
+// A class that performs regex checks on each line of the source.
+
+module.exports = LineLinter = class LineLinter extends BaseLinter {
+  static getDirective(line) {
+    var i, len, replacement, shortcut;
     for (i = 0, len = configShortcuts.length; i < len; i++) {
-      ref = configShortcuts[i], shortcut = ref[0], replacement = ref[1];
+      [shortcut, replacement] = configShortcuts[i];
       if (line.match(shortcut)) {
         return configStatement.exec(replacement);
       }
     }
     return configStatement.exec(line);
-  };
+  }
 
-  function LineLinter(source, config, rules, tokensByLine, literate) {
-    if (literate == null) {
-      literate = false;
-    }
-    LineLinter.__super__.constructor.call(this, source, config, rules);
+  constructor(source, config, rules, tokensByLine, literate = false) {
+    super(source, config, rules);
     this.lineApi = new LineApi(source, config, tokensByLine, literate);
+    // Store suppressions in the form of { line #: type }
     this.inlineConfig = {
       enable: {},
       disable: {},
@@ -1064,11 +1131,11 @@ module.exports = LineLinter = (function(superClass) {
     };
   }
 
-  LineLinter.prototype.acceptRule = function(rule) {
+  acceptRule(rule) {
     return typeof rule.lintLine === 'function';
-  };
+  }
 
-  LineLinter.prototype.lint = function() {
+  lint() {
     var error, errors, i, j, len, len1, line, lineNumber, ref, ref1;
     errors = [];
     ref = this.lineApi.lines;
@@ -1085,10 +1152,14 @@ module.exports = LineLinter = (function(superClass) {
       }
     }
     return errors;
-  };
+  }
 
-  LineLinter.prototype.lintLine = function(line) {
+  // Return an error if the line contained failed a rule, null otherwise.
+  lintLine(line) {
     var errors, i, len, ref, rule, v;
+    // Multiple rules might run against the same line to build context.
+    // Every every rule should run even if something has already produced an
+    // error for the same token.
     errors = [];
     ref = this.rules;
     for (i = 0, len = ref.length; i < len; i++) {
@@ -1099,10 +1170,11 @@ module.exports = LineLinter = (function(superClass) {
       }
     }
     return errors;
-  };
+  }
 
-  LineLinter.prototype.collectInlineConfig = function(line) {
+  collectInlineConfig(line) {
     var cmd, i, len, r, ref, result, rules;
+    // Check for block config statements enable and disable
     result = this.constructor.getDirective(line);
     if (result != null) {
       cmd = result[1];
@@ -1117,25 +1189,20 @@ module.exports = LineLinter = (function(superClass) {
       this.inlineConfig[cmd][this.lineNumber] = rules;
     }
     return null;
-  };
+  }
 
-  LineLinter.prototype.createError = function(rule, attrs) {
+  createError(rule, attrs = {}) {
     var ref;
-    if (attrs == null) {
-      attrs = {};
-    }
-    attrs.lineNumber = this.lineNumber + 1;
+    attrs.lineNumber = this.lineNumber + 1; // Lines are indexed by zero.
     attrs.level = (ref = this.config[rule]) != null ? ref.level : void 0;
-    return LineLinter.__super__.createError.call(this, rule, attrs);
-  };
+    return super.createError(rule, attrs);
+  }
 
-  return LineLinter;
-
-})(BaseLinter);
+};
 
 
-
-},{"./base_linter.coffee":4}],8:[function(require,module,exports){
+},{"./base_linter.coffee":3}],8:[function(require,module,exports){
+// CoffeeLint error levels.
 var ERROR, IGNORE, WARN;
 
 ERROR = 'error';
@@ -1144,20 +1211,54 @@ WARN = 'warn';
 
 IGNORE = 'ignore';
 
+// CoffeeLint's default rule configuration.
 module.exports = {
   coffeescript_error: {
     level: ERROR,
-    message: ''
+    message: '' // The default coffeescript error is fine.
   }
 };
-
 
 
 },{}],9:[function(require,module,exports){
 var ArrowSpacing;
 
 module.exports = ArrowSpacing = (function() {
-  function ArrowSpacing() {}
+  class ArrowSpacing {
+    lintToken(token, tokenApi) {
+      var pp;
+      // Throw error unless the following happens.
+
+      // We will take a look at the previous token to see
+      // 1. That the token is properly spaced
+      // 2. Wasn't generated by the CoffeeScript compiler
+      // 3. That it is just indentation
+      // 4. If the function declaration has no parameters
+      // e.g. x(-> 3)
+      //      x( -> 3)
+
+      // or a statement is wrapped in parentheses
+      // e.g. (-> true)()
+
+      // we will accept either having a space or not having a space there.
+
+      // Also if the -> is the beginning of the file, then simply just return
+      pp = tokenApi.peek(-1);
+      if (!pp) {
+        return;
+      }
+      // Ignore empty functions
+      if (!token.spaced && tokenApi.peek(1)[0] === 'INDENT' && tokenApi.peek(2)[0] === 'OUTDENT') {
+        return null;
+      // Throw error unless the previous token...
+      } else if (!(((token.spaced != null) || (token.newLine != null)) && (((pp.spaced != null) || pp[0] === 'TERMINATOR') || (pp.generated != null) || pp[0] === 'INDENT' || (pp[1] === '(' && (pp.generated == null))))) { //4
+        return true;
+      } else {
+        return null;
+      }
+    }
+
+  };
 
   ArrowSpacing.prototype.rule = {
     name: 'arrow_spacing',
@@ -1168,32 +1269,73 @@ module.exports = ArrowSpacing = (function() {
 
   ArrowSpacing.prototype.tokens = ['->', '=>'];
 
-  ArrowSpacing.prototype.lintToken = function(token, tokenApi) {
-    var pp;
-    pp = tokenApi.peek(-1);
-    if (!pp) {
-      return;
-    }
-    if (!token.spaced && tokenApi.peek(1)[0] === 'INDENT' && tokenApi.peek(2)[0] === 'OUTDENT') {
-      return null;
-    } else if (!(((token.spaced != null) || (token.newLine != null)) && (((pp.spaced != null) || pp[0] === 'TERMINATOR') || (pp.generated != null) || pp[0] === 'INDENT' || (pp[1] === '(' && (pp.generated == null))))) {
-      return true;
-    } else {
-      return null;
-    }
-  };
-
   return ArrowSpacing;
 
-})();
-
+}).call(this);
 
 
 },{}],10:[function(require,module,exports){
 var BracesSpacing;
 
 module.exports = BracesSpacing = (function() {
-  function BracesSpacing() {}
+  class BracesSpacing {
+    distanceBetweenTokens(firstToken, secondToken) {
+      return secondToken[2].first_column - firstToken[2].last_column - 1;
+    }
+
+    findNearestToken(token, tokenApi, difference) {
+      var nearestToken, totalDifference;
+      totalDifference = 0;
+      while (true) {
+        totalDifference += difference;
+        nearestToken = tokenApi.peek(totalDifference);
+        if (nearestToken[0] === 'OUTDENT' || (nearestToken.generated != null)) {
+          continue;
+        }
+        return nearestToken;
+      }
+    }
+
+    tokensOnSameLine(firstToken, secondToken) {
+      return firstToken[2].first_line === secondToken[2].first_line;
+    }
+
+    getExpectedSpaces(tokenApi, firstToken, secondToken) {
+      var config, ref;
+      config = tokenApi.config[this.rule.name];
+      if (firstToken[0] === '{' && secondToken[0] === '}') {
+        return (ref = config.empty_object_spaces) != null ? ref : config.spaces;
+      } else {
+        return config.spaces;
+      }
+    }
+
+    lintToken(token, tokenApi) {
+      var actual, expected, firstToken, msg, secondToken;
+      if (token.generated) {
+        return null;
+      }
+      [firstToken, secondToken] = token[0] === '{' ? [token, this.findNearestToken(token, tokenApi, 1)] : [this.findNearestToken(token, tokenApi, -1), token];
+      if (!this.tokensOnSameLine(firstToken, secondToken)) {
+        return null;
+      }
+      expected = this.getExpectedSpaces(tokenApi, firstToken, secondToken);
+      actual = this.distanceBetweenTokens(firstToken, secondToken);
+      if (actual === expected) {
+        return null;
+      } else {
+        msg = `There should be ${expected} space`;
+        if (expected !== 1) {
+          msg += 's';
+        }
+        msg += ` inside "${token[0]}"`;
+        return {
+          context: msg
+        };
+      }
+    }
+
+  };
 
   BracesSpacing.prototype.rule = {
     name: 'braces_spacing',
@@ -1206,66 +1348,9 @@ module.exports = BracesSpacing = (function() {
 
   BracesSpacing.prototype.tokens = ['{', '}'];
 
-  BracesSpacing.prototype.distanceBetweenTokens = function(firstToken, secondToken) {
-    return secondToken[2].first_column - firstToken[2].last_column - 1;
-  };
-
-  BracesSpacing.prototype.findNearestToken = function(token, tokenApi, difference) {
-    var nearestToken, totalDifference;
-    totalDifference = 0;
-    while (true) {
-      totalDifference += difference;
-      nearestToken = tokenApi.peek(totalDifference);
-      if (nearestToken[0] === 'OUTDENT' || (nearestToken.generated != null)) {
-        continue;
-      }
-      return nearestToken;
-    }
-  };
-
-  BracesSpacing.prototype.tokensOnSameLine = function(firstToken, secondToken) {
-    return firstToken[2].first_line === secondToken[2].first_line;
-  };
-
-  BracesSpacing.prototype.getExpectedSpaces = function(tokenApi, firstToken, secondToken) {
-    var config, ref;
-    config = tokenApi.config[this.rule.name];
-    if (firstToken[0] === '{' && secondToken[0] === '}') {
-      return (ref = config.empty_object_spaces) != null ? ref : config.spaces;
-    } else {
-      return config.spaces;
-    }
-  };
-
-  BracesSpacing.prototype.lintToken = function(token, tokenApi) {
-    var actual, expected, firstToken, msg, ref, secondToken;
-    if (token.generated) {
-      return null;
-    }
-    ref = token[0] === '{' ? [token, this.findNearestToken(token, tokenApi, 1)] : [this.findNearestToken(token, tokenApi, -1), token], firstToken = ref[0], secondToken = ref[1];
-    if (!this.tokensOnSameLine(firstToken, secondToken)) {
-      return null;
-    }
-    expected = this.getExpectedSpaces(tokenApi, firstToken, secondToken);
-    actual = this.distanceBetweenTokens(firstToken, secondToken);
-    if (actual === expected) {
-      return null;
-    } else {
-      msg = "There should be " + expected + " space";
-      if (expected !== 1) {
-        msg += 's';
-      }
-      msg += " inside \"" + token[0] + "\"";
-      return {
-        context: msg
-      };
-    }
-  };
-
   return BracesSpacing;
 
-})();
-
+}).call(this);
 
 
 },{}],11:[function(require,module,exports){
@@ -1276,7 +1361,39 @@ regexes = {
 };
 
 module.exports = CamelCaseClasses = (function() {
-  function CamelCaseClasses() {}
+  class CamelCaseClasses {
+    lintToken(token, tokenApi) {
+      var className, offset, ref, ref1, ref2;
+      // TODO: you can do some crazy shit in CoffeeScript, like
+      // class func().ClassName. Don't allow that.
+
+      // Don't try to lint the names of anonymous classes.
+      if ((token.newLine != null) || ((ref = tokenApi.peek()[0]) === 'INDENT' || ref === 'EXTENDS')) {
+        return null;
+      }
+      // It's common to assign a class to a global namespace, e.g.
+      // exports.MyClassName, so loop through the next tokens until
+      // we find the real identifier.
+      className = null;
+      offset = 1;
+      while (!className) {
+        if (((ref1 = tokenApi.peek(offset + 1)) != null ? ref1[0] : void 0) === '.') {
+          offset += 2;
+        } else if (((ref2 = tokenApi.peek(offset)) != null ? ref2[0] : void 0) === '@') {
+          offset += 1;
+        } else {
+          className = tokenApi.peek(offset)[1];
+        }
+      }
+      // Now check for the error.
+      if (!regexes.camelCase.test(className)) {
+        return {
+          context: `class name: ${className}`
+        };
+      }
+    }
+
+  };
 
   CamelCaseClasses.prototype.rule = {
     name: 'camel_case_classes',
@@ -1287,40 +1404,48 @@ module.exports = CamelCaseClasses = (function() {
 
   CamelCaseClasses.prototype.tokens = ['CLASS'];
 
-  CamelCaseClasses.prototype.lintToken = function(token, tokenApi) {
-    var className, offset, ref, ref1, ref2;
-    if ((token.newLine != null) || ((ref = tokenApi.peek()[0]) === 'INDENT' || ref === 'EXTENDS')) {
-      return null;
-    }
-    className = null;
-    offset = 1;
-    while (!className) {
-      if (((ref1 = tokenApi.peek(offset + 1)) != null ? ref1[0] : void 0) === '.') {
-        offset += 2;
-      } else if (((ref2 = tokenApi.peek(offset)) != null ? ref2[0] : void 0) === '@') {
-        offset += 1;
-      } else {
-        className = tokenApi.peek(offset)[1];
-      }
-    }
-    if (!regexes.camelCase.test(className)) {
-      return {
-        context: "class name: " + className
-      };
-    }
-  };
-
   return CamelCaseClasses;
 
-})();
-
+}).call(this);
 
 
 },{}],12:[function(require,module,exports){
 var ColonAssignmentSpacing;
 
 module.exports = ColonAssignmentSpacing = (function() {
-  function ColonAssignmentSpacing() {}
+  class ColonAssignmentSpacing {
+    lintToken(token, tokenApi) {
+      var checkSpacing, getSpaceFromToken, isLeftSpaced, isRightSpaced, leftSpacing, nextToken, previousToken, rightSpacing, spaceRules;
+      spaceRules = tokenApi.config[this.rule.name].spacing;
+      previousToken = tokenApi.peek(-1);
+      nextToken = tokenApi.peek(1);
+      getSpaceFromToken = function(direction) {
+        switch (direction) {
+          case 'left':
+            return token[2].first_column - previousToken[2].last_column - 1;
+          case 'right':
+            return nextToken[2].first_column - token[2].first_column - 1;
+        }
+      };
+      checkSpacing = function(direction) {
+        var isSpaced, spacing;
+        spacing = getSpaceFromToken(direction);
+        // when spacing is negative, the neighboring token is a newline
+        isSpaced = spacing < 0 ? true : spacing === parseInt(spaceRules[direction]);
+        return [isSpaced, spacing];
+      };
+      [isLeftSpaced, leftSpacing] = checkSpacing('left');
+      [isRightSpaced, rightSpacing] = checkSpacing('right');
+      if (isLeftSpaced && isRightSpaced) {
+        return null;
+      } else {
+        return {
+          context: `Incorrect spacing around column ${token[2].first_column}`
+        };
+      }
+    }
+
+  };
 
   ColonAssignmentSpacing.prototype.rule = {
     name: 'colon_assignment_spacing',
@@ -1335,47 +1460,62 @@ module.exports = ColonAssignmentSpacing = (function() {
 
   ColonAssignmentSpacing.prototype.tokens = [':'];
 
-  ColonAssignmentSpacing.prototype.lintToken = function(token, tokenApi) {
-    var checkSpacing, getSpaceFromToken, isLeftSpaced, isRightSpaced, leftSpacing, nextToken, previousToken, ref, ref1, rightSpacing, spaceRules;
-    spaceRules = tokenApi.config[this.rule.name].spacing;
-    previousToken = tokenApi.peek(-1);
-    nextToken = tokenApi.peek(1);
-    getSpaceFromToken = function(direction) {
-      switch (direction) {
-        case 'left':
-          return token[2].first_column - previousToken[2].last_column - 1;
-        case 'right':
-          return nextToken[2].first_column - token[2].first_column - 1;
-      }
-    };
-    checkSpacing = function(direction) {
-      var isSpaced, spacing;
-      spacing = getSpaceFromToken(direction);
-      isSpaced = spacing < 0 ? true : spacing === parseInt(spaceRules[direction]);
-      return [isSpaced, spacing];
-    };
-    ref = checkSpacing('left'), isLeftSpaced = ref[0], leftSpacing = ref[1];
-    ref1 = checkSpacing('right'), isRightSpaced = ref1[0], rightSpacing = ref1[1];
-    if (isLeftSpaced && isRightSpaced) {
-      return null;
-    } else {
-      return {
-        context: "Incorrect spacing around column " + token[2].first_column
-      };
-    }
-  };
-
   return ColonAssignmentSpacing;
 
-})();
-
+}).call(this);
 
 
 },{}],13:[function(require,module,exports){
 var CyclomaticComplexity;
 
 module.exports = CyclomaticComplexity = (function() {
-  function CyclomaticComplexity() {}
+  class CyclomaticComplexity {
+    // returns the "complexity" value of the current node.
+    getComplexity(node) {
+      var complexity, name, ref;
+      name = this.astApi.getNodeName(node);
+      complexity = name === 'If' || name === 'While' || name === 'For' || name === 'Try' ? 1 : name === 'Op' && ((ref = node.operator) === '&&' || ref === '||') ? 1 : name === 'Switch' ? node.cases.length : 0;
+      return complexity;
+    }
+
+    lintAST(node, astApi) {
+      this.astApi = astApi;
+      this.lintNode(node);
+      return void 0;
+    }
+
+    // Lint the AST node and return its cyclomatic complexity.
+    lintNode(node) {
+      var complexity, error, name, ref, rule;
+      // Get the complexity of the current node.
+      name = (ref = this.astApi) != null ? ref.getNodeName(node) : void 0;
+      complexity = this.getComplexity(node);
+      // Add the complexity of all child's nodes to this one.
+      node.eachChild((childNode) => {
+        var childComplexity, ref1;
+        childComplexity = this.lintNode(childNode);
+        if (((ref1 = this.astApi) != null ? ref1.getNodeName(childNode) : void 0) !== 'Code') {
+          return complexity += childComplexity;
+        }
+      });
+      rule = this.astApi.config[this.rule.name];
+      // If the current node is a function, and it's over our limit, add an
+      // error to the list.
+      if (name === 'Code' && complexity >= rule.value) {
+        error = this.astApi.createError({
+          context: complexity + 1,
+          lineNumber: node.locationData.first_line + 1,
+          lineNumberEnd: node.locationData.last_line + 1
+        });
+        if (error) {
+          this.errors.push(error);
+        }
+      }
+      // Return the complexity for the benefit of parent nodes.
+      return complexity;
+    }
+
+  };
 
   CyclomaticComplexity.prototype.rule = {
     name: 'cyclomatic_complexity',
@@ -1385,127 +1525,139 @@ module.exports = CyclomaticComplexity = (function() {
     description: 'Examine the complexity of your function.'
   };
 
-  CyclomaticComplexity.prototype.getComplexity = function(node) {
-    var complexity, name, ref;
-    name = this.astApi.getNodeName(node);
-    complexity = name === 'If' || name === 'While' || name === 'For' || name === 'Try' ? 1 : name === 'Op' && ((ref = node.operator) === '&&' || ref === '||') ? 1 : name === 'Switch' ? node.cases.length : 0;
-    return complexity;
-  };
-
-  CyclomaticComplexity.prototype.lintAST = function(node, astApi) {
-    this.astApi = astApi;
-    this.lintNode(node);
-    return void 0;
-  };
-
-  CyclomaticComplexity.prototype.lintNode = function(node) {
-    var complexity, error, name, ref, rule;
-    name = (ref = this.astApi) != null ? ref.getNodeName(node) : void 0;
-    complexity = this.getComplexity(node);
-    node.eachChild((function(_this) {
-      return function(childNode) {
-        var childComplexity, ref1;
-        childComplexity = _this.lintNode(childNode);
-        if (((ref1 = _this.astApi) != null ? ref1.getNodeName(childNode) : void 0) !== 'Code') {
-          return complexity += childComplexity;
-        }
-      };
-    })(this));
-    rule = this.astApi.config[this.rule.name];
-    if (name === 'Code' && complexity >= rule.value) {
-      error = this.astApi.createError({
-        context: complexity + 1,
-        lineNumber: node.locationData.first_line + 1,
-        lineNumberEnd: node.locationData.last_line + 1
-      });
-      if (error) {
-        this.errors.push(error);
-      }
-    }
-    return complexity;
-  };
-
   return CyclomaticComplexity;
 
-})();
-
+}).call(this);
 
 
 },{}],14:[function(require,module,exports){
 var DuplicateKey;
 
 module.exports = DuplicateKey = (function() {
+  class DuplicateKey {
+    constructor() {
+      this.braceScopes = []; // A stack tracking keys defined in nexted scopes.
+    }
+
+    lintToken([type], tokenApi) {
+      if (type === '{' || type === '}') {
+        this.lintBrace(...arguments);
+        return void 0;
+      }
+      // TODO: after <1.10.0 is not supported, remove 'IDENTIFIER' here
+      if (type === 'IDENTIFIER' || type === 'PROPERTY') {
+        return this.lintIdentifier(...arguments);
+      }
+    }
+
+    lintIdentifier(token, tokenApi) {
+      var key, nextToken, previousToken;
+      key = token[1];
+      if (this.currentScope == null) {
+        // Class names might not be in a scope
+        return null;
+      }
+      nextToken = tokenApi.peek(1);
+      if (nextToken[1] !== ':') {
+        // Exit if this identifier isn't being assigned. A and B
+        // are identifiers, but only A should be examined:
+        // A = B
+        return null;
+      }
+      previousToken = tokenApi.peek(-1);
+      if (previousToken[0] === '@') {
+        // Assigning "@something" and "something" are not the same thing
+        key = `@${key}`;
+      }
+      // Added a prefix to not interfere with things like "constructor".
+      key = `identifier-${key}`;
+      if (this.currentScope[key]) {
+        return true;
+      } else {
+        this.currentScope[key] = token;
+        return null;
+      }
+    }
+
+    lintBrace(token) {
+      if (token[0] === '{') {
+        if (this.currentScope != null) {
+          this.braceScopes.push(this.currentScope);
+        }
+        this.currentScope = {};
+      } else {
+        this.currentScope = this.braceScopes.pop();
+      }
+      return null;
+    }
+
+  };
+
   DuplicateKey.prototype.rule = {
+    // I don't know of any legitimate reason to define duplicate keys in an
+    // object. It seems to always be a mistake, it's also a syntax error in
+    // strict mode.
+    // See http://jslinterrors.com/duplicate-key-a/
     name: 'duplicate_key',
     level: 'error',
     message: 'Duplicate key defined in object or class',
     description: 'Prevents defining duplicate keys in object literals and classes'
   };
 
-  DuplicateKey.prototype.tokens = ['IDENTIFIER', '{', '}'];
-
-  function DuplicateKey() {
-    this.braceScopes = [];
-  }
-
-  DuplicateKey.prototype.lintToken = function(arg, tokenApi) {
-    var type;
-    type = arg[0];
-    if (type === '{' || type === '}') {
-      this.lintBrace.apply(this, arguments);
-      return void 0;
-    }
-    if (type === 'IDENTIFIER') {
-      return this.lintIdentifier.apply(this, arguments);
-    }
-  };
-
-  DuplicateKey.prototype.lintIdentifier = function(token, tokenApi) {
-    var key, nextToken, previousToken;
-    key = token[1];
-    if (this.currentScope == null) {
-      return null;
-    }
-    nextToken = tokenApi.peek(1);
-    if (nextToken[1] !== ':') {
-      return null;
-    }
-    previousToken = tokenApi.peek(-1);
-    if (previousToken[0] === '@') {
-      key = "@" + key;
-    }
-    key = "identifier-" + key;
-    if (this.currentScope[key]) {
-      return true;
-    } else {
-      this.currentScope[key] = token;
-      return null;
-    }
-  };
-
-  DuplicateKey.prototype.lintBrace = function(token) {
-    if (token[0] === '{') {
-      if (this.currentScope != null) {
-        this.braceScopes.push(this.currentScope);
-      }
-      this.currentScope = {};
-    } else {
-      this.currentScope = this.braceScopes.pop();
-    }
-    return null;
-  };
+  // TODO: after <1.10.0 is not supported, remove 'IDENTIFIER' here
+  DuplicateKey.prototype.tokens = ['IDENTIFIER', 'PROPERTY', '{', '}'];
 
   return DuplicateKey;
 
-})();
-
+}).call(this);
 
 
 },{}],15:[function(require,module,exports){
 var EmptyConstructorNeedsParens;
 
 module.exports = EmptyConstructorNeedsParens = (function() {
-  function EmptyConstructorNeedsParens() {}
+  class EmptyConstructorNeedsParens {
+    // Return an error if the given indentation token is not correct.
+    lintToken(token, tokenApi) {
+      var identIndex, isIdent, nextToken, peek, ref, ref1, ref2;
+      if (token[1] === 'new') {
+        peek = tokenApi.peek.bind(tokenApi);
+        // Find the last chained identifier, e.g. Bar in new foo.bar.Bar().
+        identIndex = 1;
+        while (true) {
+          isIdent = (ref = (ref1 = peek(identIndex)) != null ? ref1[0] : void 0) === 'IDENTIFIER' || ref === 'PROPERTY';
+          nextToken = peek(identIndex + 1);
+          if (isIdent) {
+            if ((nextToken != null ? nextToken[0] : void 0) === '.') {
+              // skip the dot and start with the next token
+              identIndex += 2;
+              continue;
+            }
+            if ((nextToken != null ? nextToken[0] : void 0) === 'INDEX_START') {
+              while (((ref2 = peek(identIndex)) != null ? ref2[0] : void 0) !== 'INDEX_END') {
+                identIndex++;
+              }
+              continue;
+            }
+          }
+          break;
+        }
+        // The callStart is generated if your parameters are all on the same
+        // line with implicit parens, and if your parameters start on the
+        // next line, but is missing if there are no params and no parens.
+        if (isIdent && (nextToken != null)) {
+          return this.handleExpectedCallStart(nextToken);
+        }
+      }
+    }
+
+    handleExpectedCallStart(isCallStart) {
+      if (isCallStart[0] !== 'CALL_START') {
+        return true;
+      }
+    }
+
+  };
 
   EmptyConstructorNeedsParens.prototype.rule = {
     name: 'empty_constructor_needs_parens',
@@ -1516,52 +1668,106 @@ module.exports = EmptyConstructorNeedsParens = (function() {
 
   EmptyConstructorNeedsParens.prototype.tokens = ['UNARY'];
 
-  EmptyConstructorNeedsParens.prototype.lintToken = function(token, tokenApi) {
-    var expectedCallStart, expectedIdentifier, identifierIndex, peek, ref;
-    if (token[1] === 'new') {
-      peek = tokenApi.peek.bind(tokenApi);
-      identifierIndex = 1;
-      while (true) {
-        expectedIdentifier = peek(identifierIndex);
-        expectedCallStart = peek(identifierIndex + 1);
-        if ((expectedIdentifier != null ? expectedIdentifier[0] : void 0) === 'IDENTIFIER') {
-          if ((expectedCallStart != null ? expectedCallStart[0] : void 0) === '.') {
-            identifierIndex += 2;
-            continue;
-          }
-          if ((expectedCallStart != null ? expectedCallStart[0] : void 0) === 'INDEX_START') {
-            while (((ref = peek(identifierIndex)) != null ? ref[0] : void 0) !== 'INDEX_END') {
-              identifierIndex++;
-            }
-            continue;
-          }
-        }
-        break;
-      }
-      if ((expectedIdentifier != null ? expectedIdentifier[0] : void 0) === 'IDENTIFIER' && (expectedCallStart != null)) {
-        return this.handleExpectedCallStart(expectedCallStart);
-      }
-    }
-  };
-
-  EmptyConstructorNeedsParens.prototype.handleExpectedCallStart = function(expectedCallStart) {
-    if (expectedCallStart[0] !== 'CALL_START') {
-      return true;
-    }
-  };
-
   return EmptyConstructorNeedsParens;
 
-})();
-
+}).call(this);
 
 
 },{}],16:[function(require,module,exports){
 var EnsureComprehensions,
-  indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
+  indexOf = [].indexOf;
 
 module.exports = EnsureComprehensions = (function() {
-  function EnsureComprehensions() {}
+  class EnsureComprehensions {
+    lintToken(token, tokenApi) {
+      var atEqual, idents, numCallEnds, numCallStarts, numParenEnds, numParenStarts, peeker, prevIdents, prevToken, ref, ref1;
+      // Rules
+      // Ignore if normal for-loop with a block
+      // If LHS of operation contains either the key or value variable of
+      //     the loop, assume that it is not a comprehension.
+
+      // Find all identifiers (including lhs values and parts of for loop)
+      idents = this.findIdents(tokenApi);
+      // if it looks like a for block, don't bother checking
+      if (this.forBlock) {
+        this.forBlock = false;
+        return;
+      }
+      peeker = -1;
+      atEqual = false;
+      numCallEnds = 0;
+      numCallStarts = 0;
+      numParenStarts = 0;
+      numParenEnds = 0;
+      prevIdents = [];
+      while ((prevToken = tokenApi.peek(peeker))) {
+        if (prevToken[0] === 'CALL_END') {
+          numCallEnds++;
+        }
+        if (prevToken[0] === 'CALL_START') {
+          numCallStarts++;
+        }
+        if (prevToken[0] === '(') {
+          numParenStarts++;
+        }
+        if (prevToken[0] === ')') {
+          numParenEnds++;
+        }
+        if (prevToken[0] === 'IDENTIFIER') {
+          if (!atEqual) {
+            prevIdents.push(prevToken[1]);
+          } else if (ref = prevToken[1], indexOf.call(idents, ref) >= 0) {
+            return;
+          }
+        }
+        if (((ref1 = prevToken[0]) === '(' || ref1 === '->' || ref1 === 'TERMINATOR') || (prevToken.newLine != null)) {
+          break;
+        }
+        if (prevToken[0] === '=' && numParenEnds === numParenStarts) {
+          atEqual = true;
+        }
+        peeker--;
+      }
+      // If we hit a terminal node (TERMINATOR token or w/ property newLine)
+      // or if we hit the top of the file and we've seen an '=' sign without
+      // any identifiers that are part of the for-loop, and there is an equal
+      // amount of CALL_START/CALL_END tokens. An unequal number means the list
+      // comprehension is inside of a function call
+      if (atEqual && numCallStarts === numCallEnds) {
+        return {
+          context: ''
+        };
+      }
+    }
+
+    findIdents(tokenApi) {
+      var idents, nextToken, peeker, ref;
+      peeker = 1;
+      idents = [];
+      while ((nextToken = tokenApi.peek(peeker))) {
+        if (nextToken[0] === 'IDENTIFIER') {
+          idents.push(nextToken[1]);
+        }
+        if ((ref = nextToken[0]) === 'FORIN' || ref === 'FOROF') {
+          break;
+        }
+        peeker++;
+      }
+      // now search ahead to see if this becomes a FOR block
+      while ((nextToken = tokenApi.peek(peeker))) {
+        if (nextToken[0] === 'TERMINATOR') {
+          break;
+        }
+        if (nextToken[0] === 'INDENT') {
+          this.forBlock = true;
+          break;
+        }
+        peeker++;
+      }
+      return idents;
+    }
+
+  };
 
   EnsureComprehensions.prototype.rule = {
     name: 'ensure_comprehensions',
@@ -1574,92 +1780,29 @@ module.exports = EnsureComprehensions = (function() {
 
   EnsureComprehensions.prototype.forBlock = false;
 
-  EnsureComprehensions.prototype.lintToken = function(token, tokenApi) {
-    var atEqual, idents, numCallEnds, numCallStarts, numParenEnds, numParenStarts, peeker, prevIdents, prevToken, ref, ref1;
-    idents = this.findIdents(tokenApi);
-    if (this.forBlock) {
-      this.forBlock = false;
-      return;
-    }
-    peeker = -1;
-    atEqual = false;
-    numCallEnds = 0;
-    numCallStarts = 0;
-    numParenStarts = 0;
-    numParenEnds = 0;
-    prevIdents = [];
-    while ((prevToken = tokenApi.peek(peeker))) {
-      if (prevToken[0] === 'CALL_END') {
-        numCallEnds++;
-      }
-      if (prevToken[0] === 'CALL_START') {
-        numCallStarts++;
-      }
-      if (prevToken[0] === '(') {
-        numParenStarts++;
-      }
-      if (prevToken[0] === ')') {
-        numParenEnds++;
-      }
-      if (prevToken[0] === 'IDENTIFIER') {
-        if (!atEqual) {
-          prevIdents.push(prevToken[1]);
-        } else if (ref = prevToken[1], indexOf.call(idents, ref) >= 0) {
-          return;
-        }
-      }
-      if (((ref1 = prevToken[0]) === '(' || ref1 === '->' || ref1 === 'TERMINATOR') || (prevToken.newLine != null)) {
-        break;
-      }
-      if (prevToken[0] === '=' && numParenEnds === numParenStarts) {
-        atEqual = true;
-      }
-      peeker--;
-    }
-    if (atEqual && numCallStarts === numCallEnds) {
-      return {
-        context: ''
-      };
-    }
-  };
-
-  EnsureComprehensions.prototype.findIdents = function(tokenApi) {
-    var idents, nextToken, peeker, ref;
-    peeker = 1;
-    idents = [];
-    while ((nextToken = tokenApi.peek(peeker))) {
-      if (nextToken[0] === 'IDENTIFIER') {
-        idents.push(nextToken[1]);
-      }
-      if ((ref = nextToken[0]) === 'FORIN' || ref === 'FOROF') {
-        break;
-      }
-      peeker++;
-    }
-    while ((nextToken = tokenApi.peek(peeker))) {
-      if (nextToken[0] === 'TERMINATOR') {
-        break;
-      }
-      if (nextToken[0] === 'INDENT') {
-        this.forBlock = true;
-        break;
-      }
-      peeker++;
-    }
-    return idents;
-  };
-
   return EnsureComprehensions;
 
-})();
-
+}).call(this);
 
 
 },{}],17:[function(require,module,exports){
 var EOLLast;
 
 module.exports = EOLLast = (function() {
-  function EOLLast() {}
+  class EOLLast {
+    lintLine(line, lineApi) {
+      var isNewline, previousIsNewline;
+      if (!lineApi.isLastLine()) {
+        return null;
+      }
+      isNewline = line.length === 0;
+      previousIsNewline = lineApi.lineCount > 1 ? lineApi.lines[lineApi.lineNumber - 1].length === 0 : false;
+      if (!(isNewline && !previousIsNewline)) {
+        return true;
+      }
+    }
+
+  };
 
   EOLLast.prototype.rule = {
     name: 'eol_last',
@@ -1668,29 +1811,248 @@ module.exports = EOLLast = (function() {
     description: 'Checks that the file ends with a single newline'
   };
 
-  EOLLast.prototype.lintLine = function(line, lineApi) {
-    var isNewline, previousIsNewline;
-    if (!lineApi.isLastLine()) {
-      return null;
-    }
-    isNewline = line.length === 0;
-    previousIsNewline = lineApi.lineCount > 1 ? lineApi.lines[lineApi.lineNumber - 1].length === 0 : false;
-    if (!(isNewline && !previousIsNewline)) {
-      return true;
-    }
-  };
-
   return EOLLast;
 
-})();
-
+}).call(this);
 
 
 },{}],18:[function(require,module,exports){
 var Indentation,
-  indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
+  indexOf = [].indexOf;
 
 module.exports = Indentation = (function() {
+  class Indentation {
+    constructor() {
+      this.arrayTokens = []; // A stack tracking the array token pairs.
+    }
+
+
+    // Return an error if the given indentation token is not correct.
+    lintToken(token, tokenApi) {
+      var chain, currentLine, dotIndent, expected, got, ignoreIndent, isArrayIndent, isMultiline, lineNumber, lines, next, numIndents, previous, previousSymbol, ref, ref1, regExRes, spaces, startsWith, type;
+      [type, numIndents] = token;
+      ({
+        first_column: dotIndent
+      } = token[2]);
+      ({lines, lineNumber} = tokenApi);
+      expected = tokenApi.config[this.rule.name].value;
+      // See: 'Indented chained invocations with bad indents'
+      // This actually checks the chained call to see if its properly indented
+      if (type === '.') {
+        // Keep this if statement separately, since we still need to let
+        // the linting pass if the '.' token is not at the beginning of
+        // the line
+        currentLine = lines[lineNumber];
+        if (((ref = currentLine.match(/\S/)) != null ? ref[0] : void 0) === '.') {
+          next = tokenApi.peek(1);
+          if (next[0] === 'PROPERTY') {
+            chain = '.' + next[1];
+            startsWith = new RegExp('^(\\s*)(\\' + chain + ')');
+            regExRes = currentLine.match(startsWith);
+            spaces = (regExRes != null ? regExRes[1].length : void 0) || -1;
+            if ((regExRes != null ? regExRes.index : void 0) === 0 && spaces === dotIndent) {
+              got = dotIndent;
+              if (dotIndent - expected > expected) {
+                got %= expected;
+              }
+              if (dotIndent % expected !== 0) {
+                return {
+                  context: `Expected ${expected} got ${got}`
+                };
+              }
+            }
+          }
+        }
+        return void 0;
+      }
+      if (type === '[' || type === ']') {
+        this.lintArray(token);
+        return void 0;
+      }
+      if ((token.generated != null) || (token.explicit != null)) {
+        return null;
+      }
+      // Ignore the indentation inside of an array, so that
+      // we can allow things like:
+      //   x = ["foo",
+      //             "bar"]
+      previous = tokenApi.peek(-1);
+      isArrayIndent = this.inArray() && (previous != null ? previous.newLine : void 0);
+      // Ignore indents used to for formatting on multi-line expressions, so
+      // we can allow things like:
+      //   a = b =
+      //     c = d
+      previousSymbol = (ref1 = tokenApi.peek(-1)) != null ? ref1[0] : void 0;
+      isMultiline = previousSymbol === '=' || previousSymbol === ',';
+      // Summarize the indentation conditions we'd like to ignore
+      ignoreIndent = isArrayIndent || isMultiline;
+      // Correct CoffeeScript's incorrect INDENT token value when functions
+      // get chained. See https://github.com/jashkenas/coffeescript/issues/3137
+      // Also see CoffeeLint Issues: #4, #88, #128, and many more.
+      numIndents = this.getCorrectIndent(tokenApi);
+      // Now check the indentation.
+      if (!ignoreIndent && !(indexOf.call(numIndents, expected) >= 0)) {
+        return {
+          context: `Expected ${expected} got ${numIndents[0]}`
+        };
+      }
+    }
+
+    // Return true if the current token is inside of an array.
+    inArray() {
+      return this.arrayTokens.length > 0;
+    }
+
+    // Lint the given array token.
+    lintArray(token) {
+      // Track the array token pairs
+      if (token[0] === '[') {
+        this.arrayTokens.push(token);
+      } else if (token[0] === ']') {
+        this.arrayTokens.pop();
+      }
+      // Return null, since we're not really linting
+      // anything here.
+      return null;
+    }
+
+    grabLineTokens(tokenApi, lineNumber, all = false) {
+      var i, k, len, len1, ref, ref1, results, results1, tok, tokensByLine;
+      ({tokensByLine} = tokenApi);
+      while (!((tokensByLine[lineNumber] != null) || lineNumber === 0)) {
+        lineNumber--;
+      }
+      if (all) {
+        ref = tokensByLine[lineNumber];
+        results = [];
+        for (i = 0, len = ref.length; i < len; i++) {
+          tok = ref[i];
+          results.push(tok);
+        }
+        return results;
+      } else {
+        ref1 = tokensByLine[lineNumber];
+        results1 = [];
+        for (k = 0, len1 = ref1.length; k < len1; k++) {
+          tok = ref1[k];
+          if ((tok.generated == null) && tok[0] !== 'OUTDENT') {
+            results1.push(tok);
+          }
+        }
+        return results1;
+      }
+    }
+
+    // Returns a corrected INDENT value if the current line is part of
+    // a chained call. Otherwise returns original INDENT value.
+    getCorrectIndent(tokenApi) {
+      var _, curIndent, i, j, len, lineNumber, lines, prevIndent, prevNum, prevTokens, ref, ref1, ref2, ref3, ref4, ref5, ref6, ref7, ret, skipAssign, t, tokens, tryLine;
+      ({lineNumber, lines, tokens} = tokenApi);
+      curIndent = (ref = lines[lineNumber].match(/\S/)) != null ? ref.index : void 0;
+      prevNum = 1;
+      while (/^\s*(#|$)/.test(lines[lineNumber - prevNum])) {
+        prevNum += 1;
+      }
+      prevTokens = this.grabLineTokens(tokenApi, lineNumber - prevNum);
+      if (((ref1 = prevTokens[0]) != null ? ref1[0] : void 0) === 'INDENT') {
+        // Pass both the INDENT value and the location of the first token
+        // after the INDENT because sometimes CoffeeScript doesn't return
+        // the correct INDENT if there is something like an if/else
+        // inside an if/else inside of a -> function definition: e.g.
+
+        // ->
+        //   r = if a
+        //     if b
+        //       2
+        //     else
+        //       3
+        //   else
+        //     4
+
+        // will error without: curIndent - prevTokens[1]?[2].first_column
+        return [curIndent - ((ref2 = prevTokens[1]) != null ? ref2[2].first_column : void 0), curIndent - prevTokens[0][1]];
+      } else {
+        prevIndent = (ref3 = prevTokens[0]) != null ? ref3[2].first_column : void 0;
+// This is a scan to handle extra indentation from if/else
+// statements to make them look nicer: e.g.
+
+// r = if a
+//   true
+// else
+//   false
+
+// is valid.
+
+// r = if a
+//       true
+//     else
+//       false
+
+// is also valid.
+        for (j = i = 0, len = prevTokens.length; i < len; j = ++i) {
+          _ = prevTokens[j];
+          if (!(prevTokens[j][0] === '=' && ((ref4 = prevTokens[j + 1]) != null ? ref4[0] : void 0) === 'IF')) {
+            continue;
+          }
+          skipAssign = curIndent - prevTokens[j + 1][2].first_column;
+          ret = curIndent - prevIndent;
+          if (skipAssign < 0) {
+            return [ret];
+          }
+          return [skipAssign, ret];
+        }
+        // This happens when there is an extra indent to maintain long
+        // conditional statements (IF/UNLESS): e.g.
+
+        // ->
+        //   if a is c and
+        //     (false or
+        //       long.expression.that.necessitates(linebreak))
+        //     @foo()
+
+        // is valid (note that there an only an extra indent in the last
+        // statement is required and not the line above it
+
+        // ->
+        //   if a is c and
+        //       (false or
+        //       long.expression.that.necessitates(linebreak))
+        //     @foo()
+        // is also OK.
+        while (prevIndent > curIndent) {
+          tryLine = lineNumber - prevNum;
+          prevTokens = this.grabLineTokens(tokenApi, tryLine, true);
+          // This is to handle weird object/string indentation.
+          // See: 'Handle edge-case weirdness with strings in objects'
+          //   test case in test_indentation.coffee or in the file,
+          //   test_no_empty_functions.coffee, which is why/how I
+          //   caught this.
+          if (((ref5 = prevTokens[0]) != null ? ref5[0] : void 0) === 'INDENT') {
+            prevIndent = prevTokens[0][1];
+            prevTokens = prevTokens.slice(1);
+          }
+          t = 0;
+          // keep looping prevTokens until we find a token in @keywords
+          // or we just run out of tokens in prevTokens
+          while (!((prevTokens[t] == null) || (ref6 = prevTokens[t][0], indexOf.call(this.keywords, ref6) >= 0))) {
+            t++;
+          }
+          // slice off everything before 't'
+          prevTokens = prevTokens.slice(t);
+          prevNum++;
+          if (prevTokens[0] == null) {
+            // if there isn't a valid token, restart the while loop
+            continue;
+          }
+          // set new "prevIndent"
+          prevIndent = (ref7 = prevTokens[0]) != null ? ref7[2].first_column : void 0;
+        }
+      }
+      return [curIndent - prevIndent];
+    }
+
+  };
+
   Indentation.prototype.rule = {
     name: 'indentation',
     value: 2,
@@ -1701,220 +2063,56 @@ module.exports = Indentation = (function() {
 
   Indentation.prototype.tokens = ['INDENT', '[', ']', '.'];
 
-  Indentation.prototype.keywords = ['->', '=>', '@', 'CATCH', 'CLASS', 'ELSE', 'FINALLY', 'FOR', 'FORIN', 'FOROF', 'IDENTIFIER', 'IF', 'LEADING_WHEN', 'LOOP', 'RETURN', 'SWITCH', 'THROW', 'TRY', 'UNTIL', 'WHEN', 'WHILE', 'YIELD'];
-
-  function Indentation() {
-    this.arrayTokens = [];
-  }
-
-  Indentation.prototype.lintToken = function(token, tokenApi) {
-    var currentLine, expected, ignoreIndent, isArrayIndent, isMultiline, lineNumber, lines, numIndents, previous, previousSymbol, ref, ref1, ref2, type;
-    type = token[0], numIndents = token[1], (ref = token[2], lineNumber = ref.first_line);
-    lines = tokenApi.lines, lineNumber = tokenApi.lineNumber;
-    expected = tokenApi.config[this.rule.name].value;
-    if (type === '.') {
-      currentLine = lines[lineNumber];
-      if (((ref1 = currentLine.match(/\S/)) != null ? ref1[0] : void 0) === '.') {
-        return this.handleChain(tokenApi, expected);
-      }
-      return void 0;
-    }
-    if (type === '[' || type === ']') {
-      this.lintArray(token);
-      return void 0;
-    }
-    if ((token.generated != null) || (token.explicit != null)) {
-      return null;
-    }
-    previous = tokenApi.peek(-1);
-    isArrayIndent = this.inArray() && (previous != null ? previous.newLine : void 0);
-    previousSymbol = (ref2 = tokenApi.peek(-1)) != null ? ref2[0] : void 0;
-    isMultiline = previousSymbol === '=' || previousSymbol === ',';
-    ignoreIndent = isArrayIndent || isMultiline;
-    numIndents = this.getCorrectIndent(tokenApi);
-    if (!ignoreIndent && !(indexOf.call(numIndents, expected) >= 0)) {
-      return {
-        context: "Expected " + expected + " got " + numIndents[0]
-      };
-    }
-  };
-
-  Indentation.prototype.inArray = function() {
-    return this.arrayTokens.length > 0;
-  };
-
-  Indentation.prototype.lintArray = function(token) {
-    if (token[0] === '[') {
-      this.arrayTokens.push(token);
-    } else if (token[0] === ']') {
-      this.arrayTokens.pop();
-    }
-    return null;
-  };
-
-  Indentation.prototype.handleChain = function(tokenApi, expected) {
-    var callStart, checkNum, currIsIndent, currentLine, currentSpaces, findCallStart, lastCheck, lineNumber, lines, numIndents, prevIsIndent, prevLine, prevNum, prevSpaces, ref, ref1;
-    lastCheck = 1;
-    callStart = 1;
-    prevNum = 1;
-    lineNumber = tokenApi.lineNumber, lines = tokenApi.lines;
-    currentLine = lines[lineNumber];
-    findCallStart = tokenApi.peek(-callStart);
-    while (findCallStart && findCallStart[0] !== 'TERMINATOR') {
-      lastCheck = findCallStart[2].first_line;
-      callStart += 1;
-      findCallStart = tokenApi.peek(-callStart);
-    }
-    while ((lineNumber - prevNum > lastCheck) && !/^\s*\./.test(lines[lineNumber - prevNum])) {
-      prevNum += 1;
-    }
-    checkNum = lineNumber - prevNum;
-    if (checkNum >= 0) {
-      prevLine = lines[checkNum];
-      if (prevLine.match(/\S/)[0] === '.' || checkNum === lastCheck) {
-        currentSpaces = (ref = currentLine.match(/\S/)) != null ? ref.index : void 0;
-        prevSpaces = (ref1 = prevLine.match(/\S/)) != null ? ref1.index : void 0;
-        numIndents = currentSpaces - prevSpaces;
-        prevIsIndent = prevSpaces % expected !== 0;
-        currIsIndent = currentSpaces % expected !== 0;
-        if (prevIsIndent && currIsIndent) {
-          numIndents = currentSpaces;
-        }
-        if (numIndents % expected !== 0) {
-          return {
-            context: "Expected " + expected + " got " + numIndents
-          };
-        }
-      }
-    }
-  };
-
-  Indentation.prototype.grabLineTokens = function(tokenApi, lineNumber, all) {
-    var i, k, len, len1, ref, ref1, results, results1, tok, tokensByLine;
-    if (all == null) {
-      all = false;
-    }
-    tokensByLine = tokenApi.tokensByLine;
-    while (!((tokensByLine[lineNumber] != null) || lineNumber === 0)) {
-      lineNumber--;
-    }
-    if (all) {
-      ref = tokensByLine[lineNumber];
-      results = [];
-      for (i = 0, len = ref.length; i < len; i++) {
-        tok = ref[i];
-        results.push(tok);
-      }
-      return results;
-    } else {
-      ref1 = tokensByLine[lineNumber];
-      results1 = [];
-      for (k = 0, len1 = ref1.length; k < len1; k++) {
-        tok = ref1[k];
-        if ((tok.generated == null) && tok[0] !== 'OUTDENT') {
-          results1.push(tok);
-        }
-      }
-      return results1;
-    }
-  };
-
-  Indentation.prototype.getCorrectIndent = function(tokenApi) {
-    var _, curIndent, i, j, len, lineNumber, lines, prevIndent, prevNum, prevTokens, ref, ref1, ref2, ref3, ref4, ref5, ref6, ref7, ret, skipAssign, t, tokens, tryLine;
-    lineNumber = tokenApi.lineNumber, lines = tokenApi.lines, tokens = tokenApi.tokens;
-    curIndent = (ref = lines[lineNumber].match(/\S/)) != null ? ref.index : void 0;
-    prevNum = 1;
-    while (/^\s*(#|$)/.test(lines[lineNumber - prevNum])) {
-      prevNum += 1;
-    }
-    prevTokens = this.grabLineTokens(tokenApi, lineNumber - prevNum);
-    if (((ref1 = prevTokens[0]) != null ? ref1[0] : void 0) === 'INDENT') {
-      return [curIndent - ((ref2 = prevTokens[1]) != null ? ref2[2].first_column : void 0), curIndent - prevTokens[0][1]];
-    } else {
-      prevIndent = (ref3 = prevTokens[0]) != null ? ref3[2].first_column : void 0;
-      for (j = i = 0, len = prevTokens.length; i < len; j = ++i) {
-        _ = prevTokens[j];
-        if (!(prevTokens[j][0] === '=' && ((ref4 = prevTokens[j + 1]) != null ? ref4[0] : void 0) === 'IF')) {
-          continue;
-        }
-        skipAssign = curIndent - prevTokens[j + 1][2].first_column;
-        ret = curIndent - prevIndent;
-        if (skipAssign < 0) {
-          return [ret];
-        }
-        return [skipAssign, ret];
-      }
-      while (prevIndent > curIndent) {
-        tryLine = lineNumber - prevNum;
-        prevTokens = this.grabLineTokens(tokenApi, tryLine, true);
-        if (((ref5 = prevTokens[0]) != null ? ref5[0] : void 0) === 'INDENT') {
-          prevIndent = prevTokens[0][1];
-          prevTokens = prevTokens.slice(1);
-        }
-        t = 0;
-        while (!((prevTokens[t] == null) || (ref6 = prevTokens[t][0], indexOf.call(this.keywords, ref6) >= 0))) {
-          t++;
-        }
-        prevTokens = prevTokens.slice(t);
-        prevNum++;
-        if (prevTokens[0] == null) {
-          continue;
-        }
-        prevIndent = (ref7 = prevTokens[0]) != null ? ref7[2].first_column : void 0;
-      }
-    }
-    return [curIndent - prevIndent];
-  };
+  Indentation.prototype.keywords = ['->', '=>', '@', 'CATCH', 'CLASS', 'DEFAULT', 'ELSE', 'EXPORT', 'FINALLY', 'FOR', 'FORIN', 'FOROF', 'IDENTIFIER', 'IF', 'IMPORT', 'LEADING_WHEN', 'LOOP', 'PROPERTY', 'RETURN', 'SWITCH', 'THROW', 'TRY', 'UNTIL', 'WHEN', 'WHILE', 'YIELD'];
 
   return Indentation;
 
-})();
-
+}).call(this);
 
 
 },{}],19:[function(require,module,exports){
 var LineEndings;
 
 module.exports = LineEndings = (function() {
-  function LineEndings() {}
+  class LineEndings {
+    lintLine(line, lineApi) {
+      var ending, lastChar, ref, valid;
+      ending = (ref = lineApi.config[this.rule.name]) != null ? ref.value : void 0;
+      if (!ending || lineApi.isLastLine() || !line) {
+        return null;
+      }
+      lastChar = line[line.length - 1];
+      valid = (function() {
+        if (ending === 'windows') {
+          return lastChar === '\r';
+        } else if (ending === 'unix') {
+          return lastChar !== '\r';
+        } else {
+          throw new Error(`unknown line ending type: ${ending}`);
+        }
+      })();
+      if (!valid) {
+        return {
+          context: `Expected ${ending}`
+        };
+      } else {
+        return null;
+      }
+    }
+
+  };
 
   LineEndings.prototype.rule = {
     name: 'line_endings',
     level: 'ignore',
-    value: 'unix',
+    value: 'unix', // or 'windows'
     message: 'Line contains incorrect line endings',
     description: 'This rule ensures your project uses only <tt>windows</tt> or\n<tt>unix</tt> line endings. This rule is disabled by default.'
   };
 
-  LineEndings.prototype.lintLine = function(line, lineApi) {
-    var ending, lastChar, ref, valid;
-    ending = (ref = lineApi.config[this.rule.name]) != null ? ref.value : void 0;
-    if (!ending || lineApi.isLastLine() || !line) {
-      return null;
-    }
-    lastChar = line[line.length - 1];
-    valid = (function() {
-      if (ending === 'windows') {
-        return lastChar === '\r';
-      } else if (ending === 'unix') {
-        return lastChar !== '\r';
-      } else {
-        throw new Error("unknown line ending type: " + ending);
-      }
-    })();
-    if (!valid) {
-      return {
-        context: "Expected " + ending
-      };
-    } else {
-      return null;
-    }
-  };
-
   return LineEndings;
 
-})();
-
+}).call(this);
 
 
 },{}],20:[function(require,module,exports){
@@ -1926,7 +2124,28 @@ regexes = {
 };
 
 module.exports = MaxLineLength = (function() {
-  function MaxLineLength() {}
+  class MaxLineLength {
+    lintLine(line, lineApi) {
+      var limitComments, lineLength, max, ref, ref1;
+      max = (ref = lineApi.config[this.rule.name]) != null ? ref.value : void 0;
+      limitComments = (ref1 = lineApi.config[this.rule.name]) != null ? ref1.limitComments : void 0;
+      lineLength = line.replace(/\s+$/, '').length;
+      if (lineApi.isLiterate() && regexes.literateComment.test(line)) {
+        lineLength -= 2;
+      }
+      if (max && max < lineLength && !regexes.longUrlComment.test(line)) {
+        if (!limitComments) {
+          if (lineApi.getLineTokens().length === 0) {
+            return;
+          }
+        }
+        return {
+          context: `Length is ${lineLength}, max is ${max}`
+        };
+      }
+    }
+
+  };
 
   MaxLineLength.prototype.rule = {
     name: 'max_line_length',
@@ -1937,36 +2156,14 @@ module.exports = MaxLineLength = (function() {
     description: 'This rule imposes a maximum line length on your code. <a\nhref="http://www.python.org/dev/peps/pep-0008/">Python\'s style\nguide</a> does a good job explaining why you might want to limit the\nlength of your lines, though this is a matter of taste.\n\nLines can be no longer than eighty characters by default.'
   };
 
-  MaxLineLength.prototype.lintLine = function(line, lineApi) {
-    var limitComments, lineLength, max, ref, ref1;
-    max = (ref = lineApi.config[this.rule.name]) != null ? ref.value : void 0;
-    limitComments = (ref1 = lineApi.config[this.rule.name]) != null ? ref1.limitComments : void 0;
-    lineLength = line.replace(/\s+$/, '').length;
-    if (lineApi.isLiterate() && regexes.literateComment.test(line)) {
-      lineLength -= 2;
-    }
-    if (max && max < lineLength && !regexes.longUrlComment.test(line)) {
-      if (!limitComments) {
-        if (lineApi.getLineTokens().length === 0) {
-          return;
-        }
-      }
-      return {
-        context: "Length is " + lineLength + ", max is " + max
-      };
-    }
-  };
-
   return MaxLineLength;
 
-})();
-
+}).call(this);
 
 
 },{}],21:[function(require,module,exports){
 var MissingFatArrows, any, containsButIsnt,
-  bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
-  indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
+  indexOf = [].indexOf;
 
 any = function(arr, test) {
   return arr.reduce((function(res, elt) {
@@ -1990,14 +2187,116 @@ containsButIsnt = function(node, nIsThis, nIsClass) {
 };
 
 module.exports = MissingFatArrows = (function() {
-  function MissingFatArrows() {
-    this.isFatArrowCode = bind(this.isFatArrowCode, this);
-    this.isThis = bind(this.isThis, this);
-    this.isObject = bind(this.isObject, this);
-    this.isValue = bind(this.isValue, this);
-    this.isClass = bind(this.isClass, this);
-    this.isCode = bind(this.isCode, this);
-  }
+  class MissingFatArrows {
+    constructor() {
+      this.isCode = this.isCode.bind(this);
+      this.isClass = this.isClass.bind(this);
+      this.isValue = this.isValue.bind(this);
+      this.isObject = this.isObject.bind(this);
+      this.isThis = this.isThis.bind(this);
+      this.isFatArrowCode = this.isFatArrowCode.bind(this);
+    }
+
+    lintAST(node, astApi) {
+      this.astApi = astApi;
+      this.lintNode(node);
+      return void 0;
+    }
+
+    lintNode(node, methods = []) {
+      var error, isStrict, ref;
+      isStrict = (ref = this.astApi.config[this.rule.name]) != null ? ref.is_strict : void 0;
+      if (this.isPrototype(node)) {
+        return;
+      }
+      if (this.isConstructor(node)) {
+        return;
+      }
+      // Ignore any nodes we know to be methods
+      if ((!this.isFatArrowCode(node)) && (isStrict ? true : indexOf.call(methods, node) < 0) && (this.needsFatArrow(node))) {
+        error = this.astApi.createError({
+          lineNumber: node.locationData.first_line + 1
+        });
+        this.errors.push(error);
+      }
+      return node.eachChild((child) => {
+        return this.lintNode(child, (function() {
+          switch (false) {
+            case !this.isClass(node):
+              return this.methodsOfClass(node);
+            // Once we've hit a function, we know we can't be in the top
+            // level of a method anymore, so we can safely reset the methods
+            // to empty to save work.
+            case !this.isCode(node):
+              return [];
+            default:
+              return methods;
+          }
+        }).call(this));
+      });
+    }
+
+    isCode(node) {
+      return this.astApi.getNodeName(node) === 'Code';
+    }
+
+    isClass(node) {
+      return this.astApi.getNodeName(node) === 'Class';
+    }
+
+    isValue(node) {
+      return this.astApi.getNodeName(node) === 'Value';
+    }
+
+    isObject(node) {
+      return this.astApi.getNodeName(node) === 'Obj';
+    }
+
+    isPrototype(node) {
+      var i, ident, len, props, ref, ref1;
+      props = (node != null ? (ref = node.variable) != null ? ref.properties : void 0 : void 0) || [];
+      for (i = 0, len = props.length; i < len; i++) {
+        ident = props[i];
+        if (((ref1 = ident.name) != null ? ref1.value : void 0) === 'prototype') {
+          return true;
+        }
+      }
+      return false;
+    }
+
+    isThis(node) {
+      return this.isValue(node) && node.base.value === 'this';
+    }
+
+    isFatArrowCode(node) {
+      return this.isCode(node) && node.bound;
+    }
+
+    isConstructor(node) {
+      var ref, ref1;
+      return ((ref = node.variable) != null ? (ref1 = ref.base) != null ? ref1.value : void 0 : void 0) === 'constructor';
+    }
+
+    needsFatArrow(node) {
+      return this.isCode(node) && (any(node.params, (param) => {
+        return param.contains(this.isThis) != null;
+      }) || containsButIsnt(node.body, this.isThis, this.isClass));
+    }
+
+    methodsOfClass(classNode) {
+      var bodyNodes, returnNode;
+      bodyNodes = classNode.body.expressions;
+      returnNode = bodyNodes[bodyNodes.length - 1];
+      if ((returnNode != null) && this.isValue(returnNode) && this.isObject(returnNode.base)) {
+        return returnNode.base.properties.map(function(assignNode) {
+          return assignNode.value;
+        }).filter(this.isCode);
+      } else {
+        return [];
+      }
+    }
+
+  };
 
   MissingFatArrows.prototype.rule = {
     name: 'missing_fat_arrows',
@@ -2007,119 +2306,77 @@ module.exports = MissingFatArrows = (function() {
     description: 'Warns when you use `this` inside a function that wasn\'t defined\nwith a fat arrow. This rule does not apply to methods defined in a\nclass, since they have `this` bound to the class instance (or the\nclass itself, for class methods). The option `is_strict` is\navailable for checking bindings of class methods.\n\nIt is impossible to statically determine whether a function using\n`this` will be bound with the correct `this` value due to language\nfeatures like `Function.prototype.call` and\n`Function.prototype.bind`, so this rule may produce false positives.'
   };
 
-  MissingFatArrows.prototype.lintAST = function(node, astApi) {
-    this.astApi = astApi;
-    this.lintNode(node);
-    return void 0;
-  };
-
-  MissingFatArrows.prototype.lintNode = function(node, methods) {
-    var error, isStrict, ref;
-    if (methods == null) {
-      methods = [];
-    }
-    isStrict = (ref = this.astApi.config[this.rule.name]) != null ? ref.is_strict : void 0;
-    if (this.isPrototype(node)) {
-      return;
-    }
-    if (this.isConstructor(node)) {
-      return;
-    }
-    if ((!this.isFatArrowCode(node)) && (isStrict ? true : indexOf.call(methods, node) < 0) && (this.needsFatArrow(node))) {
-      error = this.astApi.createError({
-        lineNumber: node.locationData.first_line + 1
-      });
-      this.errors.push(error);
-    }
-    return node.eachChild((function(_this) {
-      return function(child) {
-        return _this.lintNode(child, (function() {
-          switch (false) {
-            case !this.isClass(node):
-              return this.methodsOfClass(node);
-            case !this.isCode(node):
-              return [];
-            default:
-              return methods;
-          }
-        }).call(_this));
-      };
-    })(this));
-  };
-
-  MissingFatArrows.prototype.isCode = function(node) {
-    return this.astApi.getNodeName(node) === 'Code';
-  };
-
-  MissingFatArrows.prototype.isClass = function(node) {
-    return this.astApi.getNodeName(node) === 'Class';
-  };
-
-  MissingFatArrows.prototype.isValue = function(node) {
-    return this.astApi.getNodeName(node) === 'Value';
-  };
-
-  MissingFatArrows.prototype.isObject = function(node) {
-    return this.astApi.getNodeName(node) === 'Obj';
-  };
-
-  MissingFatArrows.prototype.isPrototype = function(node) {
-    var i, ident, len, props, ref, ref1;
-    props = (node != null ? (ref = node.variable) != null ? ref.properties : void 0 : void 0) || [];
-    for (i = 0, len = props.length; i < len; i++) {
-      ident = props[i];
-      if (((ref1 = ident.name) != null ? ref1.value : void 0) === 'prototype') {
-        return true;
-      }
-    }
-    return false;
-  };
-
-  MissingFatArrows.prototype.isThis = function(node) {
-    return this.isValue(node) && node.base.value === 'this';
-  };
-
-  MissingFatArrows.prototype.isFatArrowCode = function(node) {
-    return this.isCode(node) && node.bound;
-  };
-
-  MissingFatArrows.prototype.isConstructor = function(node) {
-    var ref, ref1;
-    return ((ref = node.variable) != null ? (ref1 = ref.base) != null ? ref1.value : void 0 : void 0) === 'constructor';
-  };
-
-  MissingFatArrows.prototype.needsFatArrow = function(node) {
-    return this.isCode(node) && (any(node.params, (function(_this) {
-      return function(param) {
-        return param.contains(_this.isThis) != null;
-      };
-    })(this)) || containsButIsnt(node.body, this.isThis, this.isClass));
-  };
-
-  MissingFatArrows.prototype.methodsOfClass = function(classNode) {
-    var bodyNodes, returnNode;
-    bodyNodes = classNode.body.expressions;
-    returnNode = bodyNodes[bodyNodes.length - 1];
-    if ((returnNode != null) && this.isValue(returnNode) && this.isObject(returnNode.base)) {
-      return returnNode.base.properties.map(function(assignNode) {
-        return assignNode.value;
-      }).filter(this.isCode);
-    } else {
-      return [];
-    }
-  };
-
   return MissingFatArrows;
 
-})();
-
+}).call(this);
 
 
 },{}],22:[function(require,module,exports){
 var NewlinesAfterClasses;
 
 module.exports = NewlinesAfterClasses = (function() {
-  function NewlinesAfterClasses() {}
+  class NewlinesAfterClasses {
+    lintToken(token, tokenApi) {
+      var afters, befores, comment, ending, got, lineNumber, lines, numIndents, outdent, ref, ref1, start, trueLine, type;
+      [
+        type,
+        numIndents,
+        {
+          first_line: lineNumber
+        }
+      ] = token;
+      ({lines} = tokenApi);
+      ending = tokenApi.config[this.rule.name].value;
+      if (type === 'CLASS') {
+        this.classCount++;
+      }
+      if (this.classCount > 0 && (token.generated != null)) {
+        if (type === '{' && ((ref = token.origin) != null ? ref[0] : void 0) === ':') {
+          this.classBracesCount++;
+        }
+        if (type === '}' && ((ref1 = token.origin) != null ? ref1[0] : void 0) === 'OUTDENT') {
+          this.classBracesCount--;
+          this.classCount--;
+          if (this.classCount === 0 && this.classBracesCount === 0) {
+            befores = 1;
+            afters = 1;
+            comment = 0;
+            outdent = token.origin[2].first_line;
+            start = Math.min(lineNumber, outdent);
+            trueLine = 2e308;
+            while (/^\s*(#|$)/.test(lines[start + afters])) {
+              if (/^\s*#/.test(lines[start + afters])) {
+                comment += 1;
+              } else {
+                trueLine = Math.min(trueLine, start + afters);
+              }
+              afters += 1;
+            }
+            while (/^\s*(#|$)/.test(lines[start - befores])) {
+              if (/^\s*#/.test(lines[start - befores])) {
+                comment += 1;
+              } else {
+                trueLine = Math.min(trueLine, start - befores);
+              }
+              befores += 1;
+            }
+            // add up blank lines, subtract comments, subtract 2 because
+            // before/after counters started at 1.
+            got = afters + befores - comment - 2;
+            // if `got` and `ending` don't match throw an error _unless_
+            // we are at the end of the file.
+            if (got !== ending && trueLine + ending <= lines.length) {
+              return {
+                context: `Expected ${ending} got ${got}`,
+                lineNumber: trueLine
+              };
+            }
+          }
+        }
+      }
+    }
+
+  };
 
   NewlinesAfterClasses.prototype.rule = {
     name: 'newlines_after_classes',
@@ -2135,67 +2392,21 @@ module.exports = NewlinesAfterClasses = (function() {
 
   NewlinesAfterClasses.prototype.classCount = 0;
 
-  NewlinesAfterClasses.prototype.lintToken = function(token, tokenApi) {
-    var afters, befores, comment, ending, got, lineNumber, lines, numIndents, outdent, ref, ref1, ref2, start, trueLine, type;
-    type = token[0], numIndents = token[1], (ref = token[2], lineNumber = ref.first_line);
-    lines = tokenApi.lines;
-    ending = tokenApi.config[this.rule.name].value;
-    if (type === 'CLASS') {
-      this.classCount++;
-    }
-    if (this.classCount > 0 && (token.generated != null)) {
-      if (type === '{' && ((ref1 = token.origin) != null ? ref1[0] : void 0) === ':') {
-        this.classBracesCount++;
-      }
-      if (type === '}' && ((ref2 = token.origin) != null ? ref2[0] : void 0) === 'OUTDENT') {
-        this.classBracesCount--;
-        this.classCount--;
-        if (this.classCount === 0 && this.classBracesCount === 0) {
-          befores = 1;
-          afters = 1;
-          comment = 0;
-          outdent = token.origin[2].first_line;
-          start = Math.min(lineNumber, outdent);
-          trueLine = Infinity;
-          while (/^\s*(#|$)/.test(lines[start + afters])) {
-            if (/^\s*#/.test(lines[start + afters])) {
-              comment += 1;
-            } else {
-              trueLine = Math.min(trueLine, start + afters);
-            }
-            afters += 1;
-          }
-          while (/^\s*(#|$)/.test(lines[start - befores])) {
-            if (/^\s*#/.test(lines[start - befores])) {
-              comment += 1;
-            } else {
-              trueLine = Math.min(trueLine, start - befores);
-            }
-            befores += 1;
-          }
-          got = afters + befores - comment - 2;
-          if (got !== ending && trueLine + ending <= lines.length) {
-            return {
-              context: "Expected " + ending + " got " + got,
-              lineNumber: trueLine
-            };
-          }
-        }
-      }
-    }
-  };
-
   return NewlinesAfterClasses;
 
-})();
-
+}).call(this);
 
 
 },{}],23:[function(require,module,exports){
 var NoBackticks;
 
 module.exports = NoBackticks = (function() {
-  function NoBackticks() {}
+  class NoBackticks {
+    lintToken(token, tokenApi) {
+      return token.comments == null;
+    }
+
+  };
 
   NoBackticks.prototype.rule = {
     name: 'no_backticks',
@@ -2206,21 +2417,34 @@ module.exports = NoBackticks = (function() {
 
   NoBackticks.prototype.tokens = ['JS'];
 
-  NoBackticks.prototype.lintToken = function(token, tokenApi) {
-    return true;
-  };
-
   return NoBackticks;
 
-})();
-
+}).call(this);
 
 
 },{}],24:[function(require,module,exports){
 var NoDebugger;
 
 module.exports = NoDebugger = (function() {
-  function NoDebugger() {}
+  class NoDebugger {
+    lintToken(token, tokenApi) {
+      var method, ref, ref1, ref2;
+      if (((ref = token[0]) === 'DEBUGGER' || ref === 'STATEMENT') && token[1] === 'debugger') {
+        return {
+          context: `found '${token[0]}'`
+        };
+      }
+      if ((ref1 = tokenApi.config[this.rule.name]) != null ? ref1.console : void 0) {
+        if (token[1] === 'console' && ((ref2 = tokenApi.peek(1)) != null ? ref2[0] : void 0) === '.') {
+          method = tokenApi.peek(2);
+          return {
+            context: `found 'console.${method[1]}'`
+          };
+        }
+      }
+    }
+
+  };
 
   NoDebugger.prototype.rule = {
     name: 'no_debugger',
@@ -2230,29 +2454,12 @@ module.exports = NoDebugger = (function() {
     description: 'This rule detects `debugger` and optionally `console` calls\nThis rule is `warn` by default.'
   };
 
-  NoDebugger.prototype.tokens = ['DEBUGGER', 'IDENTIFIER'];
-
-  NoDebugger.prototype.lintToken = function(token, tokenApi) {
-    var method, ref, ref1;
-    if (token[0] === 'DEBUGGER') {
-      return {
-        context: "found '" + token[0] + "'"
-      };
-    }
-    if ((ref = tokenApi.config[this.rule.name]) != null ? ref.console : void 0) {
-      if (token[1] === 'console' && ((ref1 = tokenApi.peek(1)) != null ? ref1[0] : void 0) === '.') {
-        method = tokenApi.peek(2);
-        return {
-          context: "found 'console." + method[1] + "'"
-        };
-      }
-    }
-  };
+  // TODO: after <1.10.0 is not supported, remove 'DEBUGGER' here
+  NoDebugger.prototype.tokens = ['STATEMENT', 'DEBUGGER', 'IDENTIFIER'];
 
   return NoDebugger;
 
-})();
-
+}).call(this);
 
 
 },{}],25:[function(require,module,exports){
@@ -2265,7 +2472,26 @@ isEmptyCode = function(node, astApi) {
 };
 
 module.exports = NoEmptyFunctions = (function() {
-  function NoEmptyFunctions() {}
+  class NoEmptyFunctions {
+    lintAST(node, astApi) {
+      this.lintNode(node, astApi);
+      return void 0;
+    }
+
+    lintNode(node, astApi) {
+      var error;
+      if (isEmptyCode(node, astApi)) {
+        error = astApi.createError({
+          lineNumber: node.locationData.first_line + 1
+        });
+        this.errors.push(error);
+      }
+      return node.eachChild((child) => {
+        return this.lintNode(child, astApi);
+      });
+    }
+
+  };
 
   NoEmptyFunctions.prototype.rule = {
     name: 'no_empty_functions',
@@ -2274,37 +2500,23 @@ module.exports = NoEmptyFunctions = (function() {
     description: 'Disallows declaring empty functions. The goal of this rule is that\nunintentional empty callbacks can be detected:\n<pre>\n<code>someFunctionWithCallback ->\ndoSomethingSignificant()\n</code>\n</pre>\nThe problem is that the call to\n<tt>doSomethingSignificant</tt> will be made regardless\nof <tt>someFunctionWithCallback</tt>\'s execution. It can\nbe because you did not indent the call to\n<tt>doSomethingSignificant</tt> properly.\n\nIf you really meant that <tt>someFunctionWithCallback</tt>\nshould call a callback that does nothing, you can write your code\nthis way:\n<pre>\n<code>someFunctionWithCallback ->\n    undefined\ndoSomethingSignificant()\n</code>\n</pre>'
   };
 
-  NoEmptyFunctions.prototype.lintAST = function(node, astApi) {
-    this.lintNode(node, astApi);
-    return void 0;
-  };
-
-  NoEmptyFunctions.prototype.lintNode = function(node, astApi) {
-    var error;
-    if (isEmptyCode(node, astApi)) {
-      error = astApi.createError({
-        lineNumber: node.locationData.first_line + 1
-      });
-      this.errors.push(error);
-    }
-    return node.eachChild((function(_this) {
-      return function(child) {
-        return _this.lintNode(child, astApi);
-      };
-    })(this));
-  };
-
   return NoEmptyFunctions;
 
-})();
-
+}).call(this);
 
 
 },{}],26:[function(require,module,exports){
 var NoEmptyParamList;
 
 module.exports = NoEmptyParamList = (function() {
-  function NoEmptyParamList() {}
+  class NoEmptyParamList {
+    lintToken(token, tokenApi) {
+      var nextType;
+      nextType = tokenApi.peek()[0];
+      return nextType === 'PARAM_END';
+    }
+
+  };
 
   NoEmptyParamList.prototype.rule = {
     name: 'no_empty_param_list',
@@ -2315,22 +2527,102 @@ module.exports = NoEmptyParamList = (function() {
 
   NoEmptyParamList.prototype.tokens = ['PARAM_START'];
 
-  NoEmptyParamList.prototype.lintToken = function(token, tokenApi) {
-    var nextType;
-    nextType = tokenApi.peek()[0];
-    return nextType === 'PARAM_END';
-  };
-
   return NoEmptyParamList;
 
-})();
-
+}).call(this);
 
 
 },{}],27:[function(require,module,exports){
-var NoImplicitBraces;
+var NoImplicitBraces,
+  slice = [].slice;
 
 module.exports = NoImplicitBraces = (function() {
+  class NoImplicitBraces {
+    constructor() {
+      this.isClass = false;
+      this.className = '';
+    }
+
+    lintToken(token, tokenApi) {
+      var _type, _val, c, lineNum, peekIdent, prevToken, ref, type, val;
+      [type, val, lineNum] = token;
+      if (type === 'OUTDENT' || type === 'INDENT' || type === 'CLASS') {
+        return this.trackClass(...arguments);
+      }
+      // reset "className" if class uses EXTENDS keyword
+      if (type === 'EXTENDS') {
+        this.className = '';
+        return;
+      }
+      // If we're looking at an IDENTIFIER, and we're in a class, and we've not
+      // set a className (or the previous non-identifier was 'EXTENDS', set the
+      // current identifier as the class name)
+      if ((type === 'IDENTIFIER' || type === 'PROPERTY') && this.isClass && this.className === '') {
+        // Backtrack to get the full classname
+        c = 0;
+        while ((ref = tokenApi.peek(c)[0]) === 'IDENTIFIER' || ref === 'PROPERTY' || ref === '.') {
+          this.className += tokenApi.peek(c)[1];
+          c++;
+        }
+      }
+      if (token.generated && type === '{') {
+        // If strict mode is set to false it allows implicit braces when the
+        // object is declared over multiple lines.
+        if (!tokenApi.config[this.rule.name].strict) {
+          [prevToken] = tokenApi.peek(-1);
+          if (prevToken === 'INDENT' || prevToken === 'TERMINATOR') {
+            return;
+          }
+        }
+        if (this.isClass) {
+          // The way CoffeeScript generates tokens for classes
+          // is a bit weird. It generates '{' tokens around instance
+          // methods (also known as the prototypes of an Object).
+          [prevToken] = tokenApi.peek(-1);
+          // If there is a TERMINATOR token right before the '{' token
+          if (prevToken === 'TERMINATOR') {
+            return;
+          }
+          peekIdent = '';
+          c = -2;
+          // Go back until you grab all the tokens with IDENTIFIER,
+          // PROPERTY or '.'
+          while (([_type, _val] = tokenApi.peek(c))) {
+            if (_type !== 'IDENTIFIER' && _type !== 'PROPERTY' && _type !== '.') {
+              break;
+            }
+            peekIdent = _val + peekIdent;
+            c--;
+          }
+          if (peekIdent === this.className) {
+            return;
+          }
+        }
+        return true;
+      }
+    }
+
+    trackClass(token, tokenApi) {
+      var ln, n0, n1, ref, ref1, ref2;
+      ref = [token, tokenApi.peek()], (ref1 = ref[0], [n0] = ref1, [ln] = slice.call(ref1, -1)), (ref2 = ref[1], [n1] = ref2);
+      if (n0 === 'INDENT') {
+        this.dent++;
+      }
+      if (n0 === 'OUTDENT') {
+        this.dent--;
+      }
+      if (this.dent === 0 && n0 === 'OUTDENT' && n1 === 'TERMINATOR') {
+        this.isClass = false;
+      }
+      if (n0 === 'CLASS') {
+        this.isClass = true;
+        this.className = '';
+      }
+      return null;
+    }
+
+  };
+
   NoImplicitBraces.prototype.rule = {
     name: 'no_implicit_braces',
     level: 'ignore',
@@ -2339,83 +2631,49 @@ module.exports = NoImplicitBraces = (function() {
     description: 'This rule prohibits implicit braces when declaring object literals.\nImplicit braces can make code more difficult to understand,\nespecially when used in combination with optional parenthesis.\n<pre>\n<code># Do you find this code ambiguous? Is it a\n# function call with three arguments or four?\nmyFunction a, b, 1:2, 3:4\n\n# While the same code written in a more\n# explicit manner has no ambiguity.\nmyFunction(a, b, {1:2, 3:4})\n</code>\n</pre>\nImplicit braces are permitted by default, since their use is\nidiomatic CoffeeScript.'
   };
 
-  NoImplicitBraces.prototype.tokens = ['{', 'OUTDENT', 'CLASS', 'IDENTIFIER', 'EXTENDS'];
+  NoImplicitBraces.prototype.tokens = ['{', 'OUTDENT', 'INDENT', 'CLASS', 'IDENTIFIER', 'PROPERTY', 'EXTENDS'];
 
-  function NoImplicitBraces() {
-    this.isClass = false;
-    this.className = '';
-  }
-
-  NoImplicitBraces.prototype.lintToken = function(token, tokenApi) {
-    var _type, _val, c, lineNum, peekIdent, prevToken, ref, ref1, type, val;
-    type = token[0], val = token[1], lineNum = token[2];
-    if (type === 'OUTDENT' || type === 'CLASS') {
-      return this.trackClass.apply(this, arguments);
-    }
-    if (type === 'EXTENDS') {
-      this.className = '';
-      return;
-    }
-    if (type === 'IDENTIFIER' && this.isClass && this.className === '') {
-      c = 0;
-      while ((ref = tokenApi.peek(c)[0]) === 'IDENTIFIER' || ref === '.') {
-        this.className += tokenApi.peek(c)[1];
-        c++;
-      }
-    }
-    if (token.generated && type === '{') {
-      if (!tokenApi.config[this.rule.name].strict) {
-        prevToken = tokenApi.peek(-1)[0];
-        if (prevToken === 'INDENT' || prevToken === 'TERMINATOR') {
-          return;
-        }
-      }
-      if (this.isClass) {
-        prevToken = tokenApi.peek(-1)[0];
-        if (prevToken === 'TERMINATOR') {
-          return;
-        }
-        peekIdent = '';
-        c = -2;
-        while ((ref1 = tokenApi.peek(c), _type = ref1[0], _val = ref1[1], ref1)) {
-          if (_type !== 'IDENTIFIER' && _type !== '.') {
-            break;
-          }
-          peekIdent = _val + peekIdent;
-          c--;
-        }
-        if (peekIdent === this.className) {
-          return;
-        }
-      }
-      return true;
-    }
-  };
-
-  NoImplicitBraces.prototype.trackClass = function(token, tokenApi) {
-    var ln, n0, n1, ref, ref1, ref2;
-    ref = [token, tokenApi.peek()], (ref1 = ref[0], n0 = ref1[0], ln = ref1[ref1.length - 1]), (ref2 = ref[1], n1 = ref2[0]);
-    if (n0 === 'OUTDENT' && n1 === 'TERMINATOR') {
-      this.isClass = false;
-    }
-    if (n0 === 'CLASS') {
-      this.isClass = true;
-      this.className = '';
-    }
-    return null;
-  };
+  NoImplicitBraces.prototype.dent = 0;
 
   return NoImplicitBraces;
 
-})();
-
+}).call(this);
 
 
 },{}],28:[function(require,module,exports){
 var NoImplicitParens;
 
 module.exports = NoImplicitParens = (function() {
-  function NoImplicitParens() {}
+  class NoImplicitParens {
+    lintToken(token, tokenApi) {
+      var genCallStart, i, sameLine, t;
+      if (token.generated) {
+        if (tokenApi.config[this.rule.name].strict !== false) {
+          return true;
+        } else {
+          // If strict mode is turned off it allows implicit parens when
+          // the expression is spread over multiple lines.
+          i = -1;
+          while (true) {
+            t = tokenApi.peek(i);
+            sameLine = t[2].first_line === token[2].first_line;
+            genCallStart = t[0] === 'CALL_START' && t.generated;
+            if ((t == null) || genCallStart && sameLine) {
+              return true;
+            }
+            // If we have not found a CALL_START token that is generated,
+            // and we've moved into a new line, this is fine and should
+            // just return.
+            if (!sameLine) {
+              return null;
+            }
+            i -= 1;
+          }
+        }
+      }
+    }
+
+  };
 
   NoImplicitParens.prototype.rule = {
     name: 'no_implicit_parens',
@@ -2427,38 +2685,24 @@ module.exports = NoImplicitParens = (function() {
 
   NoImplicitParens.prototype.tokens = ['CALL_END'];
 
-  NoImplicitParens.prototype.lintToken = function(token, tokenApi) {
-    var i, t;
-    if (token.generated) {
-      if (tokenApi.config[this.rule.name].strict !== false) {
-        return true;
-      } else {
-        i = -1;
-        while (true) {
-          t = tokenApi.peek(i);
-          if ((t == null) || (t[0] === 'CALL_START' && t.generated)) {
-            return true;
-          }
-          if (t[2].first_line !== token[2].first_line) {
-            return null;
-          }
-          i -= 1;
-        }
-      }
-    }
-  };
-
   return NoImplicitParens;
 
-})();
-
+}).call(this);
 
 
 },{}],29:[function(require,module,exports){
 var NoInterpolationInSingleQuotes;
 
 module.exports = NoInterpolationInSingleQuotes = (function() {
-  function NoInterpolationInSingleQuotes() {}
+  class NoInterpolationInSingleQuotes {
+    lintToken(token, tokenApi) {
+      var hasInterpolation, tokenValue;
+      tokenValue = token[1];
+      hasInterpolation = tokenValue.match(/^\'.*#\{[^}]+\}.*\'$/);
+      return hasInterpolation;
+    }
+
+  };
 
   NoInterpolationInSingleQuotes.prototype.rule = {
     name: 'no_interpolation_in_single_quotes',
@@ -2469,23 +2713,48 @@ module.exports = NoInterpolationInSingleQuotes = (function() {
 
   NoInterpolationInSingleQuotes.prototype.tokens = ['STRING'];
 
-  NoInterpolationInSingleQuotes.prototype.lintToken = function(token, tokenApi) {
-    var hasInterpolation, tokenValue;
-    tokenValue = token[1];
-    hasInterpolation = tokenValue.match(/^\'.*#\{[^}]+\}.*\'$/);
-    return hasInterpolation;
-  };
-
   return NoInterpolationInSingleQuotes;
 
-})();
-
+}).call(this);
 
 
 },{}],30:[function(require,module,exports){
 var NoNestedStringInterpolation;
 
 module.exports = NoNestedStringInterpolation = (function() {
+  class NoNestedStringInterpolation {
+    constructor() {
+      this.startedStrings = 0;
+      this.generatedError = false;
+    }
+
+    lintToken([type], tokenApi) {
+      if (type === 'STRING_START') {
+        return this.trackStringStart();
+      } else {
+        return this.trackStringEnd();
+      }
+    }
+
+    trackStringStart() {
+      this.startedStrings += 1;
+      // Don't generate multiple errors for deeply nested string interpolation
+      if (this.startedStrings <= 1 || this.generatedError) {
+        return;
+      }
+      this.generatedError = true;
+      return true;
+    }
+
+    trackStringEnd() {
+      this.startedStrings -= 1;
+      if (this.startedStrings === 1) {
+        return this.generatedError = false;
+      }
+    }
+
+  };
+
   NoNestedStringInterpolation.prototype.rule = {
     name: 'no_nested_string_interpolation',
     level: 'warn',
@@ -2495,48 +2764,23 @@ module.exports = NoNestedStringInterpolation = (function() {
 
   NoNestedStringInterpolation.prototype.tokens = ['STRING_START', 'STRING_END'];
 
-  function NoNestedStringInterpolation() {
-    this.startedStrings = 0;
-    this.generatedError = false;
-  }
-
-  NoNestedStringInterpolation.prototype.lintToken = function(arg, tokenApi) {
-    var type;
-    type = arg[0];
-    if (type === 'STRING_START') {
-      return this.trackStringStart();
-    } else {
-      return this.trackStringEnd();
-    }
-  };
-
-  NoNestedStringInterpolation.prototype.trackStringStart = function() {
-    this.startedStrings += 1;
-    if (this.startedStrings <= 1 || this.generatedError) {
-      return;
-    }
-    this.generatedError = true;
-    return true;
-  };
-
-  NoNestedStringInterpolation.prototype.trackStringEnd = function() {
-    this.startedStrings -= 1;
-    if (this.startedStrings === 1) {
-      return this.generatedError = false;
-    }
-  };
-
   return NoNestedStringInterpolation;
 
-})();
-
+}).call(this);
 
 
 },{}],31:[function(require,module,exports){
 var NoPlusPlus;
 
 module.exports = NoPlusPlus = (function() {
-  function NoPlusPlus() {}
+  class NoPlusPlus {
+    lintToken(token, tokenApi) {
+      return {
+        context: `found '${token[0]}'`
+      };
+    }
+
+  };
 
   NoPlusPlus.prototype.rule = {
     name: 'no_plusplus',
@@ -2547,31 +2791,95 @@ module.exports = NoPlusPlus = (function() {
 
   NoPlusPlus.prototype.tokens = ['++', '--'];
 
-  NoPlusPlus.prototype.lintToken = function(token, tokenApi) {
-    return {
-      context: "found '" + token[0] + "'"
-    };
-  };
-
   return NoPlusPlus;
 
-})();
-
+}).call(this);
 
 
 },{}],32:[function(require,module,exports){
 var NoPrivateFunctionFatArrows,
-  bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
-  indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
+  indexOf = [].indexOf;
 
 module.exports = NoPrivateFunctionFatArrows = (function() {
-  function NoPrivateFunctionFatArrows() {
-    this.isFatArrowCode = bind(this.isFatArrowCode, this);
-    this.isObject = bind(this.isObject, this);
-    this.isValue = bind(this.isValue, this);
-    this.isClass = bind(this.isClass, this);
-    this.isCode = bind(this.isCode, this);
-  }
+  class NoPrivateFunctionFatArrows {
+    constructor() {
+      this.isCode = this.isCode.bind(this);
+      this.isClass = this.isClass.bind(this);
+      this.isValue = this.isValue.bind(this);
+      this.isObject = this.isObject.bind(this);
+      this.isFatArrowCode = this.isFatArrowCode.bind(this);
+    }
+
+    lintAST(node, astApi) {
+      this.astApi = astApi;
+      this.lintNode(node);
+      return void 0;
+    }
+
+    lintNode(node, functions = []) {
+      var error;
+      if (this.isFatArrowCode(node) && indexOf.call(functions, node) >= 0) {
+        error = this.astApi.createError({
+          lineNumber: node.locationData.first_line + 1
+        });
+        this.errors.push(error);
+      }
+      return node.eachChild((child) => {
+        return this.lintNode(child, (function() {
+          switch (false) {
+            case !this.isClass(node):
+              return this.functionsOfClass(node);
+            // Once we've hit a function, we know we can't be in the top
+            // level of a function anymore, so we can safely reset the
+            // functions to empty to save work.
+            case !this.isCode(node):
+              return [];
+            default:
+              return functions;
+          }
+        }).call(this));
+      });
+    }
+
+    isCode(node) {
+      return this.astApi.getNodeName(node) === 'Code';
+    }
+
+    isClass(node) {
+      return this.astApi.getNodeName(node) === 'Class';
+    }
+
+    isValue(node) {
+      return this.astApi.getNodeName(node) === 'Value';
+    }
+
+    isObject(node) {
+      return this.astApi.getNodeName(node) === 'Obj';
+    }
+
+    isFatArrowCode(node) {
+      return this.isCode(node) && node.bound;
+    }
+
+    functionsOfClass(classNode) {
+      var bodyNode, bodyValues;
+      bodyValues = (function() {
+        var i, len, ref, results;
+        ref = classNode.body.expressions;
+        results = [];
+        for (i = 0, len = ref.length; i < len; i++) {
+          bodyNode = ref[i];
+          if (this.isValue(bodyNode) && this.isObject(bodyNode.base)) {
+            continue;
+          }
+          results.push(bodyNode.value);
+        }
+        return results;
+      }).call(this);
+      return bodyValues.filter(this.isCode);
+    }
+
+  };
 
   NoPrivateFunctionFatArrows.prototype.rule = {
     name: 'no_private_function_fat_arrows',
@@ -2580,88 +2888,42 @@ module.exports = NoPrivateFunctionFatArrows = (function() {
     description: 'Warns when you use the fat arrow for a private function\ninside a class definition scope. It is not necessary and\nit does not do anything.'
   };
 
-  NoPrivateFunctionFatArrows.prototype.lintAST = function(node, astApi) {
-    this.astApi = astApi;
-    this.lintNode(node);
-    return void 0;
-  };
-
-  NoPrivateFunctionFatArrows.prototype.lintNode = function(node, functions) {
-    var error;
-    if (functions == null) {
-      functions = [];
-    }
-    if (this.isFatArrowCode(node) && indexOf.call(functions, node) >= 0) {
-      error = this.astApi.createError({
-        lineNumber: node.locationData.first_line + 1
-      });
-      this.errors.push(error);
-    }
-    return node.eachChild((function(_this) {
-      return function(child) {
-        return _this.lintNode(child, (function() {
-          switch (false) {
-            case !this.isClass(node):
-              return this.functionsOfClass(node);
-            case !this.isCode(node):
-              return [];
-            default:
-              return functions;
-          }
-        }).call(_this));
-      };
-    })(this));
-  };
-
-  NoPrivateFunctionFatArrows.prototype.isCode = function(node) {
-    return this.astApi.getNodeName(node) === 'Code';
-  };
-
-  NoPrivateFunctionFatArrows.prototype.isClass = function(node) {
-    return this.astApi.getNodeName(node) === 'Class';
-  };
-
-  NoPrivateFunctionFatArrows.prototype.isValue = function(node) {
-    return this.astApi.getNodeName(node) === 'Value';
-  };
-
-  NoPrivateFunctionFatArrows.prototype.isObject = function(node) {
-    return this.astApi.getNodeName(node) === 'Obj';
-  };
-
-  NoPrivateFunctionFatArrows.prototype.isFatArrowCode = function(node) {
-    return this.isCode(node) && node.bound;
-  };
-
-  NoPrivateFunctionFatArrows.prototype.functionsOfClass = function(classNode) {
-    var bodyNode, bodyValues;
-    bodyValues = (function() {
-      var i, len, ref, results;
-      ref = classNode.body.expressions;
-      results = [];
-      for (i = 0, len = ref.length; i < len; i++) {
-        bodyNode = ref[i];
-        if (this.isValue(bodyNode) && this.isObject(bodyNode.base)) {
-          continue;
-        }
-        results.push(bodyNode.value);
-      }
-      return results;
-    }).call(this);
-    return bodyValues.filter(this.isCode);
-  };
-
   return NoPrivateFunctionFatArrows;
 
-})();
-
+}).call(this);
 
 
 },{}],33:[function(require,module,exports){
 var NoStandAloneAt;
 
 module.exports = NoStandAloneAt = (function() {
-  function NoStandAloneAt() {}
+  class NoStandAloneAt {
+    lintToken(token, tokenApi) {
+      var isAStart, isDot, isProp, isProtoProp, nextToken, noSpace, ref, ref1;
+      [nextToken] = tokenApi.peek();
+      noSpace = !token.spaced;
+      // TODO: after <1.10.0 is not supported, remove 'IDENTIFIER' here
+      isProp = nextToken === 'IDENTIFIER' || nextToken === 'PROPERTY';
+      isAStart = nextToken === 'INDEX_START' || nextToken === 'CALL_START'; // @[] or @()
+      isDot = nextToken === '.';
+      // https://github.com/jashkenas/coffee-script/issues/1601
+      // @::foo is valid, but @:: behaves inconsistently and is planned for
+      // removal. Technically @:: is a stand alone ::, but I think it makes
+      // sense to group it into no_stand_alone_at
+
+      // TODO: after v1.10.0 is not supported, remove 'IDENTIFIER' here
+      isProtoProp = nextToken === '::' && ((ref = (ref1 = tokenApi.peek(2)) != null ? ref1[0] : void 0) === 'IDENTIFIER' || ref === 'PROPERTY');
+      // Return an error after an '@' token unless:
+      // 1: there is a '.' afterwards (isDot)
+      // 2: there isn't a space after the '@' and the token following the '@'
+      // is an property, the start of an index '[' or is an property after
+      // the '::'
+      if (!(isDot || (noSpace && (isProp || isAStart || isProtoProp)))) {
+        return true;
+      }
+    }
+
+  };
 
   NoStandAloneAt.prototype.rule = {
     name: 'no_stand_alone_at',
@@ -2672,36 +2934,34 @@ module.exports = NoStandAloneAt = (function() {
 
   NoStandAloneAt.prototype.tokens = ['@'];
 
-  NoStandAloneAt.prototype.lintToken = function(token, tokenApi) {
-    var isDot, isIdentifier, isIndexStart, isValidProtoProperty, nextToken, protoProperty, spaced;
-    nextToken = tokenApi.peek();
-    spaced = token.spaced;
-    isIdentifier = nextToken[0] === 'IDENTIFIER';
-    isIndexStart = nextToken[0] === 'INDEX_START';
-    isDot = nextToken[0] === '.';
-    if (nextToken[0] === '::') {
-      protoProperty = tokenApi.peek(2);
-      isValidProtoProperty = protoProperty[0] === 'IDENTIFIER';
-    }
-    if (spaced || (!isIdentifier && !isIndexStart && !isDot && !isValidProtoProperty)) {
-      return true;
-    }
-  };
-
   return NoStandAloneAt;
 
-})();
-
+}).call(this);
 
 
 },{}],34:[function(require,module,exports){
 var NoTabs, indentationRegex,
-  indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
+  indexOf = [].indexOf;
 
 indentationRegex = /\S/;
 
 module.exports = NoTabs = (function() {
-  function NoTabs() {}
+  class NoTabs {
+    lintLine(line, lineApi) {
+      var indentation;
+      // Only check lines that have compiled tokens. This helps
+      // us ignore tabs in the middle of multi line strings, heredocs, etc.
+      // since they are all reduced to a single token whose line number
+      // is the start of the expression.
+      indentation = line.split(indentationRegex)[0];
+      if (lineApi.lineHasToken() && indexOf.call(indentation, '\t') >= 0) {
+        return true;
+      } else {
+        return null;
+      }
+    }
+
+  };
 
   NoTabs.prototype.rule = {
     name: 'no_tabs',
@@ -2710,27 +2970,30 @@ module.exports = NoTabs = (function() {
     description: 'This rule forbids tabs in indentation. Enough said. It is enabled by\ndefault.'
   };
 
-  NoTabs.prototype.lintLine = function(line, lineApi) {
-    var indentation;
-    indentation = line.split(indentationRegex)[0];
-    if (lineApi.lineHasToken() && indexOf.call(indentation, '\t') >= 0) {
-      return true;
-    } else {
-      return null;
-    }
-  };
-
   return NoTabs;
 
-})();
-
+}).call(this);
 
 
 },{}],35:[function(require,module,exports){
 var NoThis;
 
 module.exports = NoThis = (function() {
-  function NoThis() {}
+  class NoThis {
+    lintToken(token, tokenApi) {
+      var level, nextToken, ref;
+      ({
+        config: {
+          no_stand_alone_at: {level}
+        }
+      } = tokenApi);
+      nextToken = (ref = tokenApi.peek(1)) != null ? ref[0] : void 0;
+      if (!(level !== 'ignore' && nextToken !== '.')) {
+        return true;
+      }
+    }
+
+  };
 
   NoThis.prototype.rule = {
     name: 'no_this',
@@ -2741,26 +3004,25 @@ module.exports = NoThis = (function() {
 
   NoThis.prototype.tokens = ['THIS'];
 
-  NoThis.prototype.lintToken = function(token, tokenApi) {
-    var level, nextToken, ref;
-    level = tokenApi.config.no_stand_alone_at.level;
-    nextToken = (ref = tokenApi.peek(1)) != null ? ref[0] : void 0;
-    if (!(level !== 'ignore' && nextToken !== '.')) {
-      return true;
-    }
-  };
-
   return NoThis;
 
-})();
-
+}).call(this);
 
 
 },{}],36:[function(require,module,exports){
 var NoThrowingStrings;
 
 module.exports = NoThrowingStrings = (function() {
-  function NoThrowingStrings() {}
+  class NoThrowingStrings {
+    lintToken(token, tokenApi) {
+      var n1, nextIsString, ref;
+      ref = tokenApi.peek(), [n1] = ref;
+      // Catch literals and string interpolations, which are wrapped in parens.
+      nextIsString = n1 === 'STRING' || n1 === 'STRING_START';
+      return nextIsString;
+    }
+
+  };
 
   NoThrowingStrings.prototype.rule = {
     name: 'no_throwing_strings',
@@ -2771,30 +3033,61 @@ module.exports = NoThrowingStrings = (function() {
 
   NoThrowingStrings.prototype.tokens = ['THROW'];
 
-  NoThrowingStrings.prototype.lintToken = function(token, tokenApi) {
-    var n1, nextIsString, ref;
-    ref = tokenApi.peek(), n1 = ref[0];
-    nextIsString = n1 === 'STRING' || n1 === 'STRING_START';
-    return nextIsString;
-  };
-
   return NoThrowingStrings;
 
-})();
-
+}).call(this);
 
 
 },{}],37:[function(require,module,exports){
 var NoTrailingSemicolons, regexes,
-  indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; },
-  slice = [].slice;
+  indexOf = [].indexOf,
+  splice = [].splice;
 
 regexes = {
   trailingSemicolon: /;\r?$/
 };
 
 module.exports = NoTrailingSemicolons = (function() {
-  function NoTrailingSemicolons() {}
+  class NoTrailingSemicolons {
+    lintLine(line, lineApi) {
+      var endPos, first, hasNewLine, hasSemicolon, last, lineTokens, newLine, ref, ref1, startCounter, startPos, stopTokens, tokenLen;
+      // The TERMINATOR token is extended through to the next token. As a
+      // result a line with a comment DOES have a token: the TERMINATOR from
+      // the last line of code.
+      lineTokens = lineApi.getLineTokens();
+      tokenLen = lineTokens.length;
+      stopTokens = ['TERMINATOR', 'HERECOMMENT'];
+      if (tokenLen === 1 && (ref = lineTokens[0][0], indexOf.call(stopTokens, ref) >= 0)) {
+        return;
+      }
+      newLine = line;
+      if (tokenLen > 1 && lineTokens[tokenLen - 1][0] === 'TERMINATOR') {
+        // `startPos` contains the end pos of the last non-TERMINATOR token
+        // `endPos` contains the start position of the TERMINATOR token
+
+        // if startPos and endPos arent equal, that probably means a comment
+        // was sliced out of the tokenizer
+        startPos = lineTokens[tokenLen - 2][2].last_column + 1;
+        endPos = lineTokens[tokenLen - 1][2].first_column;
+        if (startPos !== endPos) {
+          startCounter = startPos;
+          while (line[startCounter] !== '#' && startCounter < line.length) {
+            startCounter++;
+          }
+          newLine = line.substring(0, startCounter).replace(/\s*$/, '');
+        }
+      }
+      hasSemicolon = regexes.trailingSemicolon.test(newLine);
+      [...first] = lineTokens, [last] = splice.call(first, -1);
+      hasNewLine = last && (last.newLine != null);
+      // Don't throw errors when the contents of multiline strings,
+      // regexes and the like end in ";"
+      if (hasSemicolon && !hasNewLine && lineApi.lineHasToken() && !((ref1 = last[0]) === 'STRING' || ref1 === 'IDENTIFIER' || ref1 === 'STRING_END')) {
+        return true;
+      }
+    }
+
+  };
 
   NoTrailingSemicolons.prototype.rule = {
     name: 'no_trailing_semicolons',
@@ -2803,38 +3096,9 @@ module.exports = NoTrailingSemicolons = (function() {
     description: 'This rule prohibits trailing semicolons, since they are needless\ncruft in CoffeeScript.\n<pre>\n<code># This semicolon is meaningful.\nx = \'1234\'; console.log(x)\n\n# This semicolon is redundant.\nalert(\'end of line\');\n</code>\n</pre>\nTrailing semicolons are forbidden by default.'
   };
 
-  NoTrailingSemicolons.prototype.lintLine = function(line, lineApi) {
-    var endPos, first, hasNewLine, hasSemicolon, i, last, lineTokens, newLine, ref, ref1, startCounter, startPos, stopTokens, tokenLen;
-    lineTokens = lineApi.getLineTokens();
-    tokenLen = lineTokens.length;
-    stopTokens = ['TERMINATOR', 'HERECOMMENT'];
-    if (tokenLen === 1 && (ref = lineTokens[0][0], indexOf.call(stopTokens, ref) >= 0)) {
-      return;
-    }
-    newLine = line;
-    if (tokenLen > 1 && lineTokens[tokenLen - 1][0] === 'TERMINATOR') {
-      startPos = lineTokens[tokenLen - 2][2].last_column + 1;
-      endPos = lineTokens[tokenLen - 1][2].first_column;
-      if (startPos !== endPos) {
-        startCounter = startPos;
-        while (line[startCounter] !== '#' && startCounter < line.length) {
-          startCounter++;
-        }
-        newLine = line.substring(0, startCounter).replace(/\s*$/, '');
-      }
-    }
-    hasSemicolon = regexes.trailingSemicolon.test(newLine);
-    first = 2 <= lineTokens.length ? slice.call(lineTokens, 0, i = lineTokens.length - 1) : (i = 0, []), last = lineTokens[i++];
-    hasNewLine = last && (last.newLine != null);
-    if (hasSemicolon && !hasNewLine && lineApi.lineHasToken() && !((ref1 = last[0]) === 'STRING' || ref1 === 'IDENTIFIER' || ref1 === 'STRING_END')) {
-      return true;
-    }
-  };
-
   return NoTrailingSemicolons;
 
-})();
-
+}).call(this);
 
 
 },{}],38:[function(require,module,exports){
@@ -2847,7 +3111,48 @@ regexes = {
 };
 
 module.exports = NoTrailingWhitespace = (function() {
-  function NoTrailingWhitespace() {}
+  class NoTrailingWhitespace {
+    lintLine(line, lineApi) {
+      var i, len, ref, ref1, ref2, str, token, tokens;
+      if (!((ref = lineApi.config['no_trailing_whitespace']) != null ? ref.allowed_in_empty_lines : void 0)) {
+        if (regexes.onlySpaces.test(line)) {
+          return true;
+        }
+      }
+      if (regexes.trailingWhitespace.test(line)) {
+        // By default only the regex above is needed.
+        if (!((ref1 = lineApi.config['no_trailing_whitespace']) != null ? ref1.allowed_in_comments : void 0)) {
+          return true;
+        }
+        line = line;
+        tokens = lineApi.tokensByLine[lineApi.lineNumber];
+        if (!tokens) {
+          return null;
+        }
+        ref2 = (function() {
+          var j, len, results;
+          results = [];
+          for (j = 0, len = tokens.length; j < len; j++) {
+            token = tokens[j];
+            if (token[0] === 'STRING') {
+              results.push(token[1]);
+            }
+          }
+          return results;
+        })();
+        // To avoid confusion when a string might contain a "#", every string
+        // on this line will be removed. before checking for a comment
+        for (i = 0, len = ref2.length; i < len; i++) {
+          str = ref2[i];
+          line = line.replace(str, 'STRING');
+        }
+        if (!regexes.lineHasComment.test(line)) {
+          return true;
+        }
+      }
+    }
+
+  };
 
   NoTrailingWhitespace.prototype.rule = {
     name: 'no_trailing_whitespace',
@@ -2858,53 +3163,61 @@ module.exports = NoTrailingWhitespace = (function() {
     description: 'This rule forbids trailing whitespace in your code, since it is\nneedless cruft. It is enabled by default.'
   };
 
-  NoTrailingWhitespace.prototype.lintLine = function(line, lineApi) {
-    var i, len, ref, ref1, ref2, str, token, tokens;
-    if (!((ref = lineApi.config['no_trailing_whitespace']) != null ? ref.allowed_in_empty_lines : void 0)) {
-      if (regexes.onlySpaces.test(line)) {
-        return true;
-      }
-    }
-    if (regexes.trailingWhitespace.test(line)) {
-      if (!((ref1 = lineApi.config['no_trailing_whitespace']) != null ? ref1.allowed_in_comments : void 0)) {
-        return true;
-      }
-      line = line;
-      tokens = lineApi.tokensByLine[lineApi.lineNumber];
-      if (!tokens) {
-        return null;
-      }
-      ref2 = (function() {
-        var j, len, results;
-        results = [];
-        for (j = 0, len = tokens.length; j < len; j++) {
-          token = tokens[j];
-          if (token[0] === 'STRING') {
-            results.push(token[1]);
-          }
-        }
-        return results;
-      })();
-      for (i = 0, len = ref2.length; i < len; i++) {
-        str = ref2[i];
-        line = line.replace(str, 'STRING');
-      }
-      if (!regexes.lineHasComment.test(line)) {
-        return true;
-      }
-    }
-  };
-
   return NoTrailingWhitespace;
 
-})();
-
+}).call(this);
 
 
 },{}],39:[function(require,module,exports){
 var NoUnnecessaryDoubleQuotes;
 
 module.exports = NoUnnecessaryDoubleQuotes = (function() {
+  class NoUnnecessaryDoubleQuotes {
+    constructor() {
+      this.regexps = [];
+      this.interpolationLevel = 0;
+    }
+
+    lintToken(token, tokenApi) {
+      var hasLegalConstructs, ref, stringValue, tokenValue, type;
+      [type, tokenValue] = token;
+      if (type === 'STRING_START' || type === 'STRING_END') {
+        return this.trackParens(...arguments);
+      }
+      stringValue = tokenValue.match(/^\"(.*)\"$/);
+      if (!stringValue) { // no double quotes, all OK
+        return false;
+      }
+
+      // When CoffeeScript generates calls to RegExp it double quotes the 2nd
+      // parameter. Using peek(2) becuase the peek(1) would be a CALL_END
+      if (((ref = tokenApi.peek(2)) != null ? ref[0] : void 0) === 'REGEX_END') {
+        return false;
+      }
+      hasLegalConstructs = this.isInInterpolation() || this.hasSingleQuote(tokenValue);
+      return !hasLegalConstructs;
+    }
+
+    isInInterpolation() {
+      return this.interpolationLevel > 0;
+    }
+
+    trackParens(token, tokenApi) {
+      if (token[0] === 'STRING_START') {
+        this.interpolationLevel += 1;
+      } else if (token[0] === 'STRING_END') {
+        this.interpolationLevel -= 1;
+      }
+      // We're not linting, just tracking interpolations.
+      return null;
+    }
+
+    hasSingleQuote(tokenValue) {
+      return tokenValue.indexOf("'") !== -1;
+    }
+
+  };
+
   NoUnnecessaryDoubleQuotes.prototype.rule = {
     name: 'no_unnecessary_double_quotes',
     level: 'ignore',
@@ -2912,56 +3225,15 @@ module.exports = NoUnnecessaryDoubleQuotes = (function() {
     description: 'This rule prohibits double quotes unless string interpolation is\nused or the string contains single quotes.\n<pre>\n<code># Double quotes are discouraged:\nfoo = "bar"\n\n# Unless string interpolation is used:\nfoo = "#{bar}baz"\n\n# Or they prevent cumbersome escaping:\nfoo = "I\'m just following the \'rules\'"\n</code>\n</pre>\nDouble quotes are permitted by default.'
   };
 
-  function NoUnnecessaryDoubleQuotes() {
-    this.regexps = [];
-    this.interpolationLevel = 0;
-  }
-
   NoUnnecessaryDoubleQuotes.prototype.tokens = ['STRING', 'STRING_START', 'STRING_END'];
-
-  NoUnnecessaryDoubleQuotes.prototype.lintToken = function(token, tokenApi) {
-    var hasLegalConstructs, ref, stringValue, tokenValue, type;
-    type = token[0], tokenValue = token[1];
-    if (type === 'STRING_START' || type === 'STRING_END') {
-      return this.trackParens.apply(this, arguments);
-    }
-    stringValue = tokenValue.match(/^\"(.*)\"$/);
-    if (!stringValue) {
-      return false;
-    }
-    if (((ref = tokenApi.peek(2)) != null ? ref[0] : void 0) === 'REGEX_END') {
-      return false;
-    }
-    hasLegalConstructs = this.isInInterpolation() || this.hasSingleQuote(tokenValue);
-    return !hasLegalConstructs;
-  };
-
-  NoUnnecessaryDoubleQuotes.prototype.isInInterpolation = function() {
-    return this.interpolationLevel > 0;
-  };
-
-  NoUnnecessaryDoubleQuotes.prototype.trackParens = function(token, tokenApi) {
-    if (token[0] === 'STRING_START') {
-      this.interpolationLevel += 1;
-    } else if (token[0] === 'STRING_END') {
-      this.interpolationLevel -= 1;
-    }
-    return null;
-  };
-
-  NoUnnecessaryDoubleQuotes.prototype.hasSingleQuote = function(tokenValue) {
-    return tokenValue.indexOf("'") !== -1;
-  };
 
   return NoUnnecessaryDoubleQuotes;
 
-})();
-
+}).call(this);
 
 
 },{}],40:[function(require,module,exports){
-var NoUnnecessaryFatArrows, any,
-  bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
+var NoUnnecessaryFatArrows, any;
 
 any = function(arr, test) {
   return arr.reduce((function(res, elt) {
@@ -2970,10 +3242,63 @@ any = function(arr, test) {
 };
 
 module.exports = NoUnnecessaryFatArrows = (function() {
-  function NoUnnecessaryFatArrows() {
-    this.needsFatArrow = bind(this.needsFatArrow, this);
-    this.isThis = bind(this.isThis, this);
-  }
+  class NoUnnecessaryFatArrows {
+    constructor() {
+      this.isThis = this.isThis.bind(this);
+      this.needsFatArrow = this.needsFatArrow.bind(this);
+    }
+
+    lintAST(node, astApi) {
+      this.astApi = astApi;
+      this.lintNode(node);
+      return void 0;
+    }
+
+    lintNode(node) {
+      var error;
+      if ((this.isFatArrowCode(node)) && (!this.needsFatArrow(node))) {
+        error = this.astApi.createError({
+          lineNumber: node.locationData.first_line + 1
+        });
+        this.errors.push(error);
+      }
+      return node.eachChild((child) => {
+        return this.lintNode(child);
+      });
+    }
+
+    isCode(node) {
+      return this.astApi.getNodeName(node) === 'Code';
+    }
+
+    isFatArrowCode(node) {
+      return this.isCode(node) && node.bound;
+    }
+
+    isValue(node) {
+      return this.astApi.getNodeName(node) === 'Value';
+    }
+
+    isThis(node) {
+      var ref;
+      return ((ref = node.constructor) != null ? ref.name : void 0) === 'ThisLiteral' || this.isValue(node) && node.base.value === 'this';
+    }
+
+    needsFatArrow(node) {
+      return this.isCode(node) && (any(node.params, (param) => {
+        return param.contains(this.isThis) != null;
+      }) || (node.body.contains(this.isThis) != null) || (node.body.contains((child) => {
+        var ref;
+        if (!this.astApi.getNodeName(child)) {
+          return ((ref = child.constructor) != null ? ref.name : void 0) === 'SuperCall' || ((child.isSuper != null) && child.isSuper);
+        } else {
+          return this.isFatArrowCode(child) && this.needsFatArrow(child);
+        }
+        // TODO: after <1.10.0 is not supported, remove child.isSuper
+      }) != null));
+    }
+
+  };
 
   NoUnnecessaryFatArrows.prototype.rule = {
     name: 'no_unnecessary_fat_arrows',
@@ -2982,78 +3307,25 @@ module.exports = NoUnnecessaryFatArrows = (function() {
     description: 'Disallows defining functions with fat arrows when `this`\nis not used within the function.'
   };
 
-  NoUnnecessaryFatArrows.prototype.lintAST = function(node, astApi) {
-    this.astApi = astApi;
-    this.lintNode(node);
-    return void 0;
-  };
-
-  NoUnnecessaryFatArrows.prototype.lintNode = function(node) {
-    var error;
-    if ((this.isFatArrowCode(node)) && (!this.needsFatArrow(node))) {
-      error = this.astApi.createError({
-        lineNumber: node.locationData.first_line + 1
-      });
-      this.errors.push(error);
-    }
-    return node.eachChild((function(_this) {
-      return function(child) {
-        return _this.lintNode(child);
-      };
-    })(this));
-  };
-
-  NoUnnecessaryFatArrows.prototype.isCode = function(node) {
-    return this.astApi.getNodeName(node) === 'Code';
-  };
-
-  NoUnnecessaryFatArrows.prototype.isFatArrowCode = function(node) {
-    return this.isCode(node) && node.bound;
-  };
-
-  NoUnnecessaryFatArrows.prototype.isValue = function(node) {
-    return this.astApi.getNodeName(node) === 'Value';
-  };
-
-  NoUnnecessaryFatArrows.prototype.isThis = function(node) {
-    return this.isValue(node) && node.base.value === 'this';
-  };
-
-  NoUnnecessaryFatArrows.prototype.needsFatArrow = function(node) {
-    return this.isCode(node) && (any(node.params, (function(_this) {
-      return function(param) {
-        return param.contains(_this.isThis) != null;
-      };
-    })(this)) || (node.body.contains(this.isThis) != null) || (node.body.contains((function(_this) {
-      return function(child) {
-        if (!_this.astApi.getNodeName(child)) {
-          return (child.isSuper != null) && child.isSuper;
-        } else {
-          return _this.isFatArrowCode(child) && _this.needsFatArrow(child);
-        }
-      };
-    })(this)) != null));
-  };
-
   return NoUnnecessaryFatArrows;
 
-})();
-
+}).call(this);
 
 
 },{}],41:[function(require,module,exports){
-var NonEmptyConstructorNeedsParens, ParentClass,
-  extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
-  hasProp = {}.hasOwnProperty;
+var NonEmptyConstructorNeedsParens, ParentClass;
 
 ParentClass = require('./empty_constructor_needs_parens.coffee');
 
-module.exports = NonEmptyConstructorNeedsParens = (function(superClass) {
-  extend(NonEmptyConstructorNeedsParens, superClass);
+module.exports = NonEmptyConstructorNeedsParens = (function() {
+  class NonEmptyConstructorNeedsParens extends ParentClass {
+    handleExpectedCallStart(isCallStart) {
+      if (isCallStart[0] === 'CALL_START' && isCallStart.generated) {
+        return true;
+      }
+    }
 
-  function NonEmptyConstructorNeedsParens() {
-    return NonEmptyConstructorNeedsParens.__super__.constructor.apply(this, arguments);
-  }
+  };
 
   NonEmptyConstructorNeedsParens.prototype.rule = {
     name: 'non_empty_constructor_needs_parens',
@@ -3062,23 +3334,58 @@ module.exports = NonEmptyConstructorNeedsParens = (function(superClass) {
     description: 'Requires constructors with parameters to include the parens'
   };
 
-  NonEmptyConstructorNeedsParens.prototype.handleExpectedCallStart = function(expectedCallStart) {
-    if (expectedCallStart[0] === 'CALL_START' && expectedCallStart.generated) {
-      return true;
-    }
-  };
-
   return NonEmptyConstructorNeedsParens;
 
-})(ParentClass);
-
+}).call(this);
 
 
 },{"./empty_constructor_needs_parens.coffee":15}],42:[function(require,module,exports){
 var PreferEnglishOperator;
 
 module.exports = PreferEnglishOperator = (function() {
-  function PreferEnglishOperator() {}
+  class PreferEnglishOperator {
+    lintToken(token, tokenApi) {
+      var actual_token, config, context, first_column, last_column, level, line;
+      config = tokenApi.config[this.rule.name];
+      level = config.level;
+      // Compare the actual token with the lexed token.
+      ({first_column, last_column} = token[2]);
+      line = tokenApi.lines[tokenApi.lineNumber];
+      actual_token = line.slice(first_column, +last_column + 1 || 9e9);
+      context = (function() {
+        var ref, ref1;
+        switch (actual_token) {
+          case '==':
+            return 'Replace "==" with "is"';
+          case '!=':
+            return 'Replace "!=" with "isnt"';
+          case '||':
+            return 'Replace "||" with "or"';
+          case '&&':
+            return 'Replace "&&" with "and"';
+          case '!':
+            // `not not expression` seems awkward, so `!!expression`
+            // gets special handling.
+            if (((ref = tokenApi.peek(1)) != null ? ref[0] : void 0) === 'UNARY_MATH') {
+              level = config.doubleNotLevel;
+              return '"?" is usually better than "!!"';
+            } else if (((ref1 = tokenApi.peek(-1)) != null ? ref1[0] : void 0) === 'UNARY_MATH') {
+              // Ignore the 2nd half of the double not
+              return void 0;
+            } else {
+              return 'Replace "!" with "not"';
+            }
+            break;
+          default:
+            return void 0;
+        }
+      })();
+      if (context != null) {
+        return {level, context};
+      }
+    }
+
+  };
 
   PreferEnglishOperator.prototype.rule = {
     name: 'prefer_english_operator',
@@ -3088,59 +3395,118 @@ module.exports = PreferEnglishOperator = (function() {
     description: 'This rule prohibits &&, ||, ==, != and !.\nUse and, or, is, isnt, and not instead.\n!! for converting to a boolean is ignored.'
   };
 
-  PreferEnglishOperator.prototype.tokens = ['COMPARE', 'UNARY_MATH', 'LOGIC'];
-
-  PreferEnglishOperator.prototype.lintToken = function(token, tokenApi) {
-    var actual_token, config, context, first_column, last_column, level, line, ref;
-    config = tokenApi.config[this.rule.name];
-    level = config.level;
-    ref = token[2], first_column = ref.first_column, last_column = ref.last_column;
-    line = tokenApi.lines[tokenApi.lineNumber];
-    actual_token = line.slice(first_column, +last_column + 1 || 9e9);
-    context = (function() {
-      var ref1, ref2;
-      switch (actual_token) {
-        case '==':
-          return 'Replace "==" with "is"';
-        case '!=':
-          return 'Replace "!=" with "isnt"';
-        case '||':
-          return 'Replace "||" with "or"';
-        case '&&':
-          return 'Replace "&&" with "and"';
-        case '!':
-          if (((ref1 = tokenApi.peek(1)) != null ? ref1[0] : void 0) === 'UNARY_MATH') {
-            level = config.doubleNotLevel;
-            return '"?" is usually better than "!!"';
-          } else if (((ref2 = tokenApi.peek(-1)) != null ? ref2[0] : void 0) === 'UNARY_MATH') {
-            return void 0;
-          } else {
-            return 'Replace "!" with "not"';
-          }
-          break;
-        default:
-          return void 0;
-      }
-    })();
-    if (context != null) {
-      return {
-        level: level,
-        context: context
-      };
-    }
-  };
+  PreferEnglishOperator.prototype.tokens = ['COMPARE', 'UNARY_MATH', '&&', '||'];
 
   return PreferEnglishOperator;
 
-})();
-
+}).call(this);
 
 
 },{}],43:[function(require,module,exports){
 var SpaceOperators,
-  indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
+  indexOf = [].indexOf;
 
 module.exports = SpaceOperators = (function() {
+  class SpaceOperators {
+    constructor() {
+      this.callTokens = []; // A stack tracking the call token pairs.
+      this.parenTokens = []; // A stack tracking the parens token pairs.
+      this.interpolationLevel = 0;
+    }
+
+    lintToken(token, tokenApi) {
+      var rest, type;
+      [type, ...rest] = token;
+      // These just keep track of state
+      if (type === 'CALL_START' || type === 'CALL_END') {
+        this.trackCall(token, tokenApi);
+        return;
+      }
+      if (type === 'STRING_START' || type === 'STRING_END') {
+        return this.trackParens(token, tokenApi);
+      }
+      // These may return errors
+      if (type === '+' || type === '-') {
+        return this.lintPlus(token, tokenApi);
+      } else {
+        return this.lintMath(token, tokenApi);
+      }
+    }
+
+    lintPlus(token, tokenApi) {
+      var isUnary, notFirstToken, p, ref, unaries;
+      // We can't check this inside of interpolations right now, because the
+      // plusses used for the string type co-ercion are marked not spaced.
+      if (this.isInInterpolation() || this.isInExtendedRegex()) {
+        return null;
+      }
+      p = tokenApi.peek(-1);
+      unaries = ['TERMINATOR', '(', '=', '-', '+', ',', 'CALL_START', 'INDEX_START', '..', '...', 'COMPARE', 'IF', 'THROW', '&', '^', '|', '&&', '||', 'POST_IF', ':', '[', 'INDENT', 'COMPOUND_ASSIGN', 'RETURN', 'MATH', 'BY', 'LEADING_WHEN'];
+      isUnary = !p ? false : (ref = p[0], indexOf.call(unaries, ref) >= 0);
+      notFirstToken = p || (token.spaced != null) || token.newLine;
+      if (notFirstToken && ((isUnary && (token.spaced != null)) || (!isUnary && !token.newLine && (!token.spaced || (p && !p.spaced))))) {
+        return {
+          context: token[1]
+        };
+      } else {
+        return null;
+      }
+    }
+
+    lintMath(token, tokenApi) {
+      var p;
+      p = tokenApi.peek(-1);
+      if (!token.newLine && (!token.spaced || (p && !p.spaced))) {
+        return {
+          context: token[1]
+        };
+      } else {
+        return null;
+      }
+    }
+
+    isInExtendedRegex() {
+      var i, len, ref, t;
+      ref = this.callTokens;
+      for (i = 0, len = ref.length; i < len; i++) {
+        t = ref[i];
+        if (t.isRegex) {
+          return true;
+        }
+      }
+      return false;
+    }
+
+    isInInterpolation() {
+      return this.interpolationLevel > 0;
+    }
+
+    trackCall(token, tokenApi) {
+      var p;
+      if (token[0] === 'CALL_START') {
+        p = tokenApi.peek(-1);
+        // Track regex calls, to know (approximately) if we're in an
+        // extended regex.
+        token.isRegex = p && p[0] === 'IDENTIFIER' && p[1] === 'RegExp';
+        this.callTokens.push(token);
+      } else {
+        this.callTokens.pop();
+      }
+      return null;
+    }
+
+    trackParens(token, tokenApi) {
+      if (token[0] === 'STRING_START') {
+        this.interpolationLevel += 1;
+      } else if (token[0] === 'STRING_END') {
+        this.interpolationLevel -= 1;
+      }
+      // We're not linting, just tracking interpolations.
+      return null;
+    }
+
+  };
+
   SpaceOperators.prototype.rule = {
     name: 'space_operators',
     level: 'ignore',
@@ -3148,107 +3514,52 @@ module.exports = SpaceOperators = (function() {
     description: 'This rule enforces that operators have spaces around them.'
   };
 
-  SpaceOperators.prototype.tokens = ['+', '-', '=', '**', 'MATH', 'COMPARE', 'LOGIC', 'COMPOUND_ASSIGN', 'STRING_START', 'STRING_END', 'CALL_START', 'CALL_END'];
-
-  function SpaceOperators() {
-    this.callTokens = [];
-    this.parenTokens = [];
-    this.interpolationLevel = 0;
-  }
-
-  SpaceOperators.prototype.lintToken = function(arg, tokenApi) {
-    var type;
-    type = arg[0];
-    if (type === 'CALL_START' || type === 'CALL_END') {
-      this.trackCall.apply(this, arguments);
-      return;
-    }
-    if (type === 'STRING_START' || type === 'STRING_END') {
-      return this.trackParens.apply(this, arguments);
-    }
-    if (type === '+' || type === '-') {
-      return this.lintPlus.apply(this, arguments);
-    } else {
-      return this.lintMath.apply(this, arguments);
-    }
-  };
-
-  SpaceOperators.prototype.lintPlus = function(token, tokenApi) {
-    var isUnary, p, ref, unaries;
-    if (this.isInInterpolation() || this.isInExtendedRegex()) {
-      return null;
-    }
-    p = tokenApi.peek(-1);
-    unaries = ['TERMINATOR', '(', '=', '-', '+', ',', 'CALL_START', 'INDEX_START', '..', '...', 'COMPARE', 'IF', 'THROW', 'LOGIC', 'POST_IF', ':', '[', 'INDENT', 'COMPOUND_ASSIGN', 'RETURN', 'MATH', 'BY', 'LEADING_WHEN'];
-    isUnary = !p ? false : (ref = p[0], indexOf.call(unaries, ref) >= 0);
-    if ((isUnary && (token.spaced != null)) || (!isUnary && !token.newLine && (!token.spaced || (p && !p.spaced)))) {
-      return {
-        context: token[1]
-      };
-    } else {
-      return null;
-    }
-  };
-
-  SpaceOperators.prototype.lintMath = function(token, tokenApi) {
-    var p;
-    p = tokenApi.peek(-1);
-    if (!token.newLine && (!token.spaced || (p && !p.spaced))) {
-      return {
-        context: token[1]
-      };
-    } else {
-      return null;
-    }
-  };
-
-  SpaceOperators.prototype.isInExtendedRegex = function() {
-    var i, len, ref, t;
-    ref = this.callTokens;
-    for (i = 0, len = ref.length; i < len; i++) {
-      t = ref[i];
-      if (t.isRegex) {
-        return true;
-      }
-    }
-    return false;
-  };
-
-  SpaceOperators.prototype.isInInterpolation = function() {
-    return this.interpolationLevel > 0;
-  };
-
-  SpaceOperators.prototype.trackCall = function(token, tokenApi) {
-    var p;
-    if (token[0] === 'CALL_START') {
-      p = tokenApi.peek(-1);
-      token.isRegex = p && p[0] === 'IDENTIFIER' && p[1] === 'RegExp';
-      this.callTokens.push(token);
-    } else {
-      this.callTokens.pop();
-    }
-    return null;
-  };
-
-  SpaceOperators.prototype.trackParens = function(token, tokenApi) {
-    if (token[0] === 'STRING_START') {
-      this.interpolationLevel += 1;
-    } else if (token[0] === 'STRING_END') {
-      this.interpolationLevel -= 1;
-    }
-    return null;
-  };
+  SpaceOperators.prototype.tokens = ['+', '-', '=', '**', 'MATH', 'COMPARE', '&', '^', '|', '&&', '||', 'COMPOUND_ASSIGN', 'STRING_START', 'STRING_END', 'CALL_START', 'CALL_END'];
 
   return SpaceOperators;
 
-})();
-
+}).call(this);
 
 
 },{}],44:[function(require,module,exports){
 var SpacingAfterComma;
 
 module.exports = SpacingAfterComma = (function() {
+  class SpacingAfterComma {
+    constructor() {
+      this.inRegex = false;
+    }
+
+    lintToken(token, tokenApi) {
+      var type;
+      [type] = token;
+      if (type === 'REGEX_START') {
+        this.inRegex = true;
+        return;
+      }
+      if (type === 'REGEX_END') {
+        this.inRegex = false;
+        return;
+      }
+      if (!(token.spaced || token.newLine || token.generated || this.isRegexFlag(token, tokenApi))) {
+        return true;
+      }
+    }
+
+    // When generating a regex (///${whatever}///i) CoffeeScript generates tokens
+    // for RegEx(whatever, "i") but doesn't bother to mark that comma as
+    // generated or spaced. Looking 3 tokens ahead skips the STRING and CALL_END
+    isRegexFlag(token, tokenApi) {
+      var maybeEnd;
+      if (!this.inRegex) {
+        return false;
+      }
+      maybeEnd = tokenApi.peek(3);
+      return (maybeEnd != null ? maybeEnd[0] : void 0) === 'REGEX_END';
+    }
+
+  };
+
   SpacingAfterComma.prototype.rule = {
     name: 'spacing_after_comma',
     level: 'ignore',
@@ -3258,46 +3569,19 @@ module.exports = SpacingAfterComma = (function() {
 
   SpacingAfterComma.prototype.tokens = [',', 'REGEX_START', 'REGEX_END'];
 
-  function SpacingAfterComma() {
-    this.inRegex = false;
-  }
-
-  SpacingAfterComma.prototype.lintToken = function(token, tokenApi) {
-    var type;
-    type = token[0];
-    if (type === 'REGEX_START') {
-      this.inRegex = true;
-      return;
-    }
-    if (type === 'REGEX_END') {
-      this.inRegex = false;
-      return;
-    }
-    if (!(token.spaced || token.newLine || token.generated || this.isRegexFlag(token, tokenApi))) {
-      return true;
-    }
-  };
-
-  SpacingAfterComma.prototype.isRegexFlag = function(token, tokenApi) {
-    var maybeEnd;
-    if (!this.inRegex) {
-      return false;
-    }
-    maybeEnd = tokenApi.peek(3);
-    return (maybeEnd != null ? maybeEnd[0] : void 0) === 'REGEX_END';
-  };
-
   return SpacingAfterComma;
 
-})();
-
+}).call(this);
 
 
 },{}],45:[function(require,module,exports){
 var TransformMessesUpLineNumbers;
 
 module.exports = TransformMessesUpLineNumbers = (function() {
-  function TransformMessesUpLineNumbers() {}
+  class TransformMessesUpLineNumbers {
+    lintToken(token, tokenApi) {}
+
+  };
 
   TransformMessesUpLineNumbers.prototype.rule = {
     name: 'transform_messes_up_line_numbers',
@@ -3308,13 +3592,12 @@ module.exports = TransformMessesUpLineNumbers = (function() {
 
   TransformMessesUpLineNumbers.prototype.tokens = [];
 
-  TransformMessesUpLineNumbers.prototype.lintToken = function(token, tokenApi) {};
-
   return TransformMessesUpLineNumbers;
 
-})();
+}).call(this);
+
+// implemented before the tokens are created, using the entire source.
 
 
-
-},{}]},{},[1])(1)
+},{}]},{},[4])(4)
 });
