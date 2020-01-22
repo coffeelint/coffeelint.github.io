@@ -6,7 +6,7 @@
   },
   "homepage": "https://coffeelint.github.io/",
   "dependencies": {
-    "@coffeelint/cli": "^3.0.1",
+    "@coffeelint/cli": "^3.0.2",
     "coffeescript": "2.4.1"
   }
 }
