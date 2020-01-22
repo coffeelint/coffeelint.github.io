@@ -2,8 +2,8 @@
 module.exports={
   "name": "@coffeelint/cli",
   "description": "Lint your CoffeeScript",
-  "version": "2.1.0",
-  "homepage": "http://www.coffeelint.org",
+  "version": "3.0.1",
+  "homepage": "https://coffeelint.github.io/",
   "keywords": [
     "lint",
     "coffeescript",
@@ -12,8 +12,7 @@ module.exports={
   "author": "Matthew Perpick <clutchski@gmail.com>",
   "main": "./lib/coffeelint.js",
   "engines": {
-    "npm": ">=1.3.7",
-    "node": ">=6.9.1"
+    "node": ">=8.x"
   },
   "repository": {
     "type": "git",
@@ -25,27 +24,26 @@ module.exports={
   "dependencies": {
     "coffeescript": "2.4.1",
     "glob": "^7.1.6",
-    "ignore": "^3.0.9",
+    "ignore": "^5.1.4",
     "optimist": "^0.6.1",
-    "resolve": "^0.6.3",
-    "strip-json-comments": "^1.0.2"
+    "resolve": "^1.14.2",
+    "strip-json-comments": "^3.0.1"
   },
   "devDependencies": {
     "browserify": "^16.5.0",
     "coffeeify": "^3.0.1",
-    "vows": "^0.8.3",
-    "underscore": "^1.9.2"
+    "underscore": "^1.9.2",
+    "vows": "^0.8.3"
   },
   "license": "MIT",
   "scripts": {
-    "pretest": "cake compile",
-    "test": "node ./vowsrunner.js --spec test/*.coffee test/*.litcoffee",
+    "test": "npm run compile && node ./vowsrunner.js --spec test/*.coffee test/*.litcoffee",
     "testrule": "npm run compile && node ./vowsrunner.js --spec",
-    "posttest": "npm run lint",
-    "lint": "cake compile && node ./bin/coffeelint .",
-    "lint-csv": "cake compile && node ./bin/coffeelint --reporter csv .",
-    "lint-jslint": "cake compile && node ./bin/coffeelint --reporter jslint .",
-    "compile": "cake compile"
+    "lint": "npm run compile && node ./bin/coffeelint .",
+    "lint-csv": "npm run compile && node ./bin/coffeelint --reporter csv .",
+    "lint-jslint": "npm run compile && node ./bin/coffeelint --reporter jslint .",
+    "compile": "cake compile",
+    "prepublish": "npm run compile"
   }
 }
 
@@ -147,23 +145,26 @@ module.exports = ASTLinter = class ASTLinter extends BaseLinter {
   }
 
   _parseCoffeeScriptError(coffeeError) {
-    var attrs, lineNumber, match, message, rule;
+    var attrs, columnNumber, lineNumber, match, message, rule;
     rule = this.config['coffeescript_error'];
     message = coffeeError.toString();
     // Parse the line number
     lineNumber = -1;
     if (coffeeError.location != null) {
       lineNumber = coffeeError.location.first_line + 1;
+      columnNumber = coffeeError.location.first_column + 1;
     } else {
       match = /line (\d+)/.exec(message);
       if ((match != null ? match.length : void 0) > 1) {
         lineNumber = parseInt(match[1], 10);
       }
+      columnNumber = 1;
     }
     attrs = {
       message: message,
       level: rule.level,
-      lineNumber: lineNumber
+      lineNumber: lineNumber,
+      columnNumber: columnNumber
     };
     return this.createError('coffeescript_error', attrs);
   }
@@ -248,7 +249,7 @@ module.exports = BaseLinter = class BaseLinter {
           results.push(void 0);
         }
       } else if (level !== 'ignore') {
-        throw new Error(`unknown level ${level} for rule: ${rule}`);
+        throw new Error(`unknown level ${level} for rule: ${name}`);
       } else {
         results.push(void 0);
       }
@@ -275,7 +276,7 @@ module.exports = BaseLinter = class BaseLinter {
   Copyright (c) 2011 Matthew Perpick.
   CoffeeLint is freely distributable under the MIT license.
   */
-var ASTLinter, CoffeeScript, ERROR, ErrorReport, IGNORE, LexicalLinter, LineLinter, RULES, WARN, _rules, cache, coffeelint, defaults, difference, extend, hasSyntaxError, mergeDefaultConfig, nodeRequire, packageJSON, sameJSON, union,
+var ASTLinter, CoffeeScript, ERROR, ErrorReport, IGNORE, LexicalLinter, LineLinter, RULES, WARN, _rules, cache, coffeelint, defaults, difference, extend, getTokens, mergeDefaultConfig, nodeRequire, packageJSON, sameJSON, union,
   indexOf = [].indexOf,
   slice = [].slice;
 
@@ -534,6 +535,8 @@ coffeelint.registerRule(require('./rules/braces_spacing.coffee'));
 
 coffeelint.registerRule(require('./rules/no_tabs.coffee'));
 
+coffeelint.registerRule(require('./rules/no_spaces.coffee'));
+
 coffeelint.registerRule(require('./rules/no_trailing_whitespace.coffee'));
 
 coffeelint.registerRule(require('./rules/max_line_length.coffee'));
@@ -602,14 +605,13 @@ coffeelint.registerRule(require('./rules/eol_last.coffee'));
 
 coffeelint.registerRule(require('./rules/no_private_function_fat_arrows.coffee'));
 
-hasSyntaxError = function(source) {
+getTokens = function(source) {
   try {
     // If there are syntax errors this will abort the lexical and line
     // linters.
-    CoffeeScript.tokens(source);
-    return false;
+    return CoffeeScript.tokens(source);
   } catch (error) {}
-  return true;
+  return null;
 };
 
 ErrorReport = require('./error_report.coffee');
@@ -631,7 +633,7 @@ coffeelint.getErrorReport = function() {
 //   }
 
 coffeelint.lint = function(source, userConfig = {}, literate = false) {
-  var allErrors, astErrors, cmd, config, disabled, disabledEntirely, disabledInitially, disabledLine, e, errors, i, inlineConfig, j, l, len, len1, lexErrors, lexicalLinter, lineErrors, lineLinter, m, n, name, nextLine, o, ref, ref1, ref2, ref3, ref4, ref5, ref6, ref7, ref8, regex, rule, ruleLoader, rules, set, sourceLength, tokensByLine, transform;
+  var allErrors, astErrors, cmd, config, disabled, disabledEntirely, disabledInitially, disabledLine, e, errors, i, inlineConfig, j, l, len, len1, lexErrors, lexicalLinter, lineErrors, lineLinter, m, n, name, nextLine, o, ref, ref1, ref2, ref3, ref4, ref5, ref6, ref7, ref8, regex, rule, ruleLoader, rules, set, sourceLength, tokens, tokensByLine, transform;
   errors = [];
   if (cache != null) {
     cache.setConfig(userConfig);
@@ -701,9 +703,10 @@ coffeelint.lint = function(source, userConfig = {}, literate = false) {
   errors = errors.concat(astErrors);
   // only do further checks if the syntax is okay, otherwise they just fail
   // with syntax error exceptions
-  if (!hasSyntaxError(source)) {
+  tokens = getTokens(source);
+  if (tokens) {
     // Do lexical linting.
-    lexicalLinter = new LexicalLinter(source, config, _rules, CoffeeScript);
+    lexicalLinter = new LexicalLinter(source, config, _rules, CoffeeScript, tokens);
     lexErrors = lexicalLinter.lint();
     errors = errors.concat(lexErrors);
     // Do line linting.
@@ -807,7 +810,7 @@ coffeelint.setCache = function(obj) {
 };
 
 
-},{"./../package.json":1,"./ast_linter.coffee":2,"./error_report.coffee":5,"./lexical_linter.coffee":6,"./line_linter.coffee":7,"./rules.coffee":8,"./rules/arrow_spacing.coffee":9,"./rules/braces_spacing.coffee":10,"./rules/camel_case_classes.coffee":11,"./rules/colon_assignment_spacing.coffee":12,"./rules/cyclomatic_complexity.coffee":13,"./rules/duplicate_key.coffee":14,"./rules/empty_constructor_needs_parens.coffee":15,"./rules/ensure_comprehensions.coffee":16,"./rules/eol_last.coffee":17,"./rules/indentation.coffee":18,"./rules/line_endings.coffee":19,"./rules/max_line_length.coffee":20,"./rules/missing_fat_arrows.coffee":21,"./rules/newlines_after_classes.coffee":22,"./rules/no_backticks.coffee":23,"./rules/no_debugger.coffee":24,"./rules/no_empty_functions.coffee":25,"./rules/no_empty_param_list.coffee":26,"./rules/no_implicit_braces.coffee":27,"./rules/no_implicit_parens.coffee":28,"./rules/no_interpolation_in_single_quotes.coffee":29,"./rules/no_nested_string_interpolation.coffee":30,"./rules/no_plusplus.coffee":31,"./rules/no_private_function_fat_arrows.coffee":32,"./rules/no_stand_alone_at.coffee":33,"./rules/no_tabs.coffee":34,"./rules/no_this.coffee":35,"./rules/no_throwing_strings.coffee":36,"./rules/no_trailing_semicolons.coffee":37,"./rules/no_trailing_whitespace.coffee":38,"./rules/no_unnecessary_double_quotes.coffee":39,"./rules/no_unnecessary_fat_arrows.coffee":40,"./rules/non_empty_constructor_needs_parens.coffee":41,"./rules/prefer_english_operator.coffee":42,"./rules/space_operators.coffee":43,"./rules/spacing_after_comma.coffee":44,"./rules/transform_messes_up_line_numbers.coffee":45}],5:[function(require,module,exports){
+},{"./../package.json":1,"./ast_linter.coffee":2,"./error_report.coffee":5,"./lexical_linter.coffee":6,"./line_linter.coffee":7,"./rules.coffee":8,"./rules/arrow_spacing.coffee":9,"./rules/braces_spacing.coffee":10,"./rules/camel_case_classes.coffee":11,"./rules/colon_assignment_spacing.coffee":12,"./rules/cyclomatic_complexity.coffee":13,"./rules/duplicate_key.coffee":14,"./rules/empty_constructor_needs_parens.coffee":15,"./rules/ensure_comprehensions.coffee":16,"./rules/eol_last.coffee":17,"./rules/indentation.coffee":18,"./rules/line_endings.coffee":19,"./rules/max_line_length.coffee":20,"./rules/missing_fat_arrows.coffee":21,"./rules/newlines_after_classes.coffee":22,"./rules/no_backticks.coffee":23,"./rules/no_debugger.coffee":24,"./rules/no_empty_functions.coffee":25,"./rules/no_empty_param_list.coffee":26,"./rules/no_implicit_braces.coffee":27,"./rules/no_implicit_parens.coffee":28,"./rules/no_interpolation_in_single_quotes.coffee":29,"./rules/no_nested_string_interpolation.coffee":30,"./rules/no_plusplus.coffee":31,"./rules/no_private_function_fat_arrows.coffee":32,"./rules/no_spaces.coffee":33,"./rules/no_stand_alone_at.coffee":34,"./rules/no_tabs.coffee":35,"./rules/no_this.coffee":36,"./rules/no_throwing_strings.coffee":37,"./rules/no_trailing_semicolons.coffee":38,"./rules/no_trailing_whitespace.coffee":39,"./rules/no_unnecessary_double_quotes.coffee":40,"./rules/no_unnecessary_fat_arrows.coffee":41,"./rules/non_empty_constructor_needs_parens.coffee":42,"./rules/prefer_english_operator.coffee":43,"./rules/space_operators.coffee":44,"./rules/spacing_after_comma.coffee":45,"./rules/transform_messes_up_line_numbers.coffee":46}],5:[function(require,module,exports){
 // A summary of errors in a CoffeeLint run.
 var ErrorReport;
 
@@ -894,10 +897,13 @@ var BaseLinter, LexicalLinter, TokenApi,
 
 TokenApi = (function() {
   class TokenApi {
-    constructor(CoffeeScript, source, config1, tokensByLine) {
+    constructor(CoffeeScript, source, config1, tokensByLine, tokens1) {
       this.config = config1;
       this.tokensByLine = tokensByLine;
-      this.tokens = CoffeeScript.tokens(source);
+      this.tokens = tokens1;
+      if (this.tokens == null) {
+        this.tokens = CoffeeScript.tokens(source);
+      }
       this.lines = source.split('\n');
       this.tokensByLine = {}; // A map of tokens by line.
     }
@@ -922,9 +928,9 @@ BaseLinter = require('./base_linter.coffee');
 // A class that performs checks on the output of CoffeeScript's lexer.
 
 module.exports = LexicalLinter = class LexicalLinter extends BaseLinter {
-  constructor(source, config, rules, CoffeeScript) {
+  constructor(source, config, rules, CoffeeScript, tokens) {
     super(source, config, rules);
-    this.tokenApi = new TokenApi(CoffeeScript, source, this.config, this.tokensByLine);
+    this.tokenApi = new TokenApi(CoffeeScript, source, this.config, this.tokensByLine, tokens);
     // This needs to be available on the LexicalLinter so it can be passed
     // to the LineLinter when this finishes running.
     this.tokensByLine = this.tokenApi.tokensByLine;
@@ -988,11 +994,23 @@ module.exports = LexicalLinter = class LexicalLinter extends BaseLinter {
   }
 
   createError(ruleName, attrs = {}) {
+    var token;
     if (attrs.lineNumber == null) {
       attrs.lineNumber = this.lineNumber;
     }
     attrs.lineNumber += 1;
     attrs.line = this.tokenApi.lines[attrs.lineNumber - 1];
+    if (attrs.token) {
+      token = attrs.token;
+      attrs.lineNumber = token[2].first_line + 1;
+      attrs.columnNumber = token[2].first_column + 1;
+      if (token[2].last_line) {
+        attrs.lineNumberEnd = token[2].last_line + 1;
+      }
+      if (token[2].last_column) {
+        attrs.columnNumberEnd = token[2].last_column + 1;
+      }
+    }
     return super.createError(ruleName, attrs);
   }
 
@@ -1193,7 +1211,9 @@ module.exports = LineLinter = class LineLinter extends BaseLinter {
 
   createError(rule, attrs = {}) {
     var ref;
-    attrs.lineNumber = this.lineNumber + 1; // Lines are indexed by zero.
+    if (attrs.lineNumber == null) {
+      attrs.lineNumber = this.lineNumber + 1; // Lines are indexed by zero.
+    }
     attrs.level = (ref = this.config[rule]) != null ? ref.level : void 0;
     return super.createError(rule, attrs);
   }
@@ -1252,7 +1272,7 @@ module.exports = ArrowSpacing = (function() {
         return null;
       // Throw error unless the previous token...
       } else if (!(((token.spaced != null) || (token.newLine != null)) && (((pp.spaced != null) || pp[0] === 'TERMINATOR') || (pp.generated != null) || pp[0] === 'INDENT' || (pp[1] === '(' && (pp.generated == null))))) { //4
-        return true;
+        return {token};
       } else {
         return null;
       }
@@ -1330,6 +1350,7 @@ module.exports = BracesSpacing = (function() {
         }
         msg += ` inside "${token[0]}"`;
         return {
+          token,
           context: msg
         };
       }
@@ -1388,6 +1409,7 @@ module.exports = CamelCaseClasses = (function() {
       // Now check for the error.
       if (!regexes.camelCase.test(className)) {
         return {
+          token,
           context: `class name: ${className}`
         };
       }
@@ -1420,11 +1442,15 @@ module.exports = ColonAssignmentSpacing = (function() {
       previousToken = tokenApi.peek(-1);
       nextToken = tokenApi.peek(1);
       getSpaceFromToken = function(direction) {
+        var offset;
         switch (direction) {
           case 'left':
             return token[2].first_column - previousToken[2].last_column - 1;
           case 'right':
-            return nextToken[2].first_column - token[2].first_column - 1;
+            // csx tags 'column' resolves to the beginning of the tag definition, rather
+            // than the '<'
+            offset = nextToken[0] !== 'CSX_TAG' ? -1 : -2;
+            return nextToken[2].first_column - token[2].first_column + offset;
         }
       };
       checkSpacing = function(direction) {
@@ -1436,10 +1462,11 @@ module.exports = ColonAssignmentSpacing = (function() {
       };
       [isLeftSpaced, leftSpacing] = checkSpacing('left');
       [isRightSpaced, rightSpacing] = checkSpacing('right');
-      if (isLeftSpaced && isRightSpaced) {
+      if (token.csxColon || isLeftSpaced && isRightSpaced) {
         return null;
       } else {
         return {
+          token: token,
           context: `Incorrect spacing around column ${token[2].first_column}`
         };
       }
@@ -1505,7 +1532,9 @@ module.exports = CyclomaticComplexity = (function() {
         error = this.astApi.createError({
           context: complexity + 1,
           lineNumber: node.locationData.first_line + 1,
-          lineNumberEnd: node.locationData.last_line + 1
+          lineNumberEnd: node.locationData.last_line + 1,
+          columnNumber: node.locationData.first_column + 1,
+          columnNumberEnd: node.locationData.last_column + 1
         });
         if (error) {
           this.errors.push(error);
@@ -1545,13 +1574,13 @@ module.exports = DuplicateKey = (function() {
         return void 0;
       }
       // TODO: after <1.10.0 is not supported, remove 'IDENTIFIER' here
-      if (type === 'IDENTIFIER' || type === 'PROPERTY') {
+      if (type === 'IDENTIFIER' || type === 'PROPERTY' || type === 'STRING') {
         return this.lintIdentifier(...arguments);
       }
     }
 
     lintIdentifier(token, tokenApi) {
-      var key, nextToken, previousToken;
+      var key, m, nextToken, previousToken;
       key = token[1];
       if (this.currentScope == null) {
         // Class names might not be in a scope
@@ -1569,10 +1598,14 @@ module.exports = DuplicateKey = (function() {
         // Assigning "@something" and "something" are not the same thing
         key = `@${key}`;
       }
+      if (m = key.match(/^(["'])(.*)\1$/)) {
+        // Normalize property, "property", and 'property'
+        key = m[2];
+      }
       // Added a prefix to not interfere with things like "constructor".
       key = `identifier-${key}`;
       if (this.currentScope[key]) {
-        return true;
+        return {token};
       } else {
         this.currentScope[key] = token;
         return null;
@@ -1605,7 +1638,7 @@ module.exports = DuplicateKey = (function() {
   };
 
   // TODO: after <1.10.0 is not supported, remove 'IDENTIFIER' here
-  DuplicateKey.prototype.tokens = ['IDENTIFIER', 'PROPERTY', '{', '}'];
+  DuplicateKey.prototype.tokens = ['IDENTIFIER', 'PROPERTY', 'STRING', '{', '}'];
 
   return DuplicateKey;
 
@@ -1646,14 +1679,16 @@ module.exports = EmptyConstructorNeedsParens = (function() {
         // line with implicit parens, and if your parameters start on the
         // next line, but is missing if there are no params and no parens.
         if (isIdent && (nextToken != null)) {
-          return this.handleExpectedCallStart(nextToken);
+          return this.handleExpectedCallStart(nextToken, tokenApi);
         }
       }
     }
 
-    handleExpectedCallStart(isCallStart) {
+    handleExpectedCallStart(isCallStart, tokenApi) {
       if (isCallStart[0] !== 'CALL_START') {
-        return true;
+        return {
+          token: tokenApi.peek(isCallStart, 1)
+        };
       }
     }
 
@@ -1724,7 +1759,7 @@ module.exports = EnsureComprehensions = (function() {
           break;
         }
         if (prevToken[0] === '=' && numParenEnds === numParenStarts) {
-          atEqual = true;
+          atEqual = {token};
         }
         peeker--;
       }
@@ -1735,6 +1770,7 @@ module.exports = EnsureComprehensions = (function() {
       // comprehension is inside of a function call
       if (atEqual && numCallStarts === numCallEnds) {
         return {
+          token,
           context: ''
         };
       }
@@ -1857,6 +1893,7 @@ module.exports = Indentation = (function() {
               }
               if (dotIndent % expected !== 0) {
                 return {
+                  token,
                   context: `Expected ${expected} got ${got}`
                 };
               }
@@ -1893,6 +1930,7 @@ module.exports = Indentation = (function() {
       // Now check the indentation.
       if (!ignoreIndent && !(indexOf.call(numIndents, expected) >= 0)) {
         return {
+          token,
           context: `Expected ${expected} got ${numIndents[0]}`
         };
       }
@@ -2058,7 +2096,7 @@ module.exports = Indentation = (function() {
     value: 2,
     level: 'error',
     message: 'Line contains inconsistent indentation',
-    description: 'This rule imposes a standard number of spaces to be used for\nindentation. Since whitespace is significant in CoffeeScript, it\'s\ncritical that a project chooses a standard indentation format and\nstays consistent. Other roads lead to darkness. <pre> <code>#\nEnabling this option will prevent this ugly\n# but otherwise valid CoffeeScript.\ntwoSpaces = () ->\n  fourSpaces = () ->\n      eightSpaces = () ->\n            \'this is valid CoffeeScript\'\n\n</code>\n</pre>\nTwo space indentation is enabled by default.'
+    description: 'This rule imposes a standard number of spaces(tabs) to be used for\nindentation. Since whitespace is significant in CoffeeScript, it\'s\ncritical that a project chooses a standard indentation format and\nstays consistent. Other roads lead to darkness. <pre> <code>#\nEnabling this option will prevent this ugly\n# but otherwise valid CoffeeScript.\ntwoSpaces = () ->\n  fourSpaces = () ->\n      eightSpaces = () ->\n            \'this is valid CoffeeScript\'\n\n</code>\n</pre>\nTwo space indentation is enabled by default.'
   };
 
   Indentation.prototype.tokens = ['INDENT', '[', ']', '.'];
@@ -2093,6 +2131,7 @@ module.exports = LineEndings = (function() {
       })();
       if (!valid) {
         return {
+          columnNumber: line.length,
           context: `Expected ${ending}`
         };
       } else {
@@ -2140,6 +2179,7 @@ module.exports = MaxLineLength = (function() {
           }
         }
         return {
+          columnNumber: max,
           context: `Length is ${lineLength}, max is ${max}`
         };
       }
@@ -2215,7 +2255,8 @@ module.exports = MissingFatArrows = (function() {
       // Ignore any nodes we know to be methods
       if ((!this.isFatArrowCode(node)) && (isStrict ? true : indexOf.call(methods, node) < 0) && (this.needsFatArrow(node))) {
         error = this.astApi.createError({
-          lineNumber: node.locationData.first_line + 1
+          lineNumber: node.locationData.first_line + 1,
+          columnNumber: node.locationData.first_column + 1
         });
         this.errors.push(error);
       }
@@ -2403,7 +2444,9 @@ var NoBackticks;
 module.exports = NoBackticks = (function() {
   class NoBackticks {
     lintToken(token, tokenApi) {
-      return token.comments == null;
+      if (token.comments == null) {
+        return {token};
+      }
     }
 
   };
@@ -2431,6 +2474,7 @@ module.exports = NoDebugger = (function() {
       var method, ref, ref1, ref2;
       if (((ref = token[0]) === 'DEBUGGER' || ref === 'STATEMENT') && token[1] === 'debugger') {
         return {
+          token,
           context: `found '${token[0]}'`
         };
       }
@@ -2438,6 +2482,7 @@ module.exports = NoDebugger = (function() {
         if (token[1] === 'console' && ((ref2 = tokenApi.peek(1)) != null ? ref2[0] : void 0) === '.') {
           method = tokenApi.peek(2);
           return {
+            token,
             context: `found 'console.${method[1]}'`
           };
         }
@@ -2482,7 +2527,8 @@ module.exports = NoEmptyFunctions = (function() {
       var error;
       if (isEmptyCode(node, astApi)) {
         error = astApi.createError({
-          lineNumber: node.locationData.first_line + 1
+          lineNumber: node.locationData.first_line + 1,
+          columnNumber: node.locationData.first_column + 1
         });
         this.errors.push(error);
       }
@@ -2513,7 +2559,9 @@ module.exports = NoEmptyParamList = (function() {
     lintToken(token, tokenApi) {
       var nextType;
       nextType = tokenApi.peek()[0];
-      return nextType === 'PARAM_END';
+      if (nextType === 'PARAM_END') {
+        return {token};
+      }
     }
 
   };
@@ -2598,7 +2646,9 @@ module.exports = NoImplicitBraces = (function() {
             return;
           }
         }
-        return true;
+        return {
+          token: tokenApi.peek(c + 1)
+        };
       }
     }
 
@@ -2649,7 +2699,7 @@ module.exports = NoImplicitParens = (function() {
       var genCallStart, i, sameLine, t;
       if (token.generated) {
         if (tokenApi.config[this.rule.name].strict !== false) {
-          return true;
+          return {token};
         } else {
           // If strict mode is turned off it allows implicit parens when
           // the expression is spread over multiple lines.
@@ -2659,7 +2709,9 @@ module.exports = NoImplicitParens = (function() {
             sameLine = t[2].first_line === token[2].first_line;
             genCallStart = t[0] === 'CALL_START' && t.generated;
             if ((t == null) || genCallStart && sameLine) {
-              return true;
+              return {
+                token: t || token
+              };
             }
             // If we have not found a CALL_START token that is generated,
             // and we've moved into a new line, this is fine and should
@@ -2699,7 +2751,9 @@ module.exports = NoInterpolationInSingleQuotes = (function() {
       var hasInterpolation, tokenValue;
       tokenValue = token[1];
       hasInterpolation = tokenValue.match(/^\'.*#\{[^}]+\}.*\'$/);
-      return hasInterpolation;
+      if (hasInterpolation) {
+        return {token};
+      }
     }
 
   };
@@ -2724,32 +2778,47 @@ var NoNestedStringInterpolation;
 module.exports = NoNestedStringInterpolation = (function() {
   class NoNestedStringInterpolation {
     constructor() {
-      this.startedStrings = 0;
-      this.generatedError = false;
+      this.blocks = [];
     }
 
-    lintToken([type], tokenApi) {
-      if (type === 'STRING_START') {
-        return this.trackStringStart();
-      } else {
-        return this.trackStringEnd();
+    lintToken(token, tokenApi) {
+      var block, ref, tag, tagname, tagtype;
+      [tag] = token;
+      if (!this.blocks.length) {
+        this.blocks.push([]);
       }
-    }
-
-    trackStringStart() {
-      this.startedStrings += 1;
-      // Don't generate multiple errors for deeply nested string interpolation
-      if (this.startedStrings <= 1 || this.generatedError) {
+      block = this.blocks[this.blocks.length - 1];
+      if (tag === 'CSX_TAG') {
+        this.blocks.push([]);
         return;
       }
-      this.generatedError = true;
-      return true;
-    }
-
-    trackStringEnd() {
-      this.startedStrings -= 1;
-      if (this.startedStrings === 1) {
-        return this.generatedError = false;
+      [tagname, tagtype] = tag.split('_');
+      if (tagtype === 'END') {
+        block.pop();
+        if (tagname === 'STRING') {
+          block.strCount -= 1;
+          if (block.strCount <= 1) {
+            block.error = false;
+          }
+        } else {
+          this.blocks.pop();
+        }
+        if (!block.length) {
+          this.blocks.pop();
+        }
+        if (!this.blocks.length) {
+          this.blocks.push([]);
+        }
+      } else {
+        block.push(tagname);
+        if (tagname === 'STRING') {
+          block.strCount = ((ref = block.strCount) != null ? ref : 0) + 1;
+          // Don't make multiple errors for deeply nested interpolation
+          if (block.strCount > 1 && !block.error) {
+            block.error = true;
+            return {token};
+          }
+        }
       }
     }
 
@@ -2762,7 +2831,7 @@ module.exports = NoNestedStringInterpolation = (function() {
     description: 'This rule warns about nested string interpolation,\nas it tends to make code harder to read and understand.\n<pre>\n<code># Good!\nstr = "Book by #{firstName.toUpperCase()} #{lastName.toUpperCase()}"\n\n# Bad!\nstr = "Book by #{"#{firstName} #{lastName}".toUpperCase()}"\n</code>\n</pre>'
   };
 
-  NoNestedStringInterpolation.prototype.tokens = ['STRING_START', 'STRING_END'];
+  NoNestedStringInterpolation.prototype.tokens = ['CSX_TAG', 'CALL_START', 'CALL_END', 'STRING_START', 'STRING_END'];
 
   return NoNestedStringInterpolation;
 
@@ -2776,6 +2845,7 @@ module.exports = NoPlusPlus = (function() {
   class NoPlusPlus {
     lintToken(token, tokenApi) {
       return {
+        token,
         context: `found '${token[0]}'`
       };
     }
@@ -2820,7 +2890,8 @@ module.exports = NoPrivateFunctionFatArrows = (function() {
       var error;
       if (this.isFatArrowCode(node) && indexOf.call(functions, node) >= 0) {
         error = this.astApi.createError({
-          lineNumber: node.locationData.first_line + 1
+          lineNumber: node.locationData.first_line + 1,
+          columnNumber: node.locationData.first_column + 1
         });
         this.errors.push(error);
       }
@@ -2894,6 +2965,42 @@ module.exports = NoPrivateFunctionFatArrows = (function() {
 
 
 },{}],33:[function(require,module,exports){
+var NoSpaces, indentationRegex,
+  indexOf = [].indexOf;
+
+indentationRegex = /\S/;
+
+module.exports = NoSpaces = (function() {
+  class NoSpaces {
+    lintLine(line, lineApi) {
+      var indentation;
+      // Only check lines that have compiled tokens. This helps
+      // us ignore spaces in the middle of multi line strings, heredocs, etc.
+      // since they are all reduced to a single token whose line number
+      // is the start of the expression.
+      indentation = line.split(indentationRegex)[0];
+      if (lineApi.lineHasToken() && indexOf.call(indentation, '\ ') >= 0) {
+        return true;
+      } else {
+        return null;
+      }
+    }
+
+  };
+
+  NoSpaces.prototype.rule = {
+    name: 'no_spaces',
+    level: 'ignore',
+    message: 'Line contains space indentation',
+    description: 'This rule forbids spaces in indentation. It is disabled by default.'
+  };
+
+  return NoSpaces;
+
+}).call(this);
+
+
+},{}],34:[function(require,module,exports){
 var NoStandAloneAt;
 
 module.exports = NoStandAloneAt = (function() {
@@ -2919,7 +3026,7 @@ module.exports = NoStandAloneAt = (function() {
       // is an property, the start of an index '[' or is an property after
       // the '::'
       if (!(isDot || (noSpace && (isProp || isAStart || isProtoProp)))) {
-        return true;
+        return {token};
       }
     }
 
@@ -2939,7 +3046,7 @@ module.exports = NoStandAloneAt = (function() {
 }).call(this);
 
 
-},{}],34:[function(require,module,exports){
+},{}],35:[function(require,module,exports){
 var NoTabs, indentationRegex,
   indexOf = [].indexOf;
 
@@ -2955,7 +3062,9 @@ module.exports = NoTabs = (function() {
       // is the start of the expression.
       indentation = line.split(indentationRegex)[0];
       if (lineApi.lineHasToken() && indexOf.call(indentation, '\t') >= 0) {
-        return true;
+        return {
+          columnNumber: indentation.indexOf('\t')
+        };
       } else {
         return null;
       }
@@ -2975,7 +3084,7 @@ module.exports = NoTabs = (function() {
 }).call(this);
 
 
-},{}],35:[function(require,module,exports){
+},{}],36:[function(require,module,exports){
 var NoThis;
 
 module.exports = NoThis = (function() {
@@ -2989,7 +3098,7 @@ module.exports = NoThis = (function() {
       } = tokenApi);
       nextToken = (ref = tokenApi.peek(1)) != null ? ref[0] : void 0;
       if (!(level !== 'ignore' && nextToken !== '.')) {
-        return true;
+        return {token};
       }
     }
 
@@ -3009,7 +3118,7 @@ module.exports = NoThis = (function() {
 }).call(this);
 
 
-},{}],36:[function(require,module,exports){
+},{}],37:[function(require,module,exports){
 var NoThrowingStrings;
 
 module.exports = NoThrowingStrings = (function() {
@@ -3019,7 +3128,9 @@ module.exports = NoThrowingStrings = (function() {
       ref = tokenApi.peek(), [n1] = ref;
       // Catch literals and string interpolations, which are wrapped in parens.
       nextIsString = n1 === 'STRING' || n1 === 'STRING_START';
-      return nextIsString;
+      if (nextIsString) {
+        return {token};
+      }
     }
 
   };
@@ -3038,7 +3149,7 @@ module.exports = NoThrowingStrings = (function() {
 }).call(this);
 
 
-},{}],37:[function(require,module,exports){
+},{}],38:[function(require,module,exports){
 var NoTrailingSemicolons, regexes,
   indexOf = [].indexOf,
   splice = [].splice;
@@ -3101,12 +3212,13 @@ module.exports = NoTrailingSemicolons = (function() {
 }).call(this);
 
 
-},{}],38:[function(require,module,exports){
+},{}],39:[function(require,module,exports){
 var NoTrailingWhitespace, regexes;
 
 regexes = {
   trailingWhitespace: /[^\s]+[\t ]+\r?$/,
   onlySpaces: /^[\t ]+\r?$/,
+  spacesStart: /[\t ]+\r?$/,
   lineHasComment: /^\s*[^\#]*\#/
 };
 
@@ -3116,13 +3228,17 @@ module.exports = NoTrailingWhitespace = (function() {
       var i, len, ref, ref1, ref2, str, token, tokens;
       if (!((ref = lineApi.config['no_trailing_whitespace']) != null ? ref.allowed_in_empty_lines : void 0)) {
         if (regexes.onlySpaces.test(line)) {
-          return true;
+          return {
+            columnNumber: line.match(regexes.spacesStart).length + 1
+          };
         }
       }
       if (regexes.trailingWhitespace.test(line)) {
         // By default only the regex above is needed.
         if (!((ref1 = lineApi.config['no_trailing_whitespace']) != null ? ref1.allowed_in_comments : void 0)) {
-          return true;
+          return {
+            columnNumber: line.match(regexes.spacesStart).index + 1
+          };
         }
         line = line;
         tokens = lineApi.tokensByLine[lineApi.lineNumber];
@@ -3147,7 +3263,9 @@ module.exports = NoTrailingWhitespace = (function() {
           line = line.replace(str, 'STRING');
         }
         if (!regexes.lineHasComment.test(line)) {
-          return true;
+          return {
+            columnNumber: line.match(regexes.spacesStart).index + 1
+          };
         }
       }
     }
@@ -3168,7 +3286,7 @@ module.exports = NoTrailingWhitespace = (function() {
 }).call(this);
 
 
-},{}],39:[function(require,module,exports){
+},{}],40:[function(require,module,exports){
 var NoUnnecessaryDoubleQuotes;
 
 module.exports = NoUnnecessaryDoubleQuotes = (function() {
@@ -3176,13 +3294,18 @@ module.exports = NoUnnecessaryDoubleQuotes = (function() {
     constructor() {
       this.regexps = [];
       this.interpolationLevel = 0;
+      this.inCSX = false;
+      this.CSXCallLevel = 0;
     }
 
     lintToken(token, tokenApi) {
       var hasLegalConstructs, ref, stringValue, tokenValue, type;
       [type, tokenValue] = token;
       if (type === 'STRING_START' || type === 'STRING_END') {
-        return this.trackParens(...arguments);
+        return this.trackInterpolation(...arguments);
+      }
+      if (type === 'CSX_TAG' || type === 'CALL_START' || type === 'CALL_END') {
+        return this.trackCSX(...arguments);
       }
       stringValue = tokenValue.match(/^\"(.*)\"$/);
       if (!stringValue) { // no double quotes, all OK
@@ -3194,19 +3317,40 @@ module.exports = NoUnnecessaryDoubleQuotes = (function() {
       if (((ref = tokenApi.peek(2)) != null ? ref[0] : void 0) === 'REGEX_END') {
         return false;
       }
-      hasLegalConstructs = this.isInInterpolation() || this.hasSingleQuote(tokenValue);
-      return !hasLegalConstructs;
+      hasLegalConstructs = this.inCSX || this.isInInterpolation() || this.hasSingleQuote(tokenValue);
+      if (!hasLegalConstructs) {
+        return {token};
+      }
     }
 
     isInInterpolation() {
       return this.interpolationLevel > 0;
     }
 
-    trackParens(token, tokenApi) {
+    trackInterpolation(token, tokenApi) {
       if (token[0] === 'STRING_START') {
         this.interpolationLevel += 1;
       } else if (token[0] === 'STRING_END') {
         this.interpolationLevel -= 1;
+      }
+      // We're not linting, just tracking interpolations.
+      return null;
+    }
+
+    trackCSX(token, tokenApi) {
+      if (token[0] === 'CSX_TAG') {
+        this.inCSX = true;
+      } else if (token[0] === 'CALL_START') {
+        if (this.inCSX) {
+          this.CSXCallLevel += 1;
+        }
+      } else if (token[0] === 'CALL_END') {
+        if (this.inCSX) {
+          this.CSXCallLevel -= 1;
+          if (this.CSXCallLevel === 0) {
+            this.inCSX = false;
+          }
+        }
       }
       // We're not linting, just tracking interpolations.
       return null;
@@ -3225,14 +3369,14 @@ module.exports = NoUnnecessaryDoubleQuotes = (function() {
     description: 'This rule prohibits double quotes unless string interpolation is\nused or the string contains single quotes.\n<pre>\n<code># Double quotes are discouraged:\nfoo = "bar"\n\n# Unless string interpolation is used:\nfoo = "#{bar}baz"\n\n# Or they prevent cumbersome escaping:\nfoo = "I\'m just following the \'rules\'"\n</code>\n</pre>\nDouble quotes are permitted by default.'
   };
 
-  NoUnnecessaryDoubleQuotes.prototype.tokens = ['STRING', 'STRING_START', 'STRING_END'];
+  NoUnnecessaryDoubleQuotes.prototype.tokens = ['STRING', 'STRING_START', 'STRING_END', 'CSX_TAG', 'CALL_START', 'CALL_END'];
 
   return NoUnnecessaryDoubleQuotes;
 
 }).call(this);
 
 
-},{}],40:[function(require,module,exports){
+},{}],41:[function(require,module,exports){
 var NoUnnecessaryFatArrows, any;
 
 any = function(arr, test) {
@@ -3258,7 +3402,8 @@ module.exports = NoUnnecessaryFatArrows = (function() {
       var error;
       if ((this.isFatArrowCode(node)) && (!this.needsFatArrow(node))) {
         error = this.astApi.createError({
-          lineNumber: node.locationData.first_line + 1
+          lineNumber: node.locationData.first_line + 1,
+          columnNumber: node.locationData.first_column + 1
         });
         this.errors.push(error);
       }
@@ -3312,16 +3457,18 @@ module.exports = NoUnnecessaryFatArrows = (function() {
 }).call(this);
 
 
-},{}],41:[function(require,module,exports){
+},{}],42:[function(require,module,exports){
 var NonEmptyConstructorNeedsParens, ParentClass;
 
 ParentClass = require('./empty_constructor_needs_parens.coffee');
 
 module.exports = NonEmptyConstructorNeedsParens = (function() {
   class NonEmptyConstructorNeedsParens extends ParentClass {
-    handleExpectedCallStart(isCallStart) {
+    handleExpectedCallStart(isCallStart, tokenApi) {
       if (isCallStart[0] === 'CALL_START' && isCallStart.generated) {
-        return true;
+        return {
+          token: tokenApi.peek(isCallStart, 1)
+        };
       }
     }
 
@@ -3339,8 +3486,9 @@ module.exports = NonEmptyConstructorNeedsParens = (function() {
 }).call(this);
 
 
-},{"./empty_constructor_needs_parens.coffee":15}],42:[function(require,module,exports){
-var PreferEnglishOperator;
+},{"./empty_constructor_needs_parens.coffee":15}],43:[function(require,module,exports){
+var PreferEnglishOperator,
+  indexOf = [].indexOf;
 
 module.exports = PreferEnglishOperator = (function() {
   class PreferEnglishOperator {
@@ -3354,16 +3502,16 @@ module.exports = PreferEnglishOperator = (function() {
       actual_token = line.slice(first_column, +last_column + 1 || 9e9);
       context = (function() {
         var ref, ref1;
-        switch (actual_token) {
-          case '==':
+        switch (true) {
+          case actual_token === '==' && indexOf.call(config.ops, 'is') >= 0:
             return 'Replace "==" with "is"';
-          case '!=':
+          case actual_token === '!=' && indexOf.call(config.ops, 'isnt') >= 0:
             return 'Replace "!=" with "isnt"';
-          case '||':
+          case actual_token === '||' && indexOf.call(config.ops, 'or') >= 0:
             return 'Replace "||" with "or"';
-          case '&&':
+          case actual_token === '&&' && indexOf.call(config.ops, 'and') >= 0:
             return 'Replace "&&" with "and"';
-          case '!':
+          case actual_token === '!' && indexOf.call(config.ops, 'not') >= 0:
             // `not not expression` seems awkward, so `!!expression`
             // gets special handling.
             if (((ref = tokenApi.peek(1)) != null ? ref[0] : void 0) === 'UNARY_MATH') {
@@ -3381,7 +3529,7 @@ module.exports = PreferEnglishOperator = (function() {
         }
       })();
       if (context != null) {
-        return {level, context};
+        return {token, level, context};
       }
     }
 
@@ -3392,6 +3540,7 @@ module.exports = PreferEnglishOperator = (function() {
     level: 'ignore',
     message: 'Don\'t use &&, ||, ==, !=, or !',
     doubleNotLevel: 'ignore',
+    ops: ['and', 'or', 'not', 'is', 'isnt'],
     description: 'This rule prohibits &&, ||, ==, != and !.\nUse and, or, is, isnt, and not instead.\n!! for converting to a boolean is ignored.'
   };
 
@@ -3402,7 +3551,7 @@ module.exports = PreferEnglishOperator = (function() {
 }).call(this);
 
 
-},{}],43:[function(require,module,exports){
+},{}],44:[function(require,module,exports){
 var SpaceOperators,
   indexOf = [].indexOf;
 
@@ -3446,6 +3595,7 @@ module.exports = SpaceOperators = (function() {
       notFirstToken = p || (token.spaced != null) || token.newLine;
       if (notFirstToken && ((isUnary && (token.spaced != null)) || (!isUnary && !token.newLine && (!token.spaced || (p && !p.spaced))))) {
         return {
+          token,
           context: token[1]
         };
       } else {
@@ -3458,6 +3608,7 @@ module.exports = SpaceOperators = (function() {
       p = tokenApi.peek(-1);
       if (!token.newLine && (!token.spaced || (p && !p.spaced))) {
         return {
+          token,
           context: token[1]
         };
       } else {
@@ -3521,7 +3672,7 @@ module.exports = SpaceOperators = (function() {
 }).call(this);
 
 
-},{}],44:[function(require,module,exports){
+},{}],45:[function(require,module,exports){
 var SpacingAfterComma;
 
 module.exports = SpacingAfterComma = (function() {
@@ -3541,9 +3692,31 @@ module.exports = SpacingAfterComma = (function() {
         this.inRegex = false;
         return;
       }
-      if (!(token.spaced || token.newLine || token.generated || this.isRegexFlag(token, tokenApi))) {
+      if (!(token.spaced || token.newLine || this.isGenerated(token, tokenApi) || this.isRegexFlag(token, tokenApi))) {
+        return {token};
+      }
+    }
+
+    // Coffeescript does some code generation when using CSX syntax, and it adds
+    // brackets & commas that are not marked as generated. The only way to check
+    // these is to see if the comma has the same column number as the last token.
+    isGenerated(token, tokenApi) {
+      var offset, pos, prevPos, prevToken;
+      if (token.generated) {
         return true;
       }
+      offset = -1;
+      prevToken = tokenApi.peek(offset);
+      while (prevToken.generated) {
+        offset -= 1;
+        prevToken = tokenApi.peek(offset);
+      }
+      pos = token[2];
+      prevPos = prevToken[2];
+      if (pos.first_line === prevPos.first_line && pos.first_column === prevPos.first_column) {
+        return true;
+      }
+      return false;
     }
 
     // When generating a regex (///${whatever}///i) CoffeeScript generates tokens
@@ -3574,7 +3747,7 @@ module.exports = SpacingAfterComma = (function() {
 }).call(this);
 
 
-},{}],45:[function(require,module,exports){
+},{}],46:[function(require,module,exports){
 var TransformMessesUpLineNumbers;
 
 module.exports = TransformMessesUpLineNumbers = (function() {
