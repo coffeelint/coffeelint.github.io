@@ -2,7 +2,7 @@
   "name": "coffeelint.github.io",
   "private": true,
   "scripts": {
-    "compile": "cake compile"
+    "compile": "npm update && cake compile"
   },
   "homepage": "https://coffeelint.github.io/",
   "dependencies": {
