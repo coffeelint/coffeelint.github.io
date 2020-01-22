@@ -1,0 +1,13 @@
+{
+  "name": "coffeelint.github.io",
+  "private": true,
+  "scripts": {
+    "compile": "cake compile"
+  },
+  "homepage": "https://coffeelint.github.io/",
+  "dependencies": {
+    "@coffeelint/cli": "^3.0.0",
+    "coffeescript": "2.4.1",
+    "underscore": "^1.9.2"
+  }
+}
