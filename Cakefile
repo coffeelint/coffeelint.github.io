@@ -4,7 +4,7 @@ task 'compile', 'Compiles index.html', ->
     invoke 'update'
 
     top = fs.readFileSync('./scripts/index-top.html').toString()
-    rules = require('./scripts/htmldoc.coffee')
+    rules = require('./scripts/rules.coffee')
     bottom = fs.readFileSync('./scripts/index-bottom.html').toString()
 
     fs.writeFileSync './index.html', top + rules + bottom
