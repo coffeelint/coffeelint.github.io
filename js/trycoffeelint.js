@@ -60,6 +60,8 @@
     };
 
     $(document).ready(function () {
+        $('.version').text('v' + coffeelint.VERSION);
+
         $('.editor').focus().keyup(runLinter);
         $('.run').click(runLinter);
 

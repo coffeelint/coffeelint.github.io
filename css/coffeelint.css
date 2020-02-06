@@ -41,6 +41,13 @@ body {
   top:8px;
 }
 
+.title .version {
+  font-size: 10px;
+  position: absolute;
+  top: -10px;
+  left: 100%;
+}
+
 .header_links {
   font-size:13px;
   position:relative;
@@ -141,12 +148,14 @@ code, .error_report {
 /* Editor styling */
 
 .row.editor_row {
-  padding-left:20px;
+  padding: 5px 5px 5px 20px;
   background-color:#111;
   border: 0;
+  position: relative;
 }
 
 .editor {
+  padding-top: 30px;
   background-color:#111;
   min-height:250px;
   color:#339933;
@@ -171,7 +180,7 @@ tt {
   float:right;
   text-transform:uppercase;
   display:inline;
-  position:relative;
+  position:absolute;
   top:20px;
   right:20px;
   background-color: #eee;
@@ -183,7 +192,6 @@ tt {
   background: -moz-radial-gradient(circle, #fff, #bbb);
   width:3em;
   text-align:center;
-  position:relative;
   z-index:10;
 }
 
