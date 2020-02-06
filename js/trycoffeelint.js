@@ -62,6 +62,10 @@
     $(document).ready(function () {
         $('.editor').focus().keyup(runLinter);
         $('.run').click(runLinter);
+
+        if (location.hash) {
+            $([document.documentElement, document.body]).scrollTop($(location.hash).offset().top);
+        }
     });
 
 })();
