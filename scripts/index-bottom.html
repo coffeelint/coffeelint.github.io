@@ -210,8 +210,42 @@
           <h2 class="section_title" id="changelog">Change Log</h2>
 
           <p>
-              <a href="https://github.com/coffeelint/coffeelint/compare/v3.0.2...master">Latest Changes</a>
+              <a href="https://github.com/coffeelint/coffeelint/compare/v3.1.0...master">Latest Changes</a>
           </p>
+
+          <div> <h3 class="changelog_header">v3.1.0</h3> <small
+          class="changelog_date">- <a
+          href="https://github.com/coffeelint/coffeelint/compare/v3.0.2...v3.1.0">2020.02.06<a></a></small>
+          <p>
+              Added a few rules and rules options. More bug fixes and internal updates to make developing easier.
+              We got through the backlog of pull requests. Now on to the issues...
+          </p>
+          <ul class="changelog_history">
+            <li>Add `prefer_logical_operator` rule.
+                <a href="https://github.com/coffeelint/coffeelint/pull/13">#13</a></li>
+            <li>Add `missing_parseint_radix` rule.
+                <a href="https://github.com/coffeelint/coffeelint/pull/17">#17</a></li>
+            <li>Add `bracket_spacing` rule.
+                <a href="https://github.com/coffeelint/coffeelint/pull/26">#26</a></li>
+            <li>`space_operators`: add `default_parameters` option.
+                <a href="https://github.com/coffeelint/coffeelint/pull/16">#16</a></li>
+            <li>`colon_assignment_spacing`: add `min_left` and `min_right` option.
+                <a href="https://github.com/coffeelint/coffeelint/pull/22">#22</a></li>
+            <li>`spacing_after_comma`: add `ignore_elision` option.
+                <a href="https://github.com/coffeelint/coffeelint/pull/34">#34</a></li>
+            <li>`braces_spacing`: add `mono_object_spaces` option.
+                <a href="https://github.com/coffeelint/coffeelint/pull/17">#17</a></li>
+            <li>Properly double quote fields in `csv` reporter.
+                <a href="https://github.com/coffeelint/coffeelint/pull/14">#14</a></li>
+            <li>Stop printing empty context in `checkstyle` reporter.
+                <a href="https://github.com/coffeelint/coffeelint/pull/12">#12</a></li>
+            <li>`no_tabs` rejects tabs at the end of the line.
+                <a href="https://github.com/coffeelint/coffeelint/pull/20">#20</a></li>
+            <li>Prevent endless loop if lineNumber is negative.
+                <a href="https://github.com/coffeelint/coffeelint/pull/10">#10</a></li>
+            <li>Update dependency `resolve` to v1.15.1</li>
+          </ul>
+          </div>
 
           <div> <h3 class="changelog_header">v3.0.2</h3> <small
           class="changelog_date">- <a
@@ -731,9 +765,9 @@
              alt="Fork me on GitHub"/>
     </a>
 
-    <script type="text/javascript" src="js/jquery-3.4.1.min.js"></script>
-    <script type="text/javascript" src="js/coffeescript.js"></script>
-    <script type="text/javascript" src="js/coffeelint.js"></script>
-    <script type="text/javascript" src="js/trycoffeelint.js"></script>
+    <script type="text/javascript" src="./js/jquery-3.4.1.min.js"></script>
+    <script type="text/javascript" src="./js/coffeescript.js"></script>
+    <script type="text/javascript" src="./js/coffeelint.js"></script>
+    <script type="text/javascript" src="./js/trycoffeelint.js"></script>
   </body>
 </html>

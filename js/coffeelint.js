@@ -2,14 +2,14 @@
 module.exports={
   "name": "@coffeelint/cli",
   "description": "Lint your CoffeeScript",
-  "version": "3.0.1",
+  "version": "3.1.0",
   "homepage": "https://coffeelint.github.io/",
   "keywords": [
     "lint",
     "coffeescript",
     "coffee-script"
   ],
-  "author": "Matthew Perpick <clutchski@gmail.com>",
+  "author": "Tony Brix <Tony@Brix.ninja> (https://Tony.Brix.ninja)",
   "main": "./lib/coffeelint.js",
   "engines": {
     "node": ">=8.x"
@@ -26,7 +26,7 @@ module.exports={
     "glob": "^7.1.6",
     "ignore": "^5.1.4",
     "optimist": "^0.6.1",
-    "resolve": "^1.14.2",
+    "resolve": "^1.15.1",
     "strip-json-comments": "^3.0.1"
   },
   "devDependencies": {
@@ -37,13 +37,13 @@ module.exports={
   },
   "license": "MIT",
   "scripts": {
-    "test": "npm run compile && node ./vowsrunner.js --spec test/*.coffee test/*.litcoffee",
+    "test": "npm run compile && node ./vowsrunner.js --dot-matrix test/*.coffee test/*.litcoffee",
     "testrule": "npm run compile && node ./vowsrunner.js --spec",
     "lint": "npm run compile && node ./bin/coffeelint .",
     "lint-csv": "npm run compile && node ./bin/coffeelint --reporter csv .",
     "lint-jslint": "npm run compile && node ./bin/coffeelint --reporter jslint .",
     "compile": "cake compile",
-    "prepublish": "npm run compile"
+    "prepublishOnly": "npm run compile"
   }
 }
 
@@ -533,6 +533,8 @@ coffeelint.registerRule(require('./rules/arrow_spacing.coffee'));
 
 coffeelint.registerRule(require('./rules/braces_spacing.coffee'));
 
+coffeelint.registerRule(require('./rules/bracket_spacing.coffee'));
+
 coffeelint.registerRule(require('./rules/no_tabs.coffee'));
 
 coffeelint.registerRule(require('./rules/no_spaces.coffee'));
@@ -593,6 +595,8 @@ coffeelint.registerRule(require('./rules/no_empty_functions.coffee'));
 
 coffeelint.registerRule(require('./rules/prefer_english_operator.coffee'));
 
+coffeelint.registerRule(require('./rules/prefer_logical_operator.coffee'));
+
 coffeelint.registerRule(require('./rules/spacing_after_comma.coffee'));
 
 coffeelint.registerRule(require('./rules/transform_messes_up_line_numbers.coffee'));
@@ -604,6 +608,8 @@ coffeelint.registerRule(require('./rules/no_this.coffee'));
 coffeelint.registerRule(require('./rules/eol_last.coffee'));
 
 coffeelint.registerRule(require('./rules/no_private_function_fat_arrows.coffee'));
+
+coffeelint.registerRule(require('./rules/missing_parseint_radix.coffee'));
 
 getTokens = function(source) {
   try {
@@ -810,7 +816,7 @@ coffeelint.setCache = function(obj) {
 };
 
 
-},{"./../package.json":1,"./ast_linter.coffee":2,"./error_report.coffee":5,"./lexical_linter.coffee":6,"./line_linter.coffee":7,"./rules.coffee":8,"./rules/arrow_spacing.coffee":9,"./rules/braces_spacing.coffee":10,"./rules/camel_case_classes.coffee":11,"./rules/colon_assignment_spacing.coffee":12,"./rules/cyclomatic_complexity.coffee":13,"./rules/duplicate_key.coffee":14,"./rules/empty_constructor_needs_parens.coffee":15,"./rules/ensure_comprehensions.coffee":16,"./rules/eol_last.coffee":17,"./rules/indentation.coffee":18,"./rules/line_endings.coffee":19,"./rules/max_line_length.coffee":20,"./rules/missing_fat_arrows.coffee":21,"./rules/newlines_after_classes.coffee":22,"./rules/no_backticks.coffee":23,"./rules/no_debugger.coffee":24,"./rules/no_empty_functions.coffee":25,"./rules/no_empty_param_list.coffee":26,"./rules/no_implicit_braces.coffee":27,"./rules/no_implicit_parens.coffee":28,"./rules/no_interpolation_in_single_quotes.coffee":29,"./rules/no_nested_string_interpolation.coffee":30,"./rules/no_plusplus.coffee":31,"./rules/no_private_function_fat_arrows.coffee":32,"./rules/no_spaces.coffee":33,"./rules/no_stand_alone_at.coffee":34,"./rules/no_tabs.coffee":35,"./rules/no_this.coffee":36,"./rules/no_throwing_strings.coffee":37,"./rules/no_trailing_semicolons.coffee":38,"./rules/no_trailing_whitespace.coffee":39,"./rules/no_unnecessary_double_quotes.coffee":40,"./rules/no_unnecessary_fat_arrows.coffee":41,"./rules/non_empty_constructor_needs_parens.coffee":42,"./rules/prefer_english_operator.coffee":43,"./rules/space_operators.coffee":44,"./rules/spacing_after_comma.coffee":45,"./rules/transform_messes_up_line_numbers.coffee":46}],5:[function(require,module,exports){
+},{"./../package.json":1,"./ast_linter.coffee":2,"./error_report.coffee":5,"./lexical_linter.coffee":6,"./line_linter.coffee":7,"./rules.coffee":8,"./rules/arrow_spacing.coffee":9,"./rules/braces_spacing.coffee":10,"./rules/bracket_spacing.coffee":11,"./rules/camel_case_classes.coffee":12,"./rules/colon_assignment_spacing.coffee":13,"./rules/cyclomatic_complexity.coffee":14,"./rules/duplicate_key.coffee":15,"./rules/empty_constructor_needs_parens.coffee":16,"./rules/ensure_comprehensions.coffee":17,"./rules/eol_last.coffee":18,"./rules/indentation.coffee":19,"./rules/line_endings.coffee":20,"./rules/max_line_length.coffee":21,"./rules/missing_fat_arrows.coffee":22,"./rules/missing_parseint_radix.coffee":23,"./rules/newlines_after_classes.coffee":24,"./rules/no_backticks.coffee":25,"./rules/no_debugger.coffee":26,"./rules/no_empty_functions.coffee":27,"./rules/no_empty_param_list.coffee":28,"./rules/no_implicit_braces.coffee":29,"./rules/no_implicit_parens.coffee":30,"./rules/no_interpolation_in_single_quotes.coffee":31,"./rules/no_nested_string_interpolation.coffee":32,"./rules/no_plusplus.coffee":33,"./rules/no_private_function_fat_arrows.coffee":34,"./rules/no_spaces.coffee":35,"./rules/no_stand_alone_at.coffee":36,"./rules/no_tabs.coffee":37,"./rules/no_this.coffee":38,"./rules/no_throwing_strings.coffee":39,"./rules/no_trailing_semicolons.coffee":40,"./rules/no_trailing_whitespace.coffee":41,"./rules/no_unnecessary_double_quotes.coffee":42,"./rules/no_unnecessary_fat_arrows.coffee":43,"./rules/non_empty_constructor_needs_parens.coffee":44,"./rules/prefer_english_operator.coffee":45,"./rules/prefer_logical_operator.coffee":46,"./rules/space_operators.coffee":47,"./rules/spacing_after_comma.coffee":48,"./rules/transform_messes_up_line_numbers.coffee":49}],5:[function(require,module,exports){
 // A summary of errors in a CoffeeLint run.
 var ErrorReport;
 
@@ -1295,7 +1301,8 @@ module.exports = ArrowSpacing = (function() {
 
 
 },{}],10:[function(require,module,exports){
-var BracesSpacing;
+var BracesSpacing,
+  indexOf = [].indexOf;
 
 module.exports = BracesSpacing = (function() {
   class BracesSpacing {
@@ -1309,7 +1316,7 @@ module.exports = BracesSpacing = (function() {
       while (true) {
         totalDifference += difference;
         nearestToken = tokenApi.peek(totalDifference);
-        if (nearestToken[0] === 'OUTDENT' || (nearestToken.generated != null)) {
+        if ((nearestToken != null ? nearestToken[0] : void 0) === 'OUTDENT' || ((nearestToken != null ? nearestToken.generated : void 0) != null)) {
           continue;
         }
         return nearestToken;
@@ -1320,26 +1327,38 @@ module.exports = BracesSpacing = (function() {
       return firstToken[2].first_line === secondToken[2].first_line;
     }
 
-    getExpectedSpaces(tokenApi, firstToken, secondToken) {
-      var config, ref;
+    tokenSetsMatch(a, b) {
+      return JSON.stringify(a) === JSON.stringify(b);
+    }
+
+    getExpectedSpaces(tokenApi, tokens) {
+      var config, mono, ref, ref1;
       config = tokenApi.config[this.rule.name];
-      if (firstToken[0] === '{' && secondToken[0] === '}') {
+      mono = ['IDENTIFIER', ...this.tokens];
+      tokens = tokens.map(function(token) {
+        return token != null ? token[0] : void 0;
+      }).filter(function(token) {
+        return indexOf.call(mono, token) >= 0;
+      });
+      if (this.tokenSetsMatch(tokens.slice(0, 2), this.tokens)) {
         return (ref = config.empty_object_spaces) != null ? ref : config.spaces;
+      } else if (this.tokenSetsMatch(mono, tokens.sort())) {
+        return (ref1 = config.mono_object_spaces) != null ? ref1 : config.spaces;
       } else {
         return config.spaces;
       }
     }
 
     lintToken(token, tokenApi) {
-      var actual, expected, firstToken, msg, secondToken;
+      var actual, expected, firstToken, msg, secondToken, tokens;
       if (token.generated) {
         return null;
       }
-      [firstToken, secondToken] = token[0] === '{' ? [token, this.findNearestToken(token, tokenApi, 1)] : [this.findNearestToken(token, tokenApi, -1), token];
+      [firstToken, secondToken] = tokens = token[0] === '{' ? [token, this.findNearestToken(token, tokenApi, 1), this.findNearestToken(token, tokenApi, 2)] : [this.findNearestToken(token, tokenApi, -1), token, this.findNearestToken(token, tokenApi, -2)];
       if (!this.tokensOnSameLine(firstToken, secondToken)) {
         return null;
       }
-      expected = this.getExpectedSpaces(tokenApi, firstToken, secondToken);
+      expected = this.getExpectedSpaces(tokenApi, tokens);
       actual = this.distanceBetweenTokens(firstToken, secondToken);
       if (actual === expected) {
         return null;
@@ -1364,7 +1383,7 @@ module.exports = BracesSpacing = (function() {
     spaces: 0,
     empty_object_spaces: 0,
     message: 'Curly braces must have the proper spacing',
-    description: 'This rule checks to see that there is the proper spacing inside\ncurly braces. The spacing amount is specified by "spaces".\nThe spacing amount for empty objects is specified by\n"empty_object_spaces".\n\n<pre><code>\n# Spaces is 0\n{a: b}     # Good\n{a: b }    # Bad\n{ a: b}    # Bad\n{ a: b }   # Bad\n\n# Spaces is 1\n{a: b}     # Bad\n{a: b }    # Bad\n{ a: b}    # Bad\n{ a: b }   # Good\n{ a: b  }  # Bad\n{  a: b }  # Bad\n{  a: b  } # Bad\n\n# Empty Object Spaces is 0\n{}         # Good\n{ }        # Bad\n\n# Empty Object Spaces is 1\n{}         # Bad\n{ }        # Good\n</code></pre>\n\nThis rule is disabled by default.'
+    description: 'This rule checks to see that there is the proper spacing inside\ncurly braces. The spacing amount is specified by "spaces".\nThe spacing amount for empty objects is specified by\n"empty_object_spaces".\nThe spacing amount for objects containing a single item is\nspecified by "mono_object_spaces".\n<pre><code>\n# Spaces is 0\n{a: b}     # Good\n{a: b }    # Bad\n{ a: b}    # Bad\n{ a: b }   # Bad\n# Spaces is 1\n{a: b}     # Bad\n{a: b }    # Bad\n{ a: b}    # Bad\n{ a: b }   # Good\n{ a: b  }  # Bad\n{  a: b }  # Bad\n{  a: b  } # Bad\n# Empty Object Spaces is 0\n{}         # Good\n{ }        # Bad\n# Empty Object Spaces is 1\n{}         # Bad\n{ }        # Good\n# Mono Object Spaces is 0\n{a}        # Good\n{ a }      # Bad\n# Mono Object Spaces is 1\n{a}        # Bad\n{ a }      # Good\n</code></pre>\nThis rule is disabled by default.'
   };
 
   BracesSpacing.prototype.tokens = ['{', '}'];
@@ -1375,6 +1394,109 @@ module.exports = BracesSpacing = (function() {
 
 
 },{}],11:[function(require,module,exports){
+var BracketSpacing;
+
+module.exports = BracketSpacing = (function() {
+  class BracketSpacing {
+    distanceBetweenTokens(firstToken, secondToken) {
+      return secondToken[2].first_column - firstToken[2].last_column - 1;
+    }
+
+    findNearestToken(token, tokenApi, difference) {
+      var nearestToken, totalDifference;
+      totalDifference = 0;
+      while (true) {
+        totalDifference += difference;
+        nearestToken = tokenApi.peek(totalDifference);
+        if (nearestToken != null ? nearestToken[0].startsWith('STRING_') : void 0) {
+          // Render quotes for string interpolation.
+          nearestToken[1] = '"';
+        }
+        if ((nearestToken != null ? nearestToken[0] : void 0) === 'OUTDENT' || ((nearestToken != null ? nearestToken.generated : void 0) != null)) {
+          continue;
+        }
+        return nearestToken;
+      }
+    }
+
+    tokensOnSameLine(firstToken, secondToken) {
+      return firstToken[2].first_line === secondToken[2].first_line;
+    }
+
+    escape(string) {
+      return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    }
+
+    getExpectedSpaces(tokenApi, tokens) {
+      var config, except, pattern, ref, ref1;
+      config = tokenApi.config[this.rule.name];
+      except = this.escape(config.exceptions.join(''));
+      pattern = tokens.map(function(token) {
+        return token != null ? token[1] : void 0;
+      }).join('');
+      switch (false) {
+        case !(except && RegExp(`^\\[[${except}]|[${except}]\\]$`).test(pattern)):
+          if (config.spaces) {
+            return 0;
+          } else {
+            return 1;
+          }
+          break;
+        case !pattern.includes('[]'):
+          return (ref = config.empty_array_spaces) != null ? ref : config.spaces;
+        case !/\[\w+\]/.test(pattern):
+          return (ref1 = config.mono_array_spaces) != null ? ref1 : config.spaces;
+        default:
+          return config.spaces;
+      }
+    }
+
+    lintToken(token, tokenApi) {
+      var actual, expected, firstToken, msg, secondToken, tokens;
+      if (token.generated) {
+        return null;
+      }
+      tokens = token[0] === this.tokens[0] ? (firstToken = token, secondToken = this.findNearestToken(token, tokenApi, 1), [firstToken, secondToken, this.findNearestToken(token, tokenApi, 2)]) : (firstToken = this.findNearestToken(token, tokenApi, -1), secondToken = token, [this.findNearestToken(token, tokenApi, -2), firstToken, secondToken]);
+      if (!this.tokensOnSameLine(firstToken, secondToken)) {
+        return null;
+      }
+      expected = this.getExpectedSpaces(tokenApi, tokens);
+      actual = this.distanceBetweenTokens(firstToken, secondToken);
+      if (actual === expected) {
+        return null;
+      } else {
+        msg = `There should be ${expected} space`;
+        if (expected !== 1) {
+          msg += 's';
+        }
+        msg += ` inside "${token[0]}"`;
+        return {
+          token,
+          context: msg
+        };
+      }
+    }
+
+  };
+
+  BracketSpacing.prototype.rule = {
+    name: 'bracket_spacing',
+    level: 'ignore',
+    spaces: 0,
+    empty_array_spaces: 0,
+    exceptions: [],
+    message: 'Square brackets must have the proper spacing',
+    description: 'This rule checks to see that there is the proper spacing inside\nsquare brackets. The spacing amount is specified by "spaces".\nThe spacing amount for empty arrays is specified by\n"empty_array_spaces".\nThe spacing amount for arrays containing a single item is\nspecified by "mono_array_spaces".\nSpecified characters will be ignored if listed in "exceptions".\n<pre><code>\n# Spaces is 0\n[a, b]     # Good\n[a, b ]    # Bad\n[ a, b]    # Bad\n[ a, b ]   # Bad\n# Except brackets\n[ [a, b] ] # Good\n[[ a, b ]] # Bad\n# Spaces is 1\n[a, b]     # Bad\n[a, b ]    # Bad\n[ a, b]    # Bad\n[ a, b ]   # Good\n[ a, b  ]  # Bad\n[  a, b ]  # Bad\n[  a, b  ] # Bad\n# Except braces\n[{ a: b }] # Good\n[ {a: b} ] # Bad\n# Empty Array Spaces is 0\n[]         # Good\n[ ]        # Bad\n# Empty Array Spaces is 1\n[]         # Bad\n[ ]        # Good\n# Mono Array Spaces is 0\n[a]        # Good\n[ a ]      # Bad\n# Mono Array Spaces is 1\n[a]        # Bad\n[ a ]      # Good\n</code></pre>\nThis rule is disabled by default.'
+  };
+
+  BracketSpacing.prototype.tokens = ['[', ']'];
+
+  return BracketSpacing;
+
+}).call(this);
+
+
+},{}],12:[function(require,module,exports){
 var CamelCaseClasses, regexes;
 
 regexes = {
@@ -1431,37 +1553,45 @@ module.exports = CamelCaseClasses = (function() {
 }).call(this);
 
 
-},{}],12:[function(require,module,exports){
+},{}],13:[function(require,module,exports){
 var ColonAssignmentSpacing;
 
 module.exports = ColonAssignmentSpacing = (function() {
   class ColonAssignmentSpacing {
     lintToken(token, tokenApi) {
-      var checkSpacing, getSpaceFromToken, isLeftSpaced, isRightSpaced, leftSpacing, nextToken, previousToken, rightSpacing, spaceRules;
+      var checkSpacing, isLeftSpaced, isRightSpaced, nextToken, previousToken, spaceRules;
       spaceRules = tokenApi.config[this.rule.name].spacing;
       previousToken = tokenApi.peek(-1);
       nextToken = tokenApi.peek(1);
-      getSpaceFromToken = function(direction) {
-        var offset;
-        switch (direction) {
-          case 'left':
-            return token[2].first_column - previousToken[2].last_column - 1;
-          case 'right':
-            // csx tags 'column' resolves to the beginning of the tag definition, rather
-            // than the '<'
-            offset = nextToken[0] !== 'CSX_TAG' ? -1 : -2;
-            return nextToken[2].first_column - token[2].first_column + offset;
+      checkSpacing = function(direction) {
+        var minDirection, offset, spacing;
+        spacing = (function() {
+          switch (direction) {
+            case 'left':
+              return token[2].first_column - previousToken[2].last_column - 1;
+            case 'right':
+              // csx tags 'column' resolves to the beginning of the tag definition, rather
+              // than the '<'
+              offset = nextToken[0] !== 'CSX_TAG' ? -1 : -2;
+              return nextToken[2].first_column - token[2].first_column + offset;
+          }
+        })();
+        // when spacing is negative, the neighboring token is a newline
+        if (spacing < 0) {
+          return true;
+        } else {
+          minDirection = parseInt(spaceRules['min_' + direction], 10);
+          // if a minimal spacing is specified, only check that
+          if (minDirection >= 0) {
+            return spacing >= minDirection;
+          } else {
+            // otherwise check exact spacing
+            return spacing === parseInt(spaceRules[direction], 10);
+          }
         }
       };
-      checkSpacing = function(direction) {
-        var isSpaced, spacing;
-        spacing = getSpaceFromToken(direction);
-        // when spacing is negative, the neighboring token is a newline
-        isSpaced = spacing < 0 ? true : spacing === parseInt(spaceRules[direction]);
-        return [isSpaced, spacing];
-      };
-      [isLeftSpaced, leftSpacing] = checkSpacing('left');
-      [isRightSpaced, rightSpacing] = checkSpacing('right');
+      isLeftSpaced = checkSpacing('left');
+      isRightSpaced = checkSpacing('right');
       if (token.csxColon || isLeftSpaced && isRightSpaced) {
         return null;
       } else {
@@ -1492,7 +1622,7 @@ module.exports = ColonAssignmentSpacing = (function() {
 }).call(this);
 
 
-},{}],13:[function(require,module,exports){
+},{}],14:[function(require,module,exports){
 var CyclomaticComplexity;
 
 module.exports = CyclomaticComplexity = (function() {
@@ -1559,7 +1689,7 @@ module.exports = CyclomaticComplexity = (function() {
 }).call(this);
 
 
-},{}],14:[function(require,module,exports){
+},{}],15:[function(require,module,exports){
 var DuplicateKey;
 
 module.exports = DuplicateKey = (function() {
@@ -1645,7 +1775,7 @@ module.exports = DuplicateKey = (function() {
 }).call(this);
 
 
-},{}],15:[function(require,module,exports){
+},{}],16:[function(require,module,exports){
 var EmptyConstructorNeedsParens;
 
 module.exports = EmptyConstructorNeedsParens = (function() {
@@ -1708,7 +1838,7 @@ module.exports = EmptyConstructorNeedsParens = (function() {
 }).call(this);
 
 
-},{}],16:[function(require,module,exports){
+},{}],17:[function(require,module,exports){
 var EnsureComprehensions,
   indexOf = [].indexOf;
 
@@ -1821,7 +1951,7 @@ module.exports = EnsureComprehensions = (function() {
 }).call(this);
 
 
-},{}],17:[function(require,module,exports){
+},{}],18:[function(require,module,exports){
 var EOLLast;
 
 module.exports = EOLLast = (function() {
@@ -1852,7 +1982,7 @@ module.exports = EOLLast = (function() {
 }).call(this);
 
 
-},{}],18:[function(require,module,exports){
+},{}],19:[function(require,module,exports){
 var Indentation,
   indexOf = [].indexOf;
 
@@ -1957,6 +2087,9 @@ module.exports = Indentation = (function() {
     grabLineTokens(tokenApi, lineNumber, all = false) {
       var i, k, len, len1, ref, ref1, results, results1, tok, tokensByLine;
       ({tokensByLine} = tokenApi);
+      if (lineNumber < 0) {
+        lineNumber = 0;
+      }
       while (!((tokensByLine[lineNumber] != null) || lineNumber === 0)) {
         lineNumber--;
       }
@@ -2108,7 +2241,7 @@ module.exports = Indentation = (function() {
 }).call(this);
 
 
-},{}],19:[function(require,module,exports){
+},{}],20:[function(require,module,exports){
 var LineEndings;
 
 module.exports = LineEndings = (function() {
@@ -2154,7 +2287,7 @@ module.exports = LineEndings = (function() {
 }).call(this);
 
 
-},{}],20:[function(require,module,exports){
+},{}],21:[function(require,module,exports){
 var MaxLineLength, regexes;
 
 regexes = {
@@ -2201,7 +2334,7 @@ module.exports = MaxLineLength = (function() {
 }).call(this);
 
 
-},{}],21:[function(require,module,exports){
+},{}],22:[function(require,module,exports){
 var MissingFatArrows, any, containsButIsnt,
   indexOf = [].indexOf;
 
@@ -2352,7 +2485,39 @@ module.exports = MissingFatArrows = (function() {
 }).call(this);
 
 
-},{}],22:[function(require,module,exports){
+},{}],23:[function(require,module,exports){
+var ParseintRadix;
+
+module.exports = ParseintRadix = (function() {
+  class ParseintRadix {
+    lintToken(token, tokenApi) {
+      var callEnd, functionName, prevToken;
+      [prevToken, functionName] = tokenApi.peek(-1);
+      if (functionName === 'parseInt') {
+        [callEnd] = tokenApi.peek(2);
+        if (callEnd === 'CALL_END') {
+          return {token};
+        }
+      }
+    }
+
+  };
+
+  ParseintRadix.prototype.rule = {
+    name: 'missing_parseint_radix',
+    level: 'warn',
+    message: 'parseInt is missing the radix argument',
+    description: "This rule warns about using parseInt without a radix. From the MDN\ndevelopers reference: <q>Always specify this parameter to eliminate\nreader confusion and to guarantee predictable behavior.</q>\n<pre>\n  <code># You would expect this to result in 8, but\n  # it might result in 0 (parsed as octal).\n  parseInt '08'\n\n  # To be safe, specify the radix argument:\n  parseInt '08', 10\n  </code>\n</pre>"
+  };
+
+  ParseintRadix.prototype.tokens = ['CALL_START'];
+
+  return ParseintRadix;
+
+}).call(this);
+
+
+},{}],24:[function(require,module,exports){
 var NewlinesAfterClasses;
 
 module.exports = NewlinesAfterClasses = (function() {
@@ -2438,7 +2603,7 @@ module.exports = NewlinesAfterClasses = (function() {
 }).call(this);
 
 
-},{}],23:[function(require,module,exports){
+},{}],25:[function(require,module,exports){
 var NoBackticks;
 
 module.exports = NoBackticks = (function() {
@@ -2465,7 +2630,7 @@ module.exports = NoBackticks = (function() {
 }).call(this);
 
 
-},{}],24:[function(require,module,exports){
+},{}],26:[function(require,module,exports){
 var NoDebugger;
 
 module.exports = NoDebugger = (function() {
@@ -2507,7 +2672,7 @@ module.exports = NoDebugger = (function() {
 }).call(this);
 
 
-},{}],25:[function(require,module,exports){
+},{}],27:[function(require,module,exports){
 var NoEmptyFunctions, isEmptyCode;
 
 isEmptyCode = function(node, astApi) {
@@ -2551,7 +2716,7 @@ module.exports = NoEmptyFunctions = (function() {
 }).call(this);
 
 
-},{}],26:[function(require,module,exports){
+},{}],28:[function(require,module,exports){
 var NoEmptyParamList;
 
 module.exports = NoEmptyParamList = (function() {
@@ -2580,7 +2745,7 @@ module.exports = NoEmptyParamList = (function() {
 }).call(this);
 
 
-},{}],27:[function(require,module,exports){
+},{}],29:[function(require,module,exports){
 var NoImplicitBraces,
   slice = [].slice;
 
@@ -2690,7 +2855,7 @@ module.exports = NoImplicitBraces = (function() {
 }).call(this);
 
 
-},{}],28:[function(require,module,exports){
+},{}],30:[function(require,module,exports){
 var NoImplicitParens;
 
 module.exports = NoImplicitParens = (function() {
@@ -2742,7 +2907,7 @@ module.exports = NoImplicitParens = (function() {
 }).call(this);
 
 
-},{}],29:[function(require,module,exports){
+},{}],31:[function(require,module,exports){
 var NoInterpolationInSingleQuotes;
 
 module.exports = NoInterpolationInSingleQuotes = (function() {
@@ -2772,7 +2937,7 @@ module.exports = NoInterpolationInSingleQuotes = (function() {
 }).call(this);
 
 
-},{}],30:[function(require,module,exports){
+},{}],32:[function(require,module,exports){
 var NoNestedStringInterpolation;
 
 module.exports = NoNestedStringInterpolation = (function() {
@@ -2838,7 +3003,7 @@ module.exports = NoNestedStringInterpolation = (function() {
 }).call(this);
 
 
-},{}],31:[function(require,module,exports){
+},{}],33:[function(require,module,exports){
 var NoPlusPlus;
 
 module.exports = NoPlusPlus = (function() {
@@ -2866,7 +3031,7 @@ module.exports = NoPlusPlus = (function() {
 }).call(this);
 
 
-},{}],32:[function(require,module,exports){
+},{}],34:[function(require,module,exports){
 var NoPrivateFunctionFatArrows,
   indexOf = [].indexOf;
 
@@ -2964,7 +3129,7 @@ module.exports = NoPrivateFunctionFatArrows = (function() {
 }).call(this);
 
 
-},{}],33:[function(require,module,exports){
+},{}],35:[function(require,module,exports){
 var NoSpaces, indentationRegex,
   indexOf = [].indexOf;
 
@@ -3000,7 +3165,7 @@ module.exports = NoSpaces = (function() {
 }).call(this);
 
 
-},{}],34:[function(require,module,exports){
+},{}],36:[function(require,module,exports){
 var NoStandAloneAt;
 
 module.exports = NoStandAloneAt = (function() {
@@ -3046,7 +3211,7 @@ module.exports = NoStandAloneAt = (function() {
 }).call(this);
 
 
-},{}],35:[function(require,module,exports){
+},{}],37:[function(require,module,exports){
 var NoTabs, indentationRegex,
   indexOf = [].indexOf;
 
@@ -3062,6 +3227,10 @@ module.exports = NoTabs = (function() {
       // is the start of the expression.
       indentation = line.split(indentationRegex)[0];
       if (lineApi.lineHasToken() && indexOf.call(indentation, '\t') >= 0) {
+        return {
+          columnNumber: indentation.indexOf('\t')
+        };
+      } else if (lineApi.lineHasToken() && line.match(/\t *$/)) {
         return {
           columnNumber: indentation.indexOf('\t')
         };
@@ -3084,7 +3253,7 @@ module.exports = NoTabs = (function() {
 }).call(this);
 
 
-},{}],36:[function(require,module,exports){
+},{}],38:[function(require,module,exports){
 var NoThis;
 
 module.exports = NoThis = (function() {
@@ -3118,7 +3287,7 @@ module.exports = NoThis = (function() {
 }).call(this);
 
 
-},{}],37:[function(require,module,exports){
+},{}],39:[function(require,module,exports){
 var NoThrowingStrings;
 
 module.exports = NoThrowingStrings = (function() {
@@ -3149,7 +3318,7 @@ module.exports = NoThrowingStrings = (function() {
 }).call(this);
 
 
-},{}],38:[function(require,module,exports){
+},{}],40:[function(require,module,exports){
 var NoTrailingSemicolons, regexes,
   indexOf = [].indexOf,
   splice = [].splice;
@@ -3212,7 +3381,7 @@ module.exports = NoTrailingSemicolons = (function() {
 }).call(this);
 
 
-},{}],39:[function(require,module,exports){
+},{}],41:[function(require,module,exports){
 var NoTrailingWhitespace, regexes;
 
 regexes = {
@@ -3286,7 +3455,7 @@ module.exports = NoTrailingWhitespace = (function() {
 }).call(this);
 
 
-},{}],40:[function(require,module,exports){
+},{}],42:[function(require,module,exports){
 var NoUnnecessaryDoubleQuotes;
 
 module.exports = NoUnnecessaryDoubleQuotes = (function() {
@@ -3376,7 +3545,7 @@ module.exports = NoUnnecessaryDoubleQuotes = (function() {
 }).call(this);
 
 
-},{}],41:[function(require,module,exports){
+},{}],43:[function(require,module,exports){
 var NoUnnecessaryFatArrows, any;
 
 any = function(arr, test) {
@@ -3457,7 +3626,7 @@ module.exports = NoUnnecessaryFatArrows = (function() {
 }).call(this);
 
 
-},{}],42:[function(require,module,exports){
+},{}],44:[function(require,module,exports){
 var NonEmptyConstructorNeedsParens, ParentClass;
 
 ParentClass = require('./empty_constructor_needs_parens.coffee');
@@ -3486,7 +3655,7 @@ module.exports = NonEmptyConstructorNeedsParens = (function() {
 }).call(this);
 
 
-},{"./empty_constructor_needs_parens.coffee":15}],43:[function(require,module,exports){
+},{"./empty_constructor_needs_parens.coffee":16}],45:[function(require,module,exports){
 var PreferEnglishOperator,
   indexOf = [].indexOf;
 
@@ -3551,7 +3720,64 @@ module.exports = PreferEnglishOperator = (function() {
 }).call(this);
 
 
-},{}],44:[function(require,module,exports){
+},{}],46:[function(require,module,exports){
+var PreferLogicalOperator;
+
+module.exports = PreferLogicalOperator = (function() {
+  class PreferLogicalOperator {
+    lintToken(token, tokenApi) {
+      var actual_token, context, first_column, last_column, line;
+      // Compare the actual token with the lexed token.
+      ({first_column, last_column} = token[2]);
+      line = tokenApi.lines[tokenApi.lineNumber];
+      actual_token = line.slice(first_column, +last_column + 1 || 9e9);
+      context = (function() {
+        switch (actual_token) {
+          case 'is':
+            return 'Replace "is" with "=="';
+          case 'isnt':
+            return 'Replace "isnt" with "!="';
+          case 'or':
+            return 'Replace "or" with "||"';
+          case 'and':
+            return 'Replace "and" with "&&"';
+          case 'not':
+            return 'Replace "not" with "!"';
+          case 'yes':
+            return 'Replace "yes" with true';
+          case 'on':
+            return 'Replace "on" with true';
+          case 'off':
+            return 'Replace "off" with false';
+          case 'no':
+            return 'Replace "no" with false';
+          default:
+            return void 0;
+        }
+      })();
+      if (context != null) {
+        return {token, context};
+      }
+    }
+
+  };
+
+  PreferLogicalOperator.prototype.rule = {
+    name: 'prefer_logical_operator',
+    level: 'ignore',
+    message: 'Don\'t use is, isnt, not, and, or, yes, on, no, off',
+    doubleNotLevel: 'ignore',
+    description: 'This rule prohibits is, isnt, not, and, or, yes, on, no, off.\nUse ==, !=, !, &&, ||, true, false instead.'
+  };
+
+  PreferLogicalOperator.prototype.tokens = ['COMPARE', 'UNARY', 'BOOL', 'COMPOUND_ASSIGN', '&&', '||'];
+
+  return PreferLogicalOperator;
+
+}).call(this);
+
+
+},{}],47:[function(require,module,exports){
 var SpaceOperators,
   indexOf = [].indexOf;
 
@@ -3561,6 +3787,7 @@ module.exports = SpaceOperators = (function() {
       this.callTokens = []; // A stack tracking the call token pairs.
       this.parenTokens = []; // A stack tracking the parens token pairs.
       this.interpolationLevel = 0;
+      this.isParam = 0;
     }
 
     lintToken(token, tokenApi) {
@@ -3571,8 +3798,13 @@ module.exports = SpaceOperators = (function() {
         this.trackCall(token, tokenApi);
         return;
       }
+      if (type === 'PARAM_START' || type === 'PARAM_END') {
+        this.trackParams(token, tokenApi);
+        return;
+      }
       if (type === 'STRING_START' || type === 'STRING_END') {
-        return this.trackParens(token, tokenApi);
+        this.trackParens(token, tokenApi);
+        return;
       }
       // These may return errors
       if (type === '+' || type === '-') {
@@ -3604,9 +3836,19 @@ module.exports = SpaceOperators = (function() {
     }
 
     lintMath(token, tokenApi) {
-      var p;
+      var default_parameters, p;
+      default_parameters = tokenApi.config[this.rule.name].default_parameters;
       p = tokenApi.peek(-1);
-      if (!token.newLine && (!token.spaced || (p && !p.spaced))) {
+      if (!default_parameters && this.isParam > 0 && token[0] === '=') {
+        if (token.spaced || (p && p.spaced)) {
+          return {
+            token,
+            context: token[1]
+          };
+        } else {
+          return null;
+        }
+      } else if (!token.newLine && (!token.spaced || (p && !p.spaced))) {
         return {
           token,
           context: token[1]
@@ -3656,24 +3898,36 @@ module.exports = SpaceOperators = (function() {
       return null;
     }
 
+    trackParams(token, tokenApi) {
+      if (token[0] === 'PARAM_START') {
+        this.isParam++;
+      } else if (token[0] === 'PARAM_END') {
+        this.isParam--;
+      }
+      // We're not linting, just tracking function params.
+      return null;
+    }
+
   };
 
   SpaceOperators.prototype.rule = {
     name: 'space_operators',
     level: 'ignore',
     message: 'Operators must be spaced properly',
-    description: 'This rule enforces that operators have spaces around them.'
+    description: 'This rule enforces that operators have space around them.\nOptionally, you can set `default_parameters` to `false` to\nrequire no space around `=` when used to define default paramaters.',
+    default_parameters: true
   };
 
-  SpaceOperators.prototype.tokens = ['+', '-', '=', '**', 'MATH', 'COMPARE', '&', '^', '|', '&&', '||', 'COMPOUND_ASSIGN', 'STRING_START', 'STRING_END', 'CALL_START', 'CALL_END'];
+  SpaceOperators.prototype.tokens = ['+', '-', '=', '**', 'MATH', 'COMPARE', '&', '^', '|', '&&', '||', 'COMPOUND_ASSIGN', 'STRING_START', 'STRING_END', 'CALL_START', 'CALL_END', 'PARAM_START', 'PARAM_END'];
 
   return SpaceOperators;
 
 }).call(this);
 
 
-},{}],45:[function(require,module,exports){
-var SpacingAfterComma;
+},{}],48:[function(require,module,exports){
+var SpacingAfterComma,
+  indexOf = [].indexOf;
 
 module.exports = SpacingAfterComma = (function() {
   class SpacingAfterComma {
@@ -3682,7 +3936,7 @@ module.exports = SpacingAfterComma = (function() {
     }
 
     lintToken(token, tokenApi) {
-      var type;
+      var ignore_elision, type;
       [type] = token;
       if (type === 'REGEX_START') {
         this.inRegex = true;
@@ -3691,6 +3945,10 @@ module.exports = SpacingAfterComma = (function() {
       if (type === 'REGEX_END') {
         this.inRegex = false;
         return;
+      }
+      ({ignore_elision} = tokenApi.config[this.rule.name]);
+      if (ignore_elision && indexOf.call(tokenApi.peek(1), ',') >= 0) {
+        return null;
       }
       if (!(token.spaced || token.newLine || this.isGenerated(token, tokenApi) || this.isRegexFlag(token, tokenApi))) {
         return {token};
@@ -3736,8 +3994,9 @@ module.exports = SpacingAfterComma = (function() {
   SpacingAfterComma.prototype.rule = {
     name: 'spacing_after_comma',
     level: 'ignore',
+    ignore_elision: false,
     message: 'a space is required after commas',
-    description: 'This rule checks to make sure you have a space after commas.'
+    description: 'This rule checks to make sure you have a space after commas.\nConsecutive commas are allowed when skipping array elements\nif "ignore_elision" is true.\n<pre><code>\n# ignore_elision: true\n[,, c,, e, f] = [1, 2, 3, 4, 5, 6]\n</code></pre>'
   };
 
   SpacingAfterComma.prototype.tokens = [',', 'REGEX_START', 'REGEX_END'];
@@ -3747,7 +4006,7 @@ module.exports = SpacingAfterComma = (function() {
 }).call(this);
 
 
-},{}],46:[function(require,module,exports){
+},{}],49:[function(require,module,exports){
 var TransformMessesUpLineNumbers;
 
 module.exports = TransformMessesUpLineNumbers = (function() {

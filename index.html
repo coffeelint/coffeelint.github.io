@@ -185,14 +185,14 @@ x((a,b)-> 3)
 curly braces. The spacing amount is specified by "spaces".
 The spacing amount for empty objects is specified by
 "empty_object_spaces".
-
+The spacing amount for objects containing a single item is
+specified by "mono_object_spaces".
 <pre><code>
 # Spaces is 0
 {a: b}     # Good
 {a: b }    # Bad
 { a: b}    # Bad
 { a: b }   # Bad
-
 # Spaces is 1
 {a: b}     # Bad
 {a: b }    # Bad
@@ -201,16 +201,66 @@ The spacing amount for empty objects is specified by
 { a: b  }  # Bad
 {  a: b }  # Bad
 {  a: b  } # Bad
-
 # Empty Object Spaces is 0
 {}         # Good
 { }        # Bad
-
 # Empty Object Spaces is 1
 {}         # Bad
 { }        # Good
+# Mono Object Spaces is 0
+{a}        # Good
+{ a }      # Bad
+# Mono Object Spaces is 1
+{a}        # Bad
+{ a }      # Good
 </code></pre>
-
+This rule is disabled by default.
+    <p><em>default level: ignore</em></p>
+</td>
+</tr>
+<tr>
+<td class="rule">bracket_spacing</td>
+<td class="description">
+    This rule checks to see that there is the proper spacing inside
+square brackets. The spacing amount is specified by "spaces".
+The spacing amount for empty arrays is specified by
+"empty_array_spaces".
+The spacing amount for arrays containing a single item is
+specified by "mono_array_spaces".
+Specified characters will be ignored if listed in "exceptions".
+<pre><code>
+# Spaces is 0
+[a, b]     # Good
+[a, b ]    # Bad
+[ a, b]    # Bad
+[ a, b ]   # Bad
+# Except brackets
+[ [a, b] ] # Good
+[[ a, b ]] # Bad
+# Spaces is 1
+[a, b]     # Bad
+[a, b ]    # Bad
+[ a, b]    # Bad
+[ a, b ]   # Good
+[ a, b  ]  # Bad
+[  a, b ]  # Bad
+[  a, b  ] # Bad
+# Except braces
+[{ a: b }] # Good
+[ {a: b} ] # Bad
+# Empty Array Spaces is 0
+[]         # Good
+[ ]        # Bad
+# Empty Array Spaces is 1
+[]         # Bad
+[ ]        # Good
+# Mono Array Spaces is 0
+[a]        # Good
+[ a ]      # Bad
+# Mono Array Spaces is 1
+[a]        # Bad
+[ a ]      # Good
+</code></pre>
 This rule is disabled by default.
     <p><em>default level: ignore</em></p>
 </td>
@@ -357,6 +407,24 @@ It is impossible to statically determine whether a function using
 features like `Function.prototype.call` and
 `Function.prototype.bind`, so this rule may produce false positives.
     <p><em>default level: ignore</em></p>
+</td>
+</tr>
+<tr>
+<td class="rule">missing_parseint_radix</td>
+<td class="description">
+    This rule warns about using parseInt without a radix. From the MDN
+developers reference: <q>Always specify this parameter to eliminate
+reader confusion and to guarantee predictable behavior.</q>
+<pre>
+  <code># You would expect this to result in 8, but
+  # it might result in 0 (parsed as octal).
+  parseInt '08'
+
+  # To be safe, specify the radix argument:
+  parseInt '08', 10
+  </code>
+</pre>
+    <p><em>default level: warn</em></p>
 </td>
 </tr>
 <tr>
@@ -652,9 +720,19 @@ Use and, or, is, isnt, and not instead.
 </td>
 </tr>
 <tr>
+<td class="rule">prefer_logical_operator</td>
+<td class="description">
+    This rule prohibits is, isnt, not, and, or, yes, on, no, off.
+Use ==, !=, !, &&, ||, true, false instead.
+    <p><em>default level: ignore</em></p>
+</td>
+</tr>
+<tr>
 <td class="rule">space_operators</td>
 <td class="description">
-    This rule enforces that operators have spaces around them.
+    This rule enforces that operators have space around them.
+Optionally, you can set `default_parameters` to `false` to
+require no space around `=` when used to define default paramaters.
     <p><em>default level: ignore</em></p>
 </td>
 </tr>
@@ -662,6 +740,12 @@ Use and, or, is, isnt, and not instead.
 <td class="rule">spacing_after_comma</td>
 <td class="description">
     This rule checks to make sure you have a space after commas.
+Consecutive commas are allowed when skipping array elements
+if "ignore_elision" is true.
+<pre><code>
+# ignore_elision: true
+[,, c,, e, f] = [1, 2, 3, 4, 5, 6]
+</code></pre>
     <p><em>default level: ignore</em></p>
 </td>
 </tr>
@@ -884,8 +968,42 @@ and warns that line numbers are probably incorrect.
           <h2 class="section_title" id="changelog">Change Log</h2>
 
           <p>
-              <a href="https://github.com/coffeelint/coffeelint/compare/v3.0.2...master">Latest Changes</a>
+              <a href="https://github.com/coffeelint/coffeelint/compare/v3.1.0...master">Latest Changes</a>
           </p>
+
+          <div> <h3 class="changelog_header">v3.1.0</h3> <small
+          class="changelog_date">- <a
+          href="https://github.com/coffeelint/coffeelint/compare/v3.0.2...v3.1.0">2020.02.06<a></a></small>
+          <p>
+              Added a few rules and rules options. More bug fixes and internal updates to make developing easier.
+              We got through the backlog of pull requests. Now on to the issues...
+          </p>
+          <ul class="changelog_history">
+            <li>Add `prefer_logical_operator` rule.
+                <a href="https://github.com/coffeelint/coffeelint/pull/13">#13</a></li>
+            <li>Add `missing_parseint_radix` rule.
+                <a href="https://github.com/coffeelint/coffeelint/pull/17">#17</a></li>
+            <li>Add `bracket_spacing` rule.
+                <a href="https://github.com/coffeelint/coffeelint/pull/26">#26</a></li>
+            <li>`space_operators`: add `default_parameters` option.
+                <a href="https://github.com/coffeelint/coffeelint/pull/16">#16</a></li>
+            <li>`colon_assignment_spacing`: add `min_left` and `min_right` option.
+                <a href="https://github.com/coffeelint/coffeelint/pull/22">#22</a></li>
+            <li>`spacing_after_comma`: add `ignore_elision` option.
+                <a href="https://github.com/coffeelint/coffeelint/pull/34">#34</a></li>
+            <li>`braces_spacing`: add `mono_object_spaces` option.
+                <a href="https://github.com/coffeelint/coffeelint/pull/17">#17</a></li>
+            <li>Properly double quote fields in `csv` reporter.
+                <a href="https://github.com/coffeelint/coffeelint/pull/14">#14</a></li>
+            <li>Stop printing empty context in `checkstyle` reporter.
+                <a href="https://github.com/coffeelint/coffeelint/pull/12">#12</a></li>
+            <li>`no_tabs` rejects tabs at the end of the line.
+                <a href="https://github.com/coffeelint/coffeelint/pull/20">#20</a></li>
+            <li>Prevent endless loop if lineNumber is negative.
+                <a href="https://github.com/coffeelint/coffeelint/pull/10">#10</a></li>
+            <li>Update dependency `resolve` to v1.15.1</li>
+          </ul>
+          </div>
 
           <div> <h3 class="changelog_header">v3.0.2</h3> <small
           class="changelog_date">- <a
@@ -1405,9 +1523,9 @@ and warns that line numbers are probably incorrect.
              alt="Fork me on GitHub"/>
     </a>
 
-    <script type="text/javascript" src="js/jquery-3.4.1.min.js"></script>
-    <script type="text/javascript" src="js/coffeescript.js"></script>
-    <script type="text/javascript" src="js/coffeelint.js"></script>
-    <script type="text/javascript" src="js/trycoffeelint.js"></script>
+    <script type="text/javascript" src="./js/jquery-3.4.1.min.js"></script>
+    <script type="text/javascript" src="./js/coffeescript.js"></script>
+    <script type="text/javascript" src="./js/coffeelint.js"></script>
+    <script type="text/javascript" src="./js/trycoffeelint.js"></script>
   </body>
 </html>
