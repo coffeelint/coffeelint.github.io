@@ -2,7 +2,7 @@
 module.exports={
   "name": "@coffeelint/cli",
   "description": "Lint your CoffeeScript",
-  "version": "3.1.1",
+  "version": "3.1.2",
   "homepage": "https://coffeelint.github.io/",
   "keywords": [
     "lint",
@@ -22,7 +22,7 @@ module.exports={
     "coffeelint": "./bin/coffeelint"
   },
   "dependencies": {
-    "coffeescript": "2.4.1",
+    "coffeescript": "2.5.1",
     "glob": "^7.1.6",
     "ignore": "^5.1.4",
     "resolve": "^1.15.1",
@@ -30,9 +30,9 @@ module.exports={
     "yargs": "^15.3.1"
   },
   "devDependencies": {
-    "browserify": "^16.5.0",
+    "browserify": "^16.5.1",
     "coffeeify": "^3.0.1",
-    "underscore": "^1.9.2",
+    "underscore": "^1.10.2",
     "vows": "^0.8.3"
   },
   "license": "MIT",
@@ -1564,16 +1564,13 @@ module.exports = ColonAssignmentSpacing = (function() {
       previousToken = tokenApi.peek(-1);
       nextToken = tokenApi.peek(1);
       checkSpacing = function(direction) {
-        var minDirection, offset, spacing;
+        var minDirection, spacing;
         spacing = (function() {
           switch (direction) {
             case 'left':
               return token[2].first_column - previousToken[2].last_column - 1;
             case 'right':
-              // csx tags 'column' resolves to the beginning of the tag definition, rather
-              // than the '<'
-              offset = nextToken[0] !== 'CSX_TAG' ? -1 : -2;
-              return nextToken[2].first_column - token[2].first_column + offset;
+              return nextToken[2].first_column - token[2].first_column - 1;
           }
         })();
         // when spacing is negative, the neighboring token is a newline
@@ -1592,7 +1589,7 @@ module.exports = ColonAssignmentSpacing = (function() {
       };
       isLeftSpaced = checkSpacing('left');
       isRightSpaced = checkSpacing('right');
-      if (token.csxColon || isLeftSpaced && isRightSpaced) {
+      if (token.jsxColon || isLeftSpaced && isRightSpaced) {
         return null;
       } else {
         return {
@@ -2298,16 +2295,17 @@ regexes = {
 module.exports = MaxLineLength = (function() {
   class MaxLineLength {
     lintLine(line, lineApi) {
-      var limitComments, lineLength, max, ref, ref1;
+      var isCommentLine, limitComments, lineLength, max, ref, ref1;
       max = (ref = lineApi.config[this.rule.name]) != null ? ref.value : void 0;
       limitComments = (ref1 = lineApi.config[this.rule.name]) != null ? ref1.limitComments : void 0;
+      isCommentLine = regexes.literateComment.test(line);
       lineLength = line.replace(/\s+$/, '').length;
-      if (lineApi.isLiterate() && regexes.literateComment.test(line)) {
+      if (lineApi.isLiterate() && isCommentLine) {
         lineLength -= 2;
       }
       if (max && max < lineLength && !regexes.longUrlComment.test(line)) {
         if (!limitComments) {
-          if (lineApi.getLineTokens().length === 0) {
+          if (isCommentLine) {
             return;
           }
         }
@@ -2915,7 +2913,7 @@ module.exports = NoInterpolationInSingleQuotes = (function() {
     lintToken(token, tokenApi) {
       var hasInterpolation, tokenValue;
       tokenValue = token[1];
-      hasInterpolation = tokenValue.match(/^\'.*#\{[^}]+\}.*\'$/);
+      hasInterpolation = tokenValue.match(/^.*#\{[^}]+\}.*$/);
       if (hasInterpolation) {
         return {token};
       }
@@ -2953,7 +2951,7 @@ module.exports = NoNestedStringInterpolation = (function() {
         this.blocks.push([]);
       }
       block = this.blocks[this.blocks.length - 1];
-      if (tag === 'CSX_TAG') {
+      if (tag === 'JSX_TAG') {
         this.blocks.push([]);
         return;
       }
@@ -2996,7 +2994,7 @@ module.exports = NoNestedStringInterpolation = (function() {
     description: 'This rule warns about nested string interpolation,\nas it tends to make code harder to read and understand.\n<pre>\n<code># Good!\nstr = "Book by #{firstName.toUpperCase()} #{lastName.toUpperCase()}"\n\n# Bad!\nstr = "Book by #{"#{firstName} #{lastName}".toUpperCase()}"\n</code>\n</pre>'
   };
 
-  NoNestedStringInterpolation.prototype.tokens = ['CSX_TAG', 'CALL_START', 'CALL_END', 'STRING_START', 'STRING_END'];
+  NoNestedStringInterpolation.prototype.tokens = ['JSX_TAG', 'CALL_START', 'CALL_END', 'STRING_START', 'STRING_END'];
 
   return NoNestedStringInterpolation;
 
@@ -3463,30 +3461,30 @@ module.exports = NoUnnecessaryDoubleQuotes = (function() {
     constructor() {
       this.regexps = [];
       this.interpolationLevel = 0;
-      this.inCSX = false;
-      this.CSXCallLevel = 0;
+      this.inJSX = false;
+      this.JSXCallLevel = 0;
     }
 
     lintToken(token, tokenApi) {
-      var hasLegalConstructs, ref, stringValue, tokenValue, type;
+      var hasLegalConstructs, isSingleBlock, isSingleQuote, ref, tokenValue, type;
       [type, tokenValue] = token;
       if (type === 'STRING_START' || type === 'STRING_END') {
         return this.trackInterpolation(...arguments);
       }
-      if (type === 'CSX_TAG' || type === 'CALL_START' || type === 'CALL_END') {
-        return this.trackCSX(...arguments);
+      if (type === 'JSX_TAG' || type === 'CALL_START' || type === 'CALL_END') {
+        return this.trackJSX(...arguments);
       }
-      stringValue = tokenValue.match(/^\"(.*)\"$/);
-      if (!stringValue) { // no double quotes, all OK
+      isSingleQuote = tokenValue.quote === "'";
+      isSingleBlock = tokenValue.quote === "'''";
+      if (isSingleQuote || isSingleBlock) { // no double quotes, all OK
         return false;
       }
-      
       // When CoffeeScript generates calls to RegExp it double quotes the 2nd
       // parameter. Using peek(2) becuase the peek(1) would be a CALL_END
       if (((ref = tokenApi.peek(2)) != null ? ref[0] : void 0) === 'REGEX_END') {
         return false;
       }
-      hasLegalConstructs = this.inCSX || this.isInInterpolation() || this.hasSingleQuote(tokenValue);
+      hasLegalConstructs = this.inJSX || this.isInInterpolation() || this.hasSingleQuote(tokenValue);
       if (!hasLegalConstructs) {
         return {token};
       }
@@ -3506,18 +3504,18 @@ module.exports = NoUnnecessaryDoubleQuotes = (function() {
       return null;
     }
 
-    trackCSX(token, tokenApi) {
-      if (token[0] === 'CSX_TAG') {
-        this.inCSX = true;
+    trackJSX(token, tokenApi) {
+      if (token[0] === 'JSX_TAG') {
+        this.inJSX = true;
       } else if (token[0] === 'CALL_START') {
-        if (this.inCSX) {
-          this.CSXCallLevel += 1;
+        if (this.inJSX) {
+          this.JSXCallLevel += 1;
         }
       } else if (token[0] === 'CALL_END') {
-        if (this.inCSX) {
-          this.CSXCallLevel -= 1;
-          if (this.CSXCallLevel === 0) {
-            this.inCSX = false;
+        if (this.inJSX) {
+          this.JSXCallLevel -= 1;
+          if (this.JSXCallLevel === 0) {
+            this.inJSX = false;
           }
         }
       }
@@ -3538,7 +3536,7 @@ module.exports = NoUnnecessaryDoubleQuotes = (function() {
     description: 'This rule prohibits double quotes unless string interpolation is\nused or the string contains single quotes.\n<pre>\n<code># Double quotes are discouraged:\nfoo = "bar"\n\n# Unless string interpolation is used:\nfoo = "#{bar}baz"\n\n# Or they prevent cumbersome escaping:\nfoo = "I\'m just following the \'rules\'"\n</code>\n</pre>\nDouble quotes are permitted by default.'
   };
 
-  NoUnnecessaryDoubleQuotes.prototype.tokens = ['STRING', 'STRING_START', 'STRING_END', 'CSX_TAG', 'CALL_START', 'CALL_END'];
+  NoUnnecessaryDoubleQuotes.prototype.tokens = ['STRING', 'STRING_START', 'STRING_END', 'JSX_TAG', 'CALL_START', 'CALL_END'];
 
   return NoUnnecessaryDoubleQuotes;
 
@@ -3731,6 +3729,9 @@ module.exports = PreferLogicalOperator = (function() {
       ({first_column, last_column} = token[2]);
       line = tokenApi.lines[tokenApi.lineNumber];
       actual_token = line.slice(first_column, +last_column + 1 || 9e9);
+      if (token[0] === 'COMPOUND_ASSIGN' && (actual_token === 'or=' || actual_token === 'and=')) {
+        actual_token = token.origin[1];
+      }
       context = (function() {
         switch (actual_token) {
           case 'is':
@@ -3955,7 +3956,7 @@ module.exports = SpacingAfterComma = (function() {
       }
     }
 
-    // Coffeescript does some code generation when using CSX syntax, and it adds
+    // Coffeescript does some code generation when using JSX syntax, and it adds
     // brackets & commas that are not marked as generated. The only way to check
     // these is to see if the comma has the same column number as the last token.
     isGenerated(token, tokenApi) {
