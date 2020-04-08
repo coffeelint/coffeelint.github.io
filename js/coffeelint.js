@@ -2,7 +2,7 @@
 module.exports={
   "name": "@coffeelint/cli",
   "description": "Lint your CoffeeScript",
-  "version": "3.1.2",
+  "version": "3.1.3",
   "homepage": "https://coffeelint.github.io/",
   "keywords": [
     "lint",
@@ -26,7 +26,7 @@ module.exports={
     "glob": "^7.1.6",
     "ignore": "^5.1.4",
     "resolve": "^1.15.1",
-    "strip-json-comments": "^3.0.1",
+    "strip-json-comments": "^3.1.0",
     "yargs": "^15.3.1"
   },
   "devDependencies": {
@@ -482,7 +482,7 @@ _rules = {};
 
 coffeelint.registerRule = function(RuleConstructor, ruleName = void 0) {
   var e, name, p, ref, ref1;
-  p = new RuleConstructor;
+  p = new RuleConstructor();
   name = (p != null ? (ref = p.rule) != null ? ref.name : void 0 : void 0) || '(unknown)';
   e = function(msg) {
     throw new Error(`Invalid rule: ${name} ${msg}`);
@@ -669,7 +669,7 @@ coffeelint.lint = function(source, userConfig = {}, literate = false) {
     if (sourceLength !== source.split('\n').length && config.transform_messes_up_line_numbers.level !== 'ignore') {
       errors.push(extend({
         lineNumber: 1,
-        context: `File was transformed from ${sourceLength} lines to ${(source.split("\n").length)} lines`
+        context: `File was transformed from ${sourceLength} lines to ${source.split("\n").length} lines`
       }, config.transform_messes_up_line_numbers));
     }
   }
@@ -915,7 +915,7 @@ TokenApi = (function() {
     }
 
     
-    // Return the token n places away from the current token.
+      // Return the token n places away from the current token.
     peek(n = 1) {
       return this.tokens[this.i + n] || null;
     }
@@ -1290,7 +1290,21 @@ module.exports = ArrowSpacing = (function() {
     name: 'arrow_spacing',
     level: 'ignore',
     message: 'Function arrows (-> and =>) must be spaced properly',
-    description: '<p>This rule checks to see that there is spacing before and after\nthe arrow operator that declares a function. This rule is disabled\nby default.</p> <p>Note that if arrow_spacing is enabled, and you\npass an empty function as a parameter, arrow_spacing will accept\neither a space or no space in-between the arrow operator and the\nparenthesis</p>\n<pre><code># Both of this will not trigger an error,\n# even with arrow_spacing enabled.\nx(-> 3)\nx( -> 3)\n\n# However, this will trigger an error\nx((a,b)-> 3)\n</code>\n</pre>'
+    description: `<p>This rule checks to see that there is spacing before and after
+the arrow operator that declares a function. This rule is disabled
+by default.</p> <p>Note that if arrow_spacing is enabled, and you
+pass an empty function as a parameter, arrow_spacing will accept
+either a space or no space in-between the arrow operator and the
+parenthesis</p>
+<pre><code># Both of this will not trigger an error,
+# even with arrow_spacing enabled.
+x(-> 3)
+x( -> 3)
+
+# However, this will trigger an error
+x((a,b)-> 3)
+</code>
+</pre>`
   };
 
   ArrowSpacing.prototype.tokens = ['->', '=>'];
@@ -1367,7 +1381,7 @@ module.exports = BracesSpacing = (function() {
         if (expected !== 1) {
           msg += 's';
         }
-        msg += ` inside "${token[0]}"`;
+        msg += ` inside \"${token[0]}\"`;
         return {
           token,
           context: msg
@@ -1383,7 +1397,40 @@ module.exports = BracesSpacing = (function() {
     spaces: 0,
     empty_object_spaces: 0,
     message: 'Curly braces must have the proper spacing',
-    description: 'This rule checks to see that there is the proper spacing inside\ncurly braces. The spacing amount is specified by "spaces".\nThe spacing amount for empty objects is specified by\n"empty_object_spaces".\nThe spacing amount for objects containing a single item is\nspecified by "mono_object_spaces".\n<pre><code>\n# Spaces is 0\n{a: b}     # Good\n{a: b }    # Bad\n{ a: b}    # Bad\n{ a: b }   # Bad\n# Spaces is 1\n{a: b}     # Bad\n{a: b }    # Bad\n{ a: b}    # Bad\n{ a: b }   # Good\n{ a: b  }  # Bad\n{  a: b }  # Bad\n{  a: b  } # Bad\n# Empty Object Spaces is 0\n{}         # Good\n{ }        # Bad\n# Empty Object Spaces is 1\n{}         # Bad\n{ }        # Good\n# Mono Object Spaces is 0\n{a}        # Good\n{ a }      # Bad\n# Mono Object Spaces is 1\n{a}        # Bad\n{ a }      # Good\n</code></pre>\nThis rule is disabled by default.'
+    description: `This rule checks to see that there is the proper spacing inside
+curly braces. The spacing amount is specified by "spaces".
+The spacing amount for empty objects is specified by
+"empty_object_spaces".
+The spacing amount for objects containing a single item is
+specified by "mono_object_spaces".
+<pre><code>
+# Spaces is 0
+{a: b}     # Good
+{a: b }    # Bad
+{ a: b}    # Bad
+{ a: b }   # Bad
+# Spaces is 1
+{a: b}     # Bad
+{a: b }    # Bad
+{ a: b}    # Bad
+{ a: b }   # Good
+{ a: b  }  # Bad
+{  a: b }  # Bad
+{  a: b  } # Bad
+# Empty Object Spaces is 0
+{}         # Good
+{ }        # Bad
+# Empty Object Spaces is 1
+{}         # Bad
+{ }        # Good
+# Mono Object Spaces is 0
+{a}        # Good
+{ a }      # Bad
+# Mono Object Spaces is 1
+{a}        # Bad
+{ a }      # Good
+</code></pre>
+This rule is disabled by default.`
   };
 
   BracesSpacing.prototype.tokens = ['{', '}'];
@@ -1469,7 +1516,7 @@ module.exports = BracketSpacing = (function() {
         if (expected !== 1) {
           msg += 's';
         }
-        msg += ` inside "${token[0]}"`;
+        msg += ` inside \"${token[0]}\"`;
         return {
           token,
           context: msg
@@ -1486,7 +1533,47 @@ module.exports = BracketSpacing = (function() {
     empty_array_spaces: 0,
     exceptions: [],
     message: 'Square brackets must have the proper spacing',
-    description: 'This rule checks to see that there is the proper spacing inside\nsquare brackets. The spacing amount is specified by "spaces".\nThe spacing amount for empty arrays is specified by\n"empty_array_spaces".\nThe spacing amount for arrays containing a single item is\nspecified by "mono_array_spaces".\nSpecified characters will be ignored if listed in "exceptions".\n<pre><code>\n# Spaces is 0\n[a, b]     # Good\n[a, b ]    # Bad\n[ a, b]    # Bad\n[ a, b ]   # Bad\n# Except brackets\n[ [a, b] ] # Good\n[[ a, b ]] # Bad\n# Spaces is 1\n[a, b]     # Bad\n[a, b ]    # Bad\n[ a, b]    # Bad\n[ a, b ]   # Good\n[ a, b  ]  # Bad\n[  a, b ]  # Bad\n[  a, b  ] # Bad\n# Except braces\n[{ a: b }] # Good\n[ {a: b} ] # Bad\n# Empty Array Spaces is 0\n[]         # Good\n[ ]        # Bad\n# Empty Array Spaces is 1\n[]         # Bad\n[ ]        # Good\n# Mono Array Spaces is 0\n[a]        # Good\n[ a ]      # Bad\n# Mono Array Spaces is 1\n[a]        # Bad\n[ a ]      # Good\n</code></pre>\nThis rule is disabled by default.'
+    description: `This rule checks to see that there is the proper spacing inside
+square brackets. The spacing amount is specified by "spaces".
+The spacing amount for empty arrays is specified by
+"empty_array_spaces".
+The spacing amount for arrays containing a single item is
+specified by "mono_array_spaces".
+Specified characters will be ignored if listed in "exceptions".
+<pre><code>
+# Spaces is 0
+[a, b]     # Good
+[a, b ]    # Bad
+[ a, b]    # Bad
+[ a, b ]   # Bad
+# Except brackets
+[ [a, b] ] # Good
+[[ a, b ]] # Bad
+# Spaces is 1
+[a, b]     # Bad
+[a, b ]    # Bad
+[ a, b]    # Bad
+[ a, b ]   # Good
+[ a, b  ]  # Bad
+[  a, b ]  # Bad
+[  a, b  ] # Bad
+# Except braces
+[{ a: b }] # Good
+[ {a: b} ] # Bad
+# Empty Array Spaces is 0
+[]         # Good
+[ ]        # Bad
+# Empty Array Spaces is 1
+[]         # Bad
+[ ]        # Good
+# Mono Array Spaces is 0
+[a]        # Good
+[ a ]      # Bad
+# Mono Array Spaces is 1
+[a]        # Bad
+[ a ]      # Good
+</code></pre>
+This rule is disabled by default.`
   };
 
   BracketSpacing.prototype.tokens = ['[', ']'];
@@ -1543,7 +1630,19 @@ module.exports = CamelCaseClasses = (function() {
     name: 'camel_case_classes',
     level: 'error',
     message: 'Class name should be UpperCamelCased',
-    description: 'This rule mandates that all class names are UpperCamelCased.\nCamel casing class names is a generally accepted way of\ndistinguishing constructor functions - which require the \'new\'\nprefix to behave properly - from plain old functions.\n<pre>\n<code># Good!\nclass BoaConstrictor\n\n# Bad!\nclass boaConstrictor\n</code>\n</pre>\nThis rule is enabled by default.'
+    description: `This rule mandates that all class names are UpperCamelCased.
+Camel casing class names is a generally accepted way of
+distinguishing constructor functions - which require the 'new'
+prefix to behave properly - from plain old functions.
+<pre>
+<code># Good!
+class BoaConstrictor
+
+# Bad!
+class boaConstrictor
+</code>
+</pre>
+This rule is enabled by default.`
   };
 
   CamelCaseClasses.prototype.tokens = ['CLASS'];
@@ -1609,7 +1708,27 @@ module.exports = ColonAssignmentSpacing = (function() {
       left: 0,
       right: 0
     },
-    description: '<p>This rule checks to see that there is spacing before and\nafter the colon in a colon assignment (i.e., classes, objects).\nThe spacing amount is specified by\nspacing.left and spacing.right, respectively.\nA zero value means no spacing required.\n</p>\n<pre><code>\n#\n# If spacing.left and spacing.right is 1\n#\n\n# Doesn\'t throw an error\nobject = {spacing : true}\nclass Dog\n  canBark : true\n\n# Throws an error\nobject = {spacing: true}\nclass Cat\n  canBark: false\n</code></pre>'
+    description: `<p>This rule checks to see that there is spacing before and
+after the colon in a colon assignment (i.e., classes, objects).
+The spacing amount is specified by
+spacing.left and spacing.right, respectively.
+A zero value means no spacing required.
+</p>
+<pre><code>
+#
+# If spacing.left and spacing.right is 1
+#
+
+# Doesn't throw an error
+object = {spacing : true}
+class Dog
+  canBark : true
+
+# Throws an error
+object = {spacing: true}
+class Cat
+  canBark: false
+</code></pre>`
   };
 
   ColonAssignmentSpacing.prototype.tokens = [':'];
@@ -1678,7 +1797,7 @@ module.exports = CyclomaticComplexity = (function() {
     level: 'ignore',
     message: 'The cyclomatic complexity is too damn high',
     value: 10,
-    description: 'Examine the complexity of your function.'
+    description: `Examine the complexity of your function.`
   };
 
   return CyclomaticComplexity;
@@ -1700,8 +1819,7 @@ module.exports = DuplicateKey = (function() {
         this.lintBrace(...arguments);
         return void 0;
       }
-      // TODO: after <1.10.0 is not supported, remove 'IDENTIFIER' here
-      if (type === 'IDENTIFIER' || type === 'PROPERTY' || type === 'STRING') {
+      if (type === 'PROPERTY' || type === 'STRING') {
         return this.lintIdentifier(...arguments);
       }
     }
@@ -1761,11 +1879,10 @@ module.exports = DuplicateKey = (function() {
     name: 'duplicate_key',
     level: 'error',
     message: 'Duplicate key defined in object or class',
-    description: 'Prevents defining duplicate keys in object literals and classes'
+    description: `Prevents defining duplicate keys in object literals and classes`
   };
 
-  // TODO: after <1.10.0 is not supported, remove 'IDENTIFIER' here
-  DuplicateKey.prototype.tokens = ['IDENTIFIER', 'PROPERTY', 'STRING', '{', '}'];
+  DuplicateKey.prototype.tokens = ['PROPERTY', 'STRING', '{', '}'];
 
   return DuplicateKey;
 
@@ -1825,7 +1942,7 @@ module.exports = EmptyConstructorNeedsParens = (function() {
     name: 'empty_constructor_needs_parens',
     level: 'ignore',
     message: 'Invoking a constructor without parens and without arguments',
-    description: 'Requires constructors with no parameters to include the parens'
+    description: `Requires constructors with no parameters to include the parens`
   };
 
   EmptyConstructorNeedsParens.prototype.tokens = ['UNARY'];
@@ -1936,7 +2053,7 @@ module.exports = EnsureComprehensions = (function() {
     name: 'ensure_comprehensions',
     level: 'warn',
     message: 'Comprehensions must have parentheses around them',
-    description: 'This rule makes sure that parentheses are around comprehensions.'
+    description: `This rule makes sure that parentheses are around comprehensions.`
   };
 
   EnsureComprehensions.prototype.tokens = ['FOR'];
@@ -1971,7 +2088,7 @@ module.exports = EOLLast = (function() {
     name: 'eol_last',
     level: 'ignore',
     message: 'File does not end with a single newline',
-    description: 'Checks that the file ends with a single newline'
+    description: `Checks that the file ends with a single newline`
   };
 
   return EOLLast;
@@ -1990,7 +2107,7 @@ module.exports = Indentation = (function() {
     }
 
     
-    // Return an error if the given indentation token is not correct.
+      // Return an error if the given indentation token is not correct.
     lintToken(token, tokenApi) {
       var chain, currentLine, dotIndent, expected, got, ignoreIndent, isArrayIndent, isMultiline, lineNumber, lines, next, numIndents, previous, previousSymbol, ref, ref1, regExRes, spaces, startsWith, type;
       [type, numIndents] = token;
@@ -2226,7 +2343,20 @@ module.exports = Indentation = (function() {
     value: 2,
     level: 'error',
     message: 'Line contains inconsistent indentation',
-    description: 'This rule imposes a standard number of spaces(tabs) to be used for\nindentation. Since whitespace is significant in CoffeeScript, it\'s\ncritical that a project chooses a standard indentation format and\nstays consistent. Other roads lead to darkness. <pre> <code>#\nEnabling this option will prevent this ugly\n# but otherwise valid CoffeeScript.\ntwoSpaces = () ->\n  fourSpaces = () ->\n      eightSpaces = () ->\n            \'this is valid CoffeeScript\'\n\n</code>\n</pre>\nTwo space indentation is enabled by default.'
+    description: `This rule imposes a standard number of spaces(tabs) to be used for
+indentation. Since whitespace is significant in CoffeeScript, it's
+critical that a project chooses a standard indentation format and
+stays consistent. Other roads lead to darkness. <pre> <code>#
+Enabling this option will prevent this ugly
+# but otherwise valid CoffeeScript.
+twoSpaces = () ->
+  fourSpaces = () ->
+      eightSpaces = () ->
+            'this is valid CoffeeScript'
+
+</code>
+</pre>
+Two space indentation is enabled by default.`
   };
 
   Indentation.prototype.tokens = ['INDENT', '[', ']', '.'];
@@ -2276,7 +2406,8 @@ module.exports = LineEndings = (function() {
     level: 'ignore',
     value: 'unix', // or 'windows'
     message: 'Line contains incorrect line endings',
-    description: 'This rule ensures your project uses only <tt>windows</tt> or\n<tt>unix</tt> line endings. This rule is disabled by default.'
+    description: `This rule ensures your project uses only <tt>windows</tt> or
+<tt>unix</tt> line endings. This rule is disabled by default.`
   };
 
   return LineEndings;
@@ -2288,8 +2419,9 @@ module.exports = LineEndings = (function() {
 var MaxLineLength, regexes;
 
 regexes = {
-  literateComment: /^\#\s/,
-  longUrlComment: /^\s*\#\s*http[^\s]+$/
+  literateComment: /^\#\s/, // This is prefixed on MarkDown lines.
+  longUrlComment: /^\s*\#\s*http[^\s]+$/ // indentation, up to comment
+// Link that takes up the rest of the line without spaces.
 };
 
 module.exports = MaxLineLength = (function() {
@@ -2324,7 +2456,12 @@ module.exports = MaxLineLength = (function() {
     level: 'error',
     limitComments: true,
     message: 'Line exceeds maximum allowed length',
-    description: 'This rule imposes a maximum line length on your code. <a\nhref="http://www.python.org/dev/peps/pep-0008/">Python\'s style\nguide</a> does a good job explaining why you might want to limit the\nlength of your lines, though this is a matter of taste.\n\nLines can be no longer than eighty characters by default.'
+    description: `This rule imposes a maximum line length on your code. <a
+href="http://www.python.org/dev/peps/pep-0008/">Python's style
+guide</a> does a good job explaining why you might want to limit the
+length of your lines, though this is a matter of taste.
+
+Lines can be no longer than eighty characters by default.`
   };
 
   return MaxLineLength;
@@ -2475,7 +2612,16 @@ module.exports = MissingFatArrows = (function() {
     level: 'ignore',
     is_strict: false,
     message: 'Used `this` in a function without a fat arrow',
-    description: 'Warns when you use `this` inside a function that wasn\'t defined\nwith a fat arrow. This rule does not apply to methods defined in a\nclass, since they have `this` bound to the class instance (or the\nclass itself, for class methods). The option `is_strict` is\navailable for checking bindings of class methods.\n\nIt is impossible to statically determine whether a function using\n`this` will be bound with the correct `this` value due to language\nfeatures like `Function.prototype.call` and\n`Function.prototype.bind`, so this rule may produce false positives.'
+    description: `Warns when you use \`this\` inside a function that wasn't defined
+with a fat arrow. This rule does not apply to methods defined in a
+class, since they have \`this\` bound to the class instance (or the
+class itself, for class methods). The option \`is_strict\` is
+available for checking bindings of class methods.
+
+It is impossible to statically determine whether a function using
+\`this\` will be bound with the correct \`this\` value due to language
+features like \`Function.prototype.call\` and
+\`Function.prototype.bind\`, so this rule may produce false positives.`
   };
 
   return MissingFatArrows;
@@ -2505,7 +2651,18 @@ module.exports = ParseintRadix = (function() {
     name: 'missing_parseint_radix',
     level: 'warn',
     message: 'parseInt is missing the radix argument',
-    description: "This rule warns about using parseInt without a radix. From the MDN\ndevelopers reference: <q>Always specify this parameter to eliminate\nreader confusion and to guarantee predictable behavior.</q>\n<pre>\n  <code># You would expect this to result in 8, but\n  # it might result in 0 (parsed as octal).\n  parseInt '08'\n\n  # To be safe, specify the radix argument:\n  parseInt '08', 10\n  </code>\n</pre>"
+    description: `This rule warns about using parseInt without a radix. From the MDN
+developers reference: <q>Always specify this parameter to eliminate
+reader confusion and to guarantee predictable behavior.</q>
+<pre>
+  <code># You would expect this to result in 8, but
+  # it might result in 0 (parsed as octal).
+  parseInt '08'
+
+  # To be safe, specify the radix argument:
+  parseInt '08', 10
+  </code>
+</pre>`
   };
 
   ParseintRadix.prototype.tokens = ['CALL_START'];
@@ -2521,7 +2678,7 @@ var NewlinesAfterClasses;
 module.exports = NewlinesAfterClasses = (function() {
   class NewlinesAfterClasses {
     lintToken(token, tokenApi) {
-      var afters, befores, comment, ending, got, lineNumber, lines, numIndents, outdent, ref, ref1, start, trueLine, type;
+      var afters, comment, ending, got, lineNumber, lines, numIndents, outdent, ref, ref1, start, trueLine, type;
       [
         type,
         numIndents,
@@ -2542,34 +2699,23 @@ module.exports = NewlinesAfterClasses = (function() {
           this.classBracesCount--;
           this.classCount--;
           if (this.classCount === 0 && this.classBracesCount === 0) {
-            befores = 1;
             afters = 1;
             comment = 0;
             outdent = token.origin[2].first_line;
             start = Math.min(lineNumber, outdent);
-            trueLine = 2e308;
+            trueLine = start + 1;
             while (/^\s*(#|$)/.test(lines[start + afters])) {
               if (/^\s*#/.test(lines[start + afters])) {
                 comment += 1;
-              } else {
-                trueLine = Math.min(trueLine, start + afters);
               }
               afters += 1;
             }
-            while (/^\s*(#|$)/.test(lines[start - befores])) {
-              if (/^\s*#/.test(lines[start - befores])) {
-                comment += 1;
-              } else {
-                trueLine = Math.min(trueLine, start - befores);
-              }
-              befores += 1;
-            }
             // add up blank lines, subtract comments, subtract 2 because
             // before/after counters started at 1.
-            got = afters + befores - comment - 2;
+            got = afters - comment - 1;
             // if `got` and `ending` don't match throw an error _unless_
             // we are at the end of the file.
-            if (got !== ending && trueLine + ending <= lines.length) {
+            if (got !== ending && trueLine + got !== lines.length) {
               return {
                 context: `Expected ${ending} got ${got}`,
                 lineNumber: trueLine
@@ -2586,8 +2732,12 @@ module.exports = NewlinesAfterClasses = (function() {
     name: 'newlines_after_classes',
     value: 3,
     level: 'ignore',
-    message: 'Wrong count of newlines between a class and other code',
-    description: '<p>Checks the number of newlines between classes and other code.</p>\n\nOptions:\n- <pre><code>value</code></pre> - The number of required newlines\nafter class definitions. Defaults to 3.'
+    message: 'Wrong count of blank lines between a class and other code',
+    description: `<p>Checks the number of blank lines between classes and other code.</p>
+
+Options:
+- <pre><code>value</code></pre> - The number of required blank lines
+after class definitions. Defaults to 3.`
   };
 
   NewlinesAfterClasses.prototype.tokens = ['CLASS', '}', '{'];
@@ -2618,7 +2768,12 @@ module.exports = NoBackticks = (function() {
     name: 'no_backticks',
     level: 'error',
     message: 'Backticks are forbidden',
-    description: 'Backticks allow snippets of JavaScript to be embedded in\nCoffeeScript. While some folks consider backticks useful in a few\nniche circumstances, they should be avoided because so none of\nJavaScript\'s "bad parts", like <tt>with</tt> and <tt>eval</tt>,\nsneak into CoffeeScript.\nThis rule is enabled by default.'
+    description: `Backticks allow snippets of JavaScript to be embedded in
+CoffeeScript. While some folks consider backticks useful in a few
+niche circumstances, they should be avoided because so none of
+JavaScript's "bad parts", like <tt>with</tt> and <tt>eval</tt>,
+sneak into CoffeeScript.
+This rule is enabled by default.`
   };
 
   NoBackticks.prototype.tokens = ['JS'];
@@ -2635,7 +2790,7 @@ module.exports = NoDebugger = (function() {
   class NoDebugger {
     lintToken(token, tokenApi) {
       var method, ref, ref1, ref2;
-      if (((ref = token[0]) === 'DEBUGGER' || ref === 'STATEMENT') && token[1] === 'debugger') {
+      if (((ref = token[0]) === 'STATEMENT') && token[1] === 'debugger') {
         return {
           token,
           context: `found '${token[0]}'`
@@ -2659,11 +2814,11 @@ module.exports = NoDebugger = (function() {
     level: 'warn',
     message: 'Found debugging code',
     console: false,
-    description: 'This rule detects `debugger` and optionally `console` calls\nThis rule is `warn` by default.'
+    description: `This rule detects \`debugger\` and optionally \`console\` calls
+This rule is \`warn\` by default.`
   };
 
-  // TODO: after <1.10.0 is not supported, remove 'DEBUGGER' here
-  NoDebugger.prototype.tokens = ['STATEMENT', 'DEBUGGER', 'IDENTIFIER'];
+  NoDebugger.prototype.tokens = ['STATEMENT', 'IDENTIFIER'];
 
   return NoDebugger;
 
@@ -2706,7 +2861,28 @@ module.exports = NoEmptyFunctions = (function() {
     name: 'no_empty_functions',
     level: 'ignore',
     message: 'Empty function',
-    description: 'Disallows declaring empty functions. The goal of this rule is that\nunintentional empty callbacks can be detected:\n<pre>\n<code>someFunctionWithCallback ->\ndoSomethingSignificant()\n</code>\n</pre>\nThe problem is that the call to\n<tt>doSomethingSignificant</tt> will be made regardless\nof <tt>someFunctionWithCallback</tt>\'s execution. It can\nbe because you did not indent the call to\n<tt>doSomethingSignificant</tt> properly.\n\nIf you really meant that <tt>someFunctionWithCallback</tt>\nshould call a callback that does nothing, you can write your code\nthis way:\n<pre>\n<code>someFunctionWithCallback ->\n    undefined\ndoSomethingSignificant()\n</code>\n</pre>'
+    description: `Disallows declaring empty functions. The goal of this rule is that
+unintentional empty callbacks can be detected:
+<pre>
+<code>someFunctionWithCallback ->
+doSomethingSignificant()
+</code>
+</pre>
+The problem is that the call to
+<tt>doSomethingSignificant</tt> will be made regardless
+of <tt>someFunctionWithCallback</tt>'s execution. It can
+be because you did not indent the call to
+<tt>doSomethingSignificant</tt> properly.
+
+If you really meant that <tt>someFunctionWithCallback</tt>
+should call a callback that does nothing, you can write your code
+this way:
+<pre>
+<code>someFunctionWithCallback ->
+    undefined
+doSomethingSignificant()
+</code>
+</pre>`
   };
 
   return NoEmptyFunctions;
@@ -2733,7 +2909,16 @@ module.exports = NoEmptyParamList = (function() {
     name: 'no_empty_param_list',
     level: 'ignore',
     message: 'Empty parameter list is forbidden',
-    description: 'This rule prohibits empty parameter lists in function definitions.\n<pre>\n<code># The empty parameter list in here is unnecessary:\nmyFunction = () -&gt;\n\n# We might favor this instead:\nmyFunction = -&gt;\n</code>\n</pre>\nEmpty parameter lists are permitted by default.'
+    description: `This rule prohibits empty parameter lists in function definitions.
+<pre>
+<code># The empty parameter list in here is unnecessary:
+myFunction = () -&gt;
+
+# We might favor this instead:
+myFunction = -&gt;
+</code>
+</pre>
+Empty parameter lists are permitted by default.`
   };
 
   NoEmptyParamList.prototype.tokens = ['PARAM_START'];
@@ -2841,7 +3026,21 @@ module.exports = NoImplicitBraces = (function() {
     level: 'ignore',
     message: 'Implicit braces are forbidden',
     strict: true,
-    description: 'This rule prohibits implicit braces when declaring object literals.\nImplicit braces can make code more difficult to understand,\nespecially when used in combination with optional parenthesis.\n<pre>\n<code># Do you find this code ambiguous? Is it a\n# function call with three arguments or four?\nmyFunction a, b, 1:2, 3:4\n\n# While the same code written in a more\n# explicit manner has no ambiguity.\nmyFunction(a, b, {1:2, 3:4})\n</code>\n</pre>\nImplicit braces are permitted by default, since their use is\nidiomatic CoffeeScript.'
+    description: `This rule prohibits implicit braces when declaring object literals.
+Implicit braces can make code more difficult to understand,
+especially when used in combination with optional parenthesis.
+<pre>
+<code># Do you find this code ambiguous? Is it a
+# function call with three arguments or four?
+myFunction a, b, 1:2, 3:4
+
+# While the same code written in a more
+# explicit manner has no ambiguity.
+myFunction(a, b, {1:2, 3:4})
+</code>
+</pre>
+Implicit braces are permitted by default, since their use is
+idiomatic CoffeeScript.`
   };
 
   NoImplicitBraces.prototype.tokens = ['{', 'OUTDENT', 'INDENT', 'CLASS', 'IDENTIFIER', 'PROPERTY', 'EXTENDS'];
@@ -2895,7 +3094,17 @@ module.exports = NoImplicitParens = (function() {
     level: 'ignore',
     message: 'Implicit parens are forbidden',
     strict: true,
-    description: 'This rule prohibits implicit parens on function calls.\n<pre>\n<code># Some folks don\'t like this style of coding.\nmyFunction a, b, c\n\n# And would rather it always be written like this:\nmyFunction(a, b, c)\n</code>\n</pre>\nImplicit parens are permitted by default, since their use is\nidiomatic CoffeeScript.'
+    description: `This rule prohibits implicit parens on function calls.
+<pre>
+<code># Some folks don't like this style of coding.
+myFunction a, b, c
+
+# And would rather it always be written like this:
+myFunction(a, b, c)
+</code>
+</pre>
+Implicit parens are permitted by default, since their use is
+idiomatic CoffeeScript.`
   };
 
   NoImplicitParens.prototype.tokens = ['CALL_END'];
@@ -2925,7 +3134,17 @@ module.exports = NoInterpolationInSingleQuotes = (function() {
     name: 'no_interpolation_in_single_quotes',
     level: 'ignore',
     message: 'Interpolation in single quoted strings is forbidden',
-    description: 'This rule prohibits string interpolation in a single quoted string.\n<pre>\n<code># String interpolation in single quotes is not allowed:\nfoo = \'#{bar}\'\n\n# Double quotes is OK of course\nfoo = "#{bar}"\n</code>\n</pre>\nString interpolation in single quoted strings is permitted by\ndefault.'
+    description: `This rule prohibits string interpolation in a single quoted string.
+<pre>
+<code># String interpolation in single quotes is not allowed:
+foo = '#{bar}'
+
+# Double quotes is OK of course
+foo = "#{bar}"
+</code>
+</pre>
+String interpolation in single quoted strings is permitted by
+default.`
   };
 
   NoInterpolationInSingleQuotes.prototype.tokens = ['STRING'];
@@ -2991,7 +3210,16 @@ module.exports = NoNestedStringInterpolation = (function() {
     name: 'no_nested_string_interpolation',
     level: 'warn',
     message: 'Nested string interpolation is forbidden',
-    description: 'This rule warns about nested string interpolation,\nas it tends to make code harder to read and understand.\n<pre>\n<code># Good!\nstr = "Book by #{firstName.toUpperCase()} #{lastName.toUpperCase()}"\n\n# Bad!\nstr = "Book by #{"#{firstName} #{lastName}".toUpperCase()}"\n</code>\n</pre>'
+    description: `This rule warns about nested string interpolation,
+as it tends to make code harder to read and understand.
+<pre>
+<code># Good!
+str = "Book by #{firstName.toUpperCase()} #{lastName.toUpperCase()}"
+
+# Bad!
+str = "Book by #{"#{firstName} #{lastName}".toUpperCase()}"
+</code>
+</pre>`
   };
 
   NoNestedStringInterpolation.prototype.tokens = ['JSX_TAG', 'CALL_START', 'CALL_END', 'STRING_START', 'STRING_END'];
@@ -3019,7 +3247,11 @@ module.exports = NoPlusPlus = (function() {
     name: 'no_plusplus',
     level: 'ignore',
     message: 'The increment and decrement operators are forbidden',
-    description: 'This rule forbids the increment and decrement arithmetic operators.\nSome people believe the <tt>++</tt> and <tt>--</tt> to be cryptic\nand the cause of bugs due to misunderstandings of their precedence\nrules.\nThis rule is disabled by default.'
+    description: `This rule forbids the increment and decrement arithmetic operators.
+Some people believe the <tt>++</tt> and <tt>--</tt> to be cryptic
+and the cause of bugs due to misunderstandings of their precedence
+rules.
+This rule is disabled by default.`
   };
 
   NoPlusPlus.prototype.tokens = ['++', '--'];
@@ -3119,7 +3351,9 @@ module.exports = NoPrivateFunctionFatArrows = (function() {
     name: 'no_private_function_fat_arrows',
     level: 'warn',
     message: 'Used the fat arrow for a private function',
-    description: 'Warns when you use the fat arrow for a private function\ninside a class definition scope. It is not necessary and\nit does not do anything.'
+    description: `Warns when you use the fat arrow for a private function
+inside a class definition scope. It is not necessary and
+it does not do anything.`
   };
 
   return NoPrivateFunctionFatArrows;
@@ -3155,7 +3389,7 @@ module.exports = NoSpaces = (function() {
     name: 'no_spaces',
     level: 'ignore',
     message: 'Line contains space indentation',
-    description: 'This rule forbids spaces in indentation. It is disabled by default.'
+    description: `This rule forbids spaces in indentation. It is disabled by default.`
   };
 
   return NoSpaces;
@@ -3172,17 +3406,14 @@ module.exports = NoStandAloneAt = (function() {
       var isAStart, isDot, isProp, isProtoProp, nextToken, noSpace, ref, ref1;
       [nextToken] = tokenApi.peek();
       noSpace = !token.spaced;
-      // TODO: after <1.10.0 is not supported, remove 'IDENTIFIER' here
-      isProp = nextToken === 'IDENTIFIER' || nextToken === 'PROPERTY';
+      isProp = nextToken === 'PROPERTY';
       isAStart = nextToken === 'INDEX_START' || nextToken === 'CALL_START'; // @[] or @()
       isDot = nextToken === '.';
       // https://github.com/jashkenas/coffee-script/issues/1601
       // @::foo is valid, but @:: behaves inconsistently and is planned for
       // removal. Technically @:: is a stand alone ::, but I think it makes
       // sense to group it into no_stand_alone_at
-
-      // TODO: after v1.10.0 is not supported, remove 'IDENTIFIER' here
-      isProtoProp = nextToken === '::' && ((ref = (ref1 = tokenApi.peek(2)) != null ? ref1[0] : void 0) === 'IDENTIFIER' || ref === 'PROPERTY');
+      isProtoProp = nextToken === '::' && ((ref = (ref1 = tokenApi.peek(2)) != null ? ref1[0] : void 0) === 'PROPERTY');
       // Return an error after an '@' token unless:
       // 1: there is a '.' afterwards (isDot)
       // 2: there isn't a space after the '@' and the token following the '@'
@@ -3199,7 +3430,10 @@ module.exports = NoStandAloneAt = (function() {
     name: 'no_stand_alone_at',
     level: 'ignore',
     message: '@ must not be used stand alone',
-    description: 'This rule checks that no stand alone @ are in use, they are\ndiscouraged. Further information in CoffeeScript issue <a\nhref="https://github.com/jashkenas/coffee-script/issues/1601">\n#1601</a>'
+    description: `This rule checks that no stand alone @ are in use, they are
+discouraged. Further information in CoffeeScript issue <a
+href="https://github.com/jashkenas/coffee-script/issues/1601">
+#1601</a>`
   };
 
   NoStandAloneAt.prototype.tokens = ['@'];
@@ -3243,7 +3477,8 @@ module.exports = NoTabs = (function() {
     name: 'no_tabs',
     level: 'error',
     message: 'Line contains tab indentation',
-    description: 'This rule forbids tabs in indentation. Enough said. It is enabled by\ndefault.'
+    description: `This rule forbids tabs in indentation. Enough said. It is enabled by
+default.`
   };
 
   return NoTabs;
@@ -3275,7 +3510,8 @@ module.exports = NoThis = (function() {
     name: 'no_this',
     level: 'ignore',
     message: "Don't use 'this', use '@' instead",
-    description: 'This rule prohibits \'this\'.\nUse \'@\' instead.'
+    description: `This rule prohibits 'this'.
+Use '@' instead.`
   };
 
   NoThis.prototype.tokens = ['THIS'];
@@ -3306,7 +3542,24 @@ module.exports = NoThrowingStrings = (function() {
     name: 'no_throwing_strings',
     level: 'error',
     message: 'Throwing strings is forbidden',
-    description: 'This rule forbids throwing string literals or interpolations. While\nJavaScript (and CoffeeScript by extension) allow any expression to\nbe thrown, it is best to only throw <a\nhref="https://developer.mozilla.org\n/en/JavaScript/Reference/Global_Objects/Error"> Error</a> objects,\nbecause they contain valuable debugging information like the stack\ntrace. Because of JavaScript\'s dynamic nature, CoffeeLint cannot\nensure you are always throwing instances of <tt>Error</tt>. It will\nonly catch the simple but real case of throwing literal strings.\n<pre>\n<code># CoffeeLint will catch this:\nthrow "i made a boo boo"\n\n# ... but not this:\nthrow getSomeString()\n</code>\n</pre>\nThis rule is enabled by default.'
+    description: `This rule forbids throwing string literals or interpolations. While
+JavaScript (and CoffeeScript by extension) allow any expression to
+be thrown, it is best to only throw <a
+href="https://developer.mozilla.org
+/en/JavaScript/Reference/Global_Objects/Error"> Error</a> objects,
+because they contain valuable debugging information like the stack
+trace. Because of JavaScript's dynamic nature, CoffeeLint cannot
+ensure you are always throwing instances of <tt>Error</tt>. It will
+only catch the simple but real case of throwing literal strings.
+<pre>
+<code># CoffeeLint will catch this:
+throw "i made a boo boo"
+
+# ... but not this:
+throw getSomeString()
+</code>
+</pre>
+This rule is enabled by default.`
   };
 
   NoThrowingStrings.prototype.tokens = ['THROW'];
@@ -3371,7 +3624,17 @@ module.exports = NoTrailingSemicolons = (function() {
     name: 'no_trailing_semicolons',
     level: 'error',
     message: 'Line contains a trailing semicolon',
-    description: 'This rule prohibits trailing semicolons, since they are needless\ncruft in CoffeeScript.\n<pre>\n<code># This semicolon is meaningful.\nx = \'1234\'; console.log(x)\n\n# This semicolon is redundant.\nalert(\'end of line\');\n</code>\n</pre>\nTrailing semicolons are forbidden by default.'
+    description: `This rule prohibits trailing semicolons, since they are needless
+cruft in CoffeeScript.
+<pre>
+<code># This semicolon is meaningful.
+x = '1234'; console.log(x)
+
+# This semicolon is redundant.
+alert('end of line');
+</code>
+</pre>
+Trailing semicolons are forbidden by default.`
   };
 
   return NoTrailingSemicolons;
@@ -3445,7 +3708,8 @@ module.exports = NoTrailingWhitespace = (function() {
     message: 'Line ends with trailing whitespace',
     allowed_in_comments: false,
     allowed_in_empty_lines: true,
-    description: 'This rule forbids trailing whitespace in your code, since it is\nneedless cruft. It is enabled by default.'
+    description: `This rule forbids trailing whitespace in your code, since it is
+needless cruft. It is enabled by default.`
   };
 
   return NoTrailingWhitespace;
@@ -3533,7 +3797,20 @@ module.exports = NoUnnecessaryDoubleQuotes = (function() {
     name: 'no_unnecessary_double_quotes',
     level: 'ignore',
     message: 'Unnecessary double quotes are forbidden',
-    description: 'This rule prohibits double quotes unless string interpolation is\nused or the string contains single quotes.\n<pre>\n<code># Double quotes are discouraged:\nfoo = "bar"\n\n# Unless string interpolation is used:\nfoo = "#{bar}baz"\n\n# Or they prevent cumbersome escaping:\nfoo = "I\'m just following the \'rules\'"\n</code>\n</pre>\nDouble quotes are permitted by default.'
+    description: `This rule prohibits double quotes unless string interpolation is
+used or the string contains single quotes.
+<pre>
+<code># Double quotes are discouraged:
+foo = "bar"
+
+# Unless string interpolation is used:
+foo = "#{bar}baz"
+
+# Or they prevent cumbersome escaping:
+foo = "I'm just following the 'rules'"
+</code>
+</pre>
+Double quotes are permitted by default.`
   };
 
   NoUnnecessaryDoubleQuotes.prototype.tokens = ['STRING', 'STRING_START', 'STRING_END', 'JSX_TAG', 'CALL_START', 'CALL_END'];
@@ -3602,11 +3879,10 @@ module.exports = NoUnnecessaryFatArrows = (function() {
       }) || (node.body.contains(this.isThis) != null) || (node.body.contains((child) => {
         var ref;
         if (!this.astApi.getNodeName(child)) {
-          return ((ref = child.constructor) != null ? ref.name : void 0) === 'SuperCall' || ((child.isSuper != null) && child.isSuper);
+          return ((ref = child.constructor) != null ? ref.name : void 0) === 'SuperCall';
         } else {
           return this.isFatArrowCode(child) && this.needsFatArrow(child);
         }
-        // TODO: after <1.10.0 is not supported, remove child.isSuper
       }) != null));
     }
 
@@ -3616,7 +3892,8 @@ module.exports = NoUnnecessaryFatArrows = (function() {
     name: 'no_unnecessary_fat_arrows',
     level: 'warn',
     message: 'Unnecessary fat arrow',
-    description: 'Disallows defining functions with fat arrows when `this`\nis not used within the function.'
+    description: `Disallows defining functions with fat arrows when \`this\`
+is not used within the function.`
   };
 
   return NoUnnecessaryFatArrows;
@@ -3645,7 +3922,7 @@ module.exports = NonEmptyConstructorNeedsParens = (function() {
     name: 'non_empty_constructor_needs_parens',
     level: 'ignore',
     message: 'Invoking a constructor without parens and with arguments',
-    description: 'Requires constructors with parameters to include the parens'
+    description: `Requires constructors with parameters to include the parens`
   };
 
   return NonEmptyConstructorNeedsParens;
@@ -3708,7 +3985,9 @@ module.exports = PreferEnglishOperator = (function() {
     message: 'Don\'t use &&, ||, ==, !=, or !',
     doubleNotLevel: 'ignore',
     ops: ['and', 'or', 'not', 'is', 'isnt'],
-    description: 'This rule prohibits &&, ||, ==, != and !.\nUse and, or, is, isnt, and not instead.\n!! for converting to a boolean is ignored.'
+    description: `This rule prohibits &&, ||, ==, != and !.
+Use and, or, is, isnt, and not instead.
+!! for converting to a boolean is ignored.`
   };
 
   PreferEnglishOperator.prototype.tokens = ['COMPARE', 'UNARY_MATH', '&&', '||'];
@@ -3768,7 +4047,8 @@ module.exports = PreferLogicalOperator = (function() {
     level: 'ignore',
     message: 'Don\'t use is, isnt, not, and, or, yes, on, no, off',
     doubleNotLevel: 'ignore',
-    description: 'This rule prohibits is, isnt, not, and, or, yes, on, no, off.\nUse ==, !=, !, &&, ||, true, false instead.'
+    description: `This rule prohibits is, isnt, not, and, or, yes, on, no, off.
+Use ==, !=, !, &&, ||, true, false instead.`
   };
 
   PreferLogicalOperator.prototype.tokens = ['COMPARE', 'UNARY', 'BOOL', 'COMPOUND_ASSIGN', '&&', '||'];
@@ -3915,7 +4195,9 @@ module.exports = SpaceOperators = (function() {
     name: 'space_operators',
     level: 'ignore',
     message: 'Operators must be spaced properly',
-    description: 'This rule enforces that operators have space around them.\nOptionally, you can set `default_parameters` to `false` to\nrequire no space around `=` when used to define default paramaters.',
+    description: `This rule enforces that operators have space around them.
+Optionally, you can set \`default_parameters\` to \`false\` to
+require no space around \`=\` when used to define default paramaters.`,
     default_parameters: true
   };
 
@@ -3997,7 +4279,13 @@ module.exports = SpacingAfterComma = (function() {
     level: 'ignore',
     ignore_elision: false,
     message: 'a space is required after commas',
-    description: 'This rule checks to make sure you have a space after commas.\nConsecutive commas are allowed when skipping array elements\nif "ignore_elision" is true.\n<pre><code>\n# ignore_elision: true\n[,, c,, e, f] = [1, 2, 3, 4, 5, 6]\n</code></pre>'
+    description: `This rule checks to make sure you have a space after commas.
+Consecutive commas are allowed when skipping array elements
+if "ignore_elision" is true.
+<pre><code>
+# ignore_elision: true
+[,, c,, e, f] = [1, 2, 3, 4, 5, 6]
+</code></pre>`
   };
 
   SpacingAfterComma.prototype.tokens = [',', 'REGEX_START', 'REGEX_END'];
@@ -4020,7 +4308,8 @@ module.exports = TransformMessesUpLineNumbers = (function() {
     name: 'transform_messes_up_line_numbers',
     level: 'warn',
     message: 'Transforming source messes up line numbers',
-    description: 'This rule detects when changes are made by transform function,\nand warns that line numbers are probably incorrect.'
+    description: `This rule detects when changes are made by transform function,
+and warns that line numbers are probably incorrect.`
   };
 
   TransformMessesUpLineNumbers.prototype.tokens = [];
