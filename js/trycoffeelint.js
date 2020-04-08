@@ -44,11 +44,17 @@
     };
 
     var runLinter = function () {
-        var source = $('.editor').val();
+        var source = $('.run_editor').val();
+        var config = $('.config_editor').val();
         var errors = [];
         var compileError = null;
         try {
-            errors = coffeelint.lint(source);
+            try {
+                config = JSON.parse(config);
+            } catch {
+                throw new Error('Invalid configuration: Must be valid JSON');
+            }
+            errors = coffeelint.lint(source, config);
         } catch (e) {
             compileError = e;
         }
@@ -59,10 +65,27 @@
         }
     };
 
+    var toggleConfiguration = function () {
+        $('.config_editor_toggle').slideToggle();
+    };
+
+    var generateInitialConfig = function () {
+        var config = coffeelint.getRules();
+        for (const prop in config) {
+            delete config[prop].name;
+            delete config[prop].message;
+            delete config[prop].description;
+        }
+        $('.config_editor').val(JSON.stringify(config, null, 2));
+    }
+
     $(document).ready(function () {
+        generateInitialConfig();
+        $('.configuration').click(toggleConfiguration)
         $('.version').text('v' + coffeelint.VERSION);
 
-        $('.editor').focus().keyup(runLinter);
+        $('.editor').keyup(runLinter);
+        $('.run_editor').focus();
         $('.run').click(runLinter);
 
         if (location.hash) {

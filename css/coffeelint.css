@@ -195,6 +195,15 @@ tt {
   z-index:10;
 }
 
+.configuration {
+  cursor: pointer;
+  color: #fff;
+}
+
+.config_editor_toggle {
+  display: none;
+}
+
 /** Report style **/
 
 .report_row {

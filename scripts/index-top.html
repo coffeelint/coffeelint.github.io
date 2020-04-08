@@ -32,15 +32,21 @@
     <div class="container">
 
       <!-- EDITOR -->
-      <div class="row editor_row">
+      <div class="row editor_row configuration_row">
         <div class="run">Run</div>
-<textarea class="editor" spellcheck="false"># Lint your CoffeeScript!
+<textarea class="editor run_editor" spellcheck="false"># Lint your CoffeeScript!
 
 class Gangster
 
   wasItAGoodDay : () ->
     yes
 </textarea>
+      </div>
+      <div class="row editor_row">
+        <div class="configuration">Configuration</div>
+        <div class="config_editor_toggle">
+<textarea class="editor config_editor" spellcheck="false"></textarea>
+</div>
       </div>
 
       <!-- LINT REPORT -->
