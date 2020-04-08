@@ -56,6 +56,7 @@
             }
             errors = coffeelint.lint(source, config);
         } catch (e) {
+            console.error(e);
             compileError = e;
         }
         if (compileError) {
@@ -70,13 +71,13 @@
     };
 
     var generateInitialConfig = function () {
-        var config = coffeelint.getRules();
+        var config = JSON.parse(JSON.stringify(coffeelint.getRules()));
         for (const prop in config) {
             delete config[prop].name;
             delete config[prop].message;
             delete config[prop].description;
         }
-        $('.config_editor').val(JSON.stringify(config, null, 2));
+        $('.config_editor').val(JSON.stringify(config, null, 2) + '\n');
     }
 
     $(document).ready(function () {
