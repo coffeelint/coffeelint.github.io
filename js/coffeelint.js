@@ -2,7 +2,7 @@
 module.exports={
   "name": "@coffeelint/cli",
   "description": "Lint your CoffeeScript",
-  "version": "3.1.3",
+  "version": "3.2.0",
   "homepage": "https://coffeelint.github.io/",
   "keywords": [
     "lint",
@@ -583,6 +583,8 @@ coffeelint.registerRule(require('./rules/no_unnecessary_fat_arrows.coffee'));
 
 coffeelint.registerRule(require('./rules/missing_fat_arrows.coffee'));
 
+coffeelint.registerRule(require('./rules/prefer_fat_arrows_in_methods.coffee'));
+
 coffeelint.registerRule(require('./rules/non_empty_constructor_needs_parens.coffee'));
 
 coffeelint.registerRule(require('./rules/no_unnecessary_double_quotes.coffee'));
@@ -816,7 +818,7 @@ coffeelint.setCache = function(obj) {
 };
 
 
-},{"./../package.json":1,"./ast_linter.coffee":2,"./error_report.coffee":5,"./lexical_linter.coffee":6,"./line_linter.coffee":7,"./rules.coffee":8,"./rules/arrow_spacing.coffee":9,"./rules/braces_spacing.coffee":10,"./rules/bracket_spacing.coffee":11,"./rules/camel_case_classes.coffee":12,"./rules/colon_assignment_spacing.coffee":13,"./rules/cyclomatic_complexity.coffee":14,"./rules/duplicate_key.coffee":15,"./rules/empty_constructor_needs_parens.coffee":16,"./rules/ensure_comprehensions.coffee":17,"./rules/eol_last.coffee":18,"./rules/indentation.coffee":19,"./rules/line_endings.coffee":20,"./rules/max_line_length.coffee":21,"./rules/missing_fat_arrows.coffee":22,"./rules/missing_parseint_radix.coffee":23,"./rules/newlines_after_classes.coffee":24,"./rules/no_backticks.coffee":25,"./rules/no_debugger.coffee":26,"./rules/no_empty_functions.coffee":27,"./rules/no_empty_param_list.coffee":28,"./rules/no_implicit_braces.coffee":29,"./rules/no_implicit_parens.coffee":30,"./rules/no_interpolation_in_single_quotes.coffee":31,"./rules/no_nested_string_interpolation.coffee":32,"./rules/no_plusplus.coffee":33,"./rules/no_private_function_fat_arrows.coffee":34,"./rules/no_spaces.coffee":35,"./rules/no_stand_alone_at.coffee":36,"./rules/no_tabs.coffee":37,"./rules/no_this.coffee":38,"./rules/no_throwing_strings.coffee":39,"./rules/no_trailing_semicolons.coffee":40,"./rules/no_trailing_whitespace.coffee":41,"./rules/no_unnecessary_double_quotes.coffee":42,"./rules/no_unnecessary_fat_arrows.coffee":43,"./rules/non_empty_constructor_needs_parens.coffee":44,"./rules/prefer_english_operator.coffee":45,"./rules/prefer_logical_operator.coffee":46,"./rules/space_operators.coffee":47,"./rules/spacing_after_comma.coffee":48,"./rules/transform_messes_up_line_numbers.coffee":49}],5:[function(require,module,exports){
+},{"./../package.json":1,"./ast_linter.coffee":2,"./error_report.coffee":5,"./lexical_linter.coffee":6,"./line_linter.coffee":7,"./rules.coffee":8,"./rules/arrow_spacing.coffee":9,"./rules/braces_spacing.coffee":10,"./rules/bracket_spacing.coffee":11,"./rules/camel_case_classes.coffee":12,"./rules/colon_assignment_spacing.coffee":13,"./rules/cyclomatic_complexity.coffee":14,"./rules/duplicate_key.coffee":15,"./rules/empty_constructor_needs_parens.coffee":16,"./rules/ensure_comprehensions.coffee":17,"./rules/eol_last.coffee":18,"./rules/indentation.coffee":19,"./rules/line_endings.coffee":20,"./rules/max_line_length.coffee":21,"./rules/missing_fat_arrows.coffee":22,"./rules/missing_parseint_radix.coffee":23,"./rules/newlines_after_classes.coffee":24,"./rules/no_backticks.coffee":25,"./rules/no_debugger.coffee":26,"./rules/no_empty_functions.coffee":27,"./rules/no_empty_param_list.coffee":28,"./rules/no_implicit_braces.coffee":29,"./rules/no_implicit_parens.coffee":30,"./rules/no_interpolation_in_single_quotes.coffee":31,"./rules/no_nested_string_interpolation.coffee":32,"./rules/no_plusplus.coffee":33,"./rules/no_private_function_fat_arrows.coffee":34,"./rules/no_spaces.coffee":35,"./rules/no_stand_alone_at.coffee":36,"./rules/no_tabs.coffee":37,"./rules/no_this.coffee":38,"./rules/no_throwing_strings.coffee":39,"./rules/no_trailing_semicolons.coffee":40,"./rules/no_trailing_whitespace.coffee":41,"./rules/no_unnecessary_double_quotes.coffee":42,"./rules/no_unnecessary_fat_arrows.coffee":43,"./rules/non_empty_constructor_needs_parens.coffee":44,"./rules/prefer_english_operator.coffee":45,"./rules/prefer_fat_arrows_in_methods.coffee":46,"./rules/prefer_logical_operator.coffee":47,"./rules/space_operators.coffee":48,"./rules/spacing_after_comma.coffee":49,"./rules/transform_messes_up_line_numbers.coffee":50}],5:[function(require,module,exports){
 // A summary of errors in a CoffeeLint run.
 var ErrorReport;
 
@@ -3581,7 +3583,7 @@ regexes = {
 module.exports = NoTrailingSemicolons = (function() {
   class NoTrailingSemicolons {
     lintLine(line, lineApi) {
-      var endPos, first, hasNewLine, hasSemicolon, last, lineTokens, newLine, ref, ref1, startCounter, startPos, stopTokens, tokenLen;
+      var endPos, first, hasNewLine, hasSemicolon, last, lineTokens, newLine, ref, ref1, ref2, startCounter, startPos, stopTokens, tokenLen;
       // The TERMINATOR token is extended through to the next token. As a
       // result a line with a comment DOES have a token: the TERMINATOR from
       // the last line of code.
@@ -3589,6 +3591,9 @@ module.exports = NoTrailingSemicolons = (function() {
       tokenLen = lineTokens.length;
       stopTokens = ['TERMINATOR', 'HERECOMMENT'];
       if (tokenLen === 1 && (ref = lineTokens[0][0], indexOf.call(stopTokens, ref) >= 0)) {
+        return;
+      }
+      if (tokenLen === 2 && lineTokens[1].generated && (ref1 = lineTokens[0][0], indexOf.call(stopTokens, ref1) >= 0)) {
         return;
       }
       newLine = line;
@@ -3613,7 +3618,7 @@ module.exports = NoTrailingSemicolons = (function() {
       hasNewLine = last && (last.newLine != null);
       // Don't throw errors when the contents of multiline strings,
       // regexes and the like end in ";"
-      if (hasSemicolon && !hasNewLine && lineApi.lineHasToken() && !((ref1 = last[0]) === 'STRING' || ref1 === 'IDENTIFIER' || ref1 === 'STRING_END')) {
+      if (hasSemicolon && !hasNewLine && lineApi.lineHasToken() && !((ref2 = last[0]) === 'STRING' || ref2 === 'IDENTIFIER' || ref2 === 'STRING_END')) {
         return true;
       }
     }
@@ -3998,6 +4003,108 @@ Use and, or, is, isnt, and not instead.
 
 
 },{}],46:[function(require,module,exports){
+var MissingFatArrows,
+  indexOf = [].indexOf;
+
+module.exports = MissingFatArrows = (function() {
+  class MissingFatArrows {
+    constructor() {
+      this.isCode = this.isCode.bind(this);
+      this.isClass = this.isClass.bind(this);
+      this.isValue = this.isValue.bind(this);
+      this.isObject = this.isObject.bind(this);
+      this.isFatArrowCode = this.isFatArrowCode.bind(this);
+      this.insideMethod = [false];
+    }
+
+    lintAST(node, astApi) {
+      this.astApi = astApi;
+      this.lintNode(node);
+      return void 0;
+    }
+
+    lintNode(node, methods = []) {
+      var error;
+      if (indexOf.call(methods, node) >= 0) {
+        this.insideMethod.push(true);
+      } else if (this.isClass(node)) {
+        this.insideMethod.push(false);
+      } else if ((this.isCode(node)) && this.insideMethod[this.insideMethod.length - 1] && !this.isFatArrowCode(node)) {
+        error = this.astApi.createError({
+          lineNumber: node.locationData.first_line + 1
+        });
+        this.errors.push(error);
+      }
+      node.eachChild((child) => {
+        return this.lintNode(child, (function() {
+          switch (false) {
+            case !this.isClass(node):
+              return this.methodsOfClass(node);
+            // Once we've hit a function, we know we can't be in the top
+            // level of a method anymore, so we can safely reset the methods
+            // to empty to save work.
+            case !this.isCode(node):
+              return [];
+            default:
+              return methods;
+          }
+        }).call(this));
+      });
+      if (indexOf.call(methods, node) >= 0 || this.isClass(node)) {
+        return this.insideMethod.pop();
+      }
+    }
+
+    isCode(node) {
+      return this.astApi.getNodeName(node) === 'Code';
+    }
+
+    isClass(node) {
+      return this.astApi.getNodeName(node) === 'Class';
+    }
+
+    isValue(node) {
+      return this.astApi.getNodeName(node) === 'Value';
+    }
+
+    isObject(node) {
+      return this.astApi.getNodeName(node) === 'Obj';
+    }
+
+    isFatArrowCode(node) {
+      return this.isCode(node) && node.bound;
+    }
+
+    methodsOfClass(classNode) {
+      var bodyNodes, returnNode;
+      bodyNodes = classNode.body.expressions;
+      returnNode = bodyNodes[bodyNodes.length - 1];
+      if ((returnNode != null) && this.isValue(returnNode) && this.isObject(returnNode.base)) {
+        return returnNode.base.properties.map(function(assignNode) {
+          return assignNode.value;
+        }).filter(this.isCode);
+      } else {
+        return [];
+      }
+    }
+
+  };
+
+  MissingFatArrows.prototype.rule = {
+    name: 'prefer_fat_arrows_in_methods',
+    level: 'ignore',
+    message: 'Require fat arrows inside method bodies',
+    description: `Warns when you do not use a fat arrow for functions defined inside
+method bodies. This assures that \`this\` is always bound to the
+method's object inside the code block of a method.`
+  };
+
+  return MissingFatArrows;
+
+}).call(this);
+
+
+},{}],47:[function(require,module,exports){
 var PreferLogicalOperator;
 
 module.exports = PreferLogicalOperator = (function() {
@@ -4058,7 +4165,7 @@ Use ==, !=, !, &&, ||, true, false instead.`
 }).call(this);
 
 
-},{}],47:[function(require,module,exports){
+},{}],48:[function(require,module,exports){
 var SpaceOperators,
   indexOf = [].indexOf;
 
@@ -4208,7 +4315,7 @@ require no space around \`=\` when used to define default paramaters.`,
 }).call(this);
 
 
-},{}],48:[function(require,module,exports){
+},{}],49:[function(require,module,exports){
 var SpacingAfterComma,
   indexOf = [].indexOf;
 
@@ -4295,7 +4402,7 @@ if "ignore_elision" is true.
 }).call(this);
 
 
-},{}],49:[function(require,module,exports){
+},{}],50:[function(require,module,exports){
 var TransformMessesUpLineNumbers;
 
 module.exports = TransformMessesUpLineNumbers = (function() {

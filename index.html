@@ -727,6 +727,15 @@ Use and, or, is, isnt, and not instead.
 </td>
 </tr>
 <tr>
+<td class="rule">prefer_fat_arrows_in_methods</td>
+<td class="description">
+    Warns when you do not use a fat arrow for functions defined inside
+method bodies. This assures that `this` is always bound to the
+method's object inside the code block of a method.
+    <p><em>default level: ignore</em></p>
+</td>
+</tr>
+<tr>
 <td class="rule">prefer_logical_operator</td>
 <td class="description">
     This rule prohibits is, isnt, not, and, or, yes, on, no, off.
@@ -975,8 +984,22 @@ and warns that line numbers are probably incorrect.
           <h2 class="section_title" id="changelog">Change Log</h2>
 
           <p>
-              <a href="https://github.com/coffeelint/coffeelint/compare/v3.1.3...master">Latest Changes</a>
+              <a href="https://github.com/coffeelint/coffeelint/compare/v3.2.0...master">Latest Changes</a>
           </p>
+
+          <div> <h3 class="changelog_header">v3.2.0</h3> <small
+          class="changelog_date">- <a
+          href="https://github.com/coffeelint/coffeelint/compare/v3.1.3...v3.2.0">2020.04.10<a></a></small>
+          <p>
+              Add prefer_fat_arrows_in_methods rule.
+          </p>
+          <ul class="changelog_history">
+            <li>Fix last line comment trailing semicolon
+                <a href="https://github.com/coffeelint/coffeelint/pull/55">#55</a></li>
+            <li>Add prefer_fat_arrows_in_methods rule
+                <a href="https://github.com/coffeelint/coffeelint/pull/15">#15</a></li>
+          </ul>
+          </div>
 
           <div> <h3 class="changelog_header">v3.1.3</h3> <small
           class="changelog_date">- <a
