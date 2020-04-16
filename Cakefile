@@ -1,15 +1,23 @@
+child_process = require 'child_process'
+marked = require 'marked'
 fs = require 'fs'
 
 task 'compile', 'Compiles index.html', ->
     invoke 'update'
 
-    top = fs.readFileSync('./scripts/index-top.html').toString()
-    rules = require('./scripts/rules.coffee')
-    bottom = fs.readFileSync('./scripts/index-bottom.html').toString()
+    changelog = fs.readFileSync('./node_modules/@coffeelint/cli/CHANGELOG.md').toString()
+    template = fs.readFileSync('./scripts/template.html').toString()
+    template = template.replace '{{{changelog}}}', marked changelog
+    template = template.replace '{{{rules}}}', require './scripts/rules.coffee'
 
-    fs.writeFileSync './index.html', top + rules + bottom
+    fs.writeFileSync './index.html', template
 
 task 'update', 'Update coffeelint.js and coffeescript.js', ->
+    child_process.execSync "npm install @coffeelint/cli@#{process.COFFEELINT_VERSION ? 'latest'}"
+    coffeelintPackage = require './node_modules/@coffeelint/cli/package.json'
+    coffeescriptVersion = coffeelintPackage.dependencies.coffeescript
+    child_process.execSync "npm install coffeescript@#{coffeescriptVersion}"
+
     coffeelintFile = './node_modules/@coffeelint/cli/lib/coffeelint.js'
     coffeescriptFile =
         './node_modules/coffeescript/lib/coffeescript-browser-compiler-legacy/coffeescript.js'

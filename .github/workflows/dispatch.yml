@@ -1,0 +1,24 @@
+name: Compile
+
+on:
+  repository_dispatch:
+    types: [compile]
+
+jobs:
+  Compile:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Build 🗜️
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          COFFEELINT_VERSION: ${{ github.event.client_payload.coffeelint_version }}
+        run: |
+          npm run build
+          if ! git diff --quiet; then
+            git config --global user.email "<>"
+            git config --global user.name ""
+            git commit -am "v${COFFEELINT_VERSION}"
+            git push "https://${GITHUB_ACTOR}:${GITHUB_TOKEN}@github.com/coffeelint/coffeelint.github.io.git" HEAD:master
+          fi
