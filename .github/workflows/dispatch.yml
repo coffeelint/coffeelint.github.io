@@ -8,8 +8,10 @@ jobs:
   Compile:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: Checkout Code
         uses: actions/checkout@v2
+      - name: Install Dependencies
+        run: npm ci
       - name: Build 🗜️
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
