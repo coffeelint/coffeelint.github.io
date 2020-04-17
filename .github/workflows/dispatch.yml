@@ -20,7 +20,7 @@ jobs:
           npm run build
           if ! git diff --quiet; then
             git config --global user.email "<>"
-            git config --global user.name ""
+            git config --global user.name "GitHub Actions"
             git commit -am "v${COFFEELINT_VERSION}"
             git push "https://${GITHUB_ACTOR}:${GITHUB_TOKEN}@github.com/coffeelint/coffeelint.github.io.git" HEAD:master
           fi
