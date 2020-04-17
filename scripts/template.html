@@ -140,11 +140,9 @@ class Gangster
         <p>
           To disable a rule inline use the following:
         </p>
-        <pre><code>
-# coffeelint: disable=max_line_length
+        <pre><code># coffeelint: disable=max_line_length
 foo = "some/huge/line/string/with/embed/#{values}.that/surpasses/the/max/column/width"
-# coffeelint: enable=max_line_length
-        </code></pre>
+# coffeelint: enable=max_line_length</code></pre>
 
         <p>
           You can also disable all checks for a single line by appending <tt>#
@@ -304,7 +302,7 @@ throw "I should be an Error not a string but YOLO" # noqa
           <p>
             Some nice folks have coded up some cool CoffeeLint plugins for editors and
             build systems. Check them out:
-            <ul class="changelog_history">
+            <ul class="plugin_list">
               <li>The aptly named
         <a href="https://github.com/kchmck/vim-coffee-script">vim-coffee-script</a>
                 by Mick Koch. </li>
@@ -373,7 +371,9 @@ throw "I should be an Error not a string but YOLO" # noqa
 
           <h2 class="section_title" id="changelog">Change Log</h2>
 
-          {{{changelog}}}
+          <div class="changelog_history">
+            {{{changelog}}}
+          </div>
 
       </div>
     </div>

@@ -913,7 +913,7 @@ and warns that line numbers are probably incorrect.
           <p>
             Some nice folks have coded up some cool CoffeeLint plugins for editors and
             build systems. Check them out:
-            <ul class="changelog_history">
+            <ul class="plugin_list">
               <li>The aptly named
         <a href="https://github.com/kchmck/vim-coffee-script">vim-coffee-script</a>
                 by Mick Koch. </li>
@@ -982,618 +982,338 @@ and warns that line numbers are probably incorrect.
 
           <h2 class="section_title" id="changelog">Change Log</h2>
 
-          <h2 id="321-2020-04-17"><a href="https://github.com/coffeelint/coffeelint/compare/v3.2.0...v3.2.1">3.2.1</a> (2020-04-17)</h2>
+          <div class="changelog_history">
+            <h2 id="321-2020-04-17"><a href="https://github.com/coffeelint/coffeelint/compare/v3.2.0...v3.2.1">3.2.1</a> (2020-04-17)</h2>
 <h3 id="bug-fixes">Bug Fixes</h3>
 <ul>
 <li><strong>deps:</strong> use semantic-release (<a href="https://github.com/coffeelint/coffeelint/commit/9c90153a106990f0fad4424e12b64fb7f332fdbb">9c90153</a>)</li>
 </ul>
-<div> <h3 class="changelog_header">v3.2.0</h3> <small
-          class="changelog_date">- <a
-          href="https://github.com/coffeelint/coffeelint/compare/v3.1.3...v3.2.0">2020.04.10<a></a></small>
-          <p>
-              Add prefer_fat_arrows_in_methods rule.
-          </p>
-          <ul class="changelog_history">
-            <li>Fix last line comment trailing semicolon
-                <a href="https://github.com/coffeelint/coffeelint/pull/55">#55</a></li>
-            <li>Add prefer_fat_arrows_in_methods rule
-                <a href="https://github.com/coffeelint/coffeelint/pull/15">#15</a></li>
-          </ul>
+<h2 id="320-20200410"><a href="https://github.com/coffeelint/coffeelint/compare/v3.1.3...v3.2.0">3.2.0</a> (2020.04.10)</h2>
+<p>Add prefer_fat_arrows_in_methods rule.</p>
+<ul>
+<li>Fix last line comment trailing semicolon <a href="https://github.com/coffeelint/coffeelint/pull/55">#55</a></li>
+<li>Add prefer_fat_arrows_in_methods rule <a href="https://github.com/coffeelint/coffeelint/pull/15">#15</a></li>
+</ul>
+<h2 id="313-20200408"><a href="https://github.com/coffeelint/coffeelint/compare/v3.1.2...v3.1.3">3.1.3</a> (2020.04.08)</h2>
+<p>Fix newlines_after_classes when there are blank lines before last line in class.</p>
+<ul>
+<li>Fix newlines_after_classes <a href="https://github.com/coffeelint/coffeelint/pull/52">#52</a></li>
+<li>Remove relics from coffeescript &lt;= v1.10.0 <a href="https://github.com/coffeelint/coffeelint/pull/53">#53</a></li>
+</ul>
+<h2 id="312-20200405"><a href="https://github.com/coffeelint/coffeelint/compare/v3.1.1...v3.1.2">3.1.2</a> (2020.04.05)</h2>
+<p>Update coffeescript dependency to v2.5.1.</p>
+<ul>
+<li>Update coffeescript dependency. <a href="https://github.com/coffeelint/coffeelint/pull/50">#50</a></li>
+</ul>
+<h2 id="311-20200322"><a href="https://github.com/coffeelint/coffeelint/compare/v3.1.0...v3.1.1">3.1.1</a> (2020.03.22)</h2>
+<p>Update commandline dependency to maintained dependency.</p>
+<ul>
+<li>Replace optimist with yargs. <a href="https://github.com/coffeelint/coffeelint/pull/46">#46</a></li>
+</ul>
+<h2 id="1162-20200206"><a href="https://github.com/coffeelint/coffeelint/compare/v1.16.1...v1.16.2">1.16.2</a> (2020.02.06)</h2>
+<p>First 1.x release under new npm package; to use: <code>npm install -g @coffeelint/cli@old</code></p>
+<ul>
+<li>Don’t unnecessarily print “context:” at the end of some error messages <a href="https://github.com/coffeelint/coffeelint/pull/42">#42</a></li>
+</ul>
+<h2 id="310-20200206"><a href="https://github.com/coffeelint/coffeelint/compare/v3.0.2...v3.1.0">3.1.0</a> (2020.02.06)</h2>
+<p>Added a few rules and rules options. More bug fixes and internal updates to make developing easier. We got through the backlog of pull requests. Now on to the issues...</p>
+<ul>
+<li>Add <code>prefer_logical_operator</code> rule. <a href="https://github.com/coffeelint/coffeelint/pull/13">#13</a></li>
+<li>Add <code>missing_parseint_radix</code> rule. <a href="https://github.com/coffeelint/coffeelint/pull/17">#17</a></li>
+<li>Add <code>bracket_spacing</code> rule. <a href="https://github.com/coffeelint/coffeelint/pull/26">#26</a></li>
+<li><code>space_operators</code>: add <code>default_parameters</code> option. <a href="https://github.com/coffeelint/coffeelint/pull/16">#16</a></li>
+<li><code>colon_assignment_spacing</code>: add <code>min_left</code> and <code>min_right</code> option. <a href="https://github.com/coffeelint/coffeelint/pull/22">#22</a></li>
+<li><code>spacing_after_comma</code>: add <code>ignore_elision</code> option. <a href="https://github.com/coffeelint/coffeelint/pull/34">#34</a></li>
+<li><code>braces_spacing</code>: add <code>mono_object_spaces</code> option. <a href="https://github.com/coffeelint/coffeelint/pull/17">#17</a></li>
+<li>Properly double quote fields in <code>csv</code> reporter. <a href="https://github.com/coffeelint/coffeelint/pull/14">#14</a></li>
+<li>Stop printing empty context in <code>checkstyle</code> reporter. <a href="https://github.com/coffeelint/coffeelint/pull/12">#12</a></li>
+<li><code>no_tabs</code> rejects tabs at the end of the line. <a href="https://github.com/coffeelint/coffeelint/pull/20">#20</a></li>
+<li>Prevent endless loop if lineNumber is negative. <a href="https://github.com/coffeelint/coffeelint/pull/10">#10</a></li>
+<li>Update dependency <code>resolve</code> to v1.15.1</li>
+</ul>
+<h2 id="302-20200122"><a href="https://github.com/coffeelint/coffeelint/compare/v3.0.1...v3.0.2">3.0.2</a> (2020.01.22)</h2>
+<p>small fixes</p>
+<ul>
+<li>Bugfix for error message when a config file cannot be found. <a href="https://github.com/coffeelint/coffeelint/pull/38">#38</a></li>
+<li>Update dependency <code>resolve</code> to v1.15.0</li>
+<li>Update documentation</li>
+</ul>
+<h2 id="301-20200122"><a href="https://github.com/coffeelint/coffeelint/compare/v3.0.0...v3.0.1">3.0.1</a> (2020.01.22)</h2>
+<p>CoffeeLint has a new webpage at <a href="https://coffeelint.github.io">https://coffeelint.github.io</a></p>
+<ul>
+<li>Update dependencies and clean up documentation</li>
+</ul>
+<h2 id="300-20200114"><a href="https://github.com/coffeelint/coffeelint/compare/v2.1.0...v3.0.0">3.0.0</a> (2020.01.14)</h2>
+<p>CoffeeLint has a new home at <a href="https://github.com/coffeelint/coffeelint">https://github.com/coffeelint/coffeelint</a> and a new npm package <a href="https://www.npmjs.com/package/@coffeelint/cli">@coffeelint/cli</a>.</p>
+<ul>
+<li>Bugfix for error message when an unknown level is used. <a href="https://github.com/coffeelint/coffeelint/pull/4">#4</a></li>
+<li>Bugfix for error <code>duplicate_key</code> when keys are wrapped in quotes. <a href="https://github.com/coffeelint/coffeelint/pull/6">#6</a></li>
+<li>Add <code>no_spaces</code> rule to disallow spaces for indentation. <a href="https://github.com/coffeelint/coffeelint/pull/7">#7</a></li>
+<li>Several enhancements, including CJSX fixes. <a href="https://github.com/coffeelint/coffeelint/pull/8">#8</a></li>
+<li>Add rule name to default reporter. <a href="https://github.com/coffeelint/coffeelint/pull/11">#11</a></li>
+</ul>
+<h2 id="1150-20151118"><a href="https://github.com/coffeelint/coffeelint/compare/v1.14.1...v1.15.0">1.15.0</a> (2015.11.18)</h2>
+<p>This version updates the enable/disable directives. In addition to
+the existing <code># coffeelint: disable=rule_name</code> you can also
+use <code># coffeelint: disable-line=rule_name</code>. The rule name is
+still optional in both cases, and you can enable the rules using
+the same syntax.</p>
+<p>You can also use <code># noqa</code> as a shortcut for <code># coffeelint: disable-line</code></p>
+<ul>
+<li>See <a href="https://github.com/clutchski/coffeelint/pull/552">#552</a> for more details.</li>
+</ul>
+<h2 id="1141-20151118"><a href="https://github.com/coffeelint/coffeelint/compare/v1.14.0...v1.14.1">1.14.1</a> (2015.11.18)</h2>
+<p>Most of the changes are more for linting the development files of
+coffeelint. The minor version increase is due to the change in
+cyclomatic_complexity, which now ignores nested functions. I foresee
+this change affecting very few people but probably still needs a minor
+version increase.</p>
+<ul>
+<li><code>cyclomatic_complexity</code> rule has been changed to ignore nested functions</li>
+<li>1.4.1: inlined rules not previously specified in JSON config now properly return a message</li>
+</ul>
+<h2 id="1130-20151007"><a href="https://github.com/coffeelint/coffeelint/compare/v1.11.0...v1.13.0">1.13.0</a> (2015.10.07)</h2>
+<p>The v1.12.x versions are considered buggy and you should upgrade to v1.13.x if you experience problems</p>
+<p><strong>These releases were largely for bugfixes!</strong></p>
+<ul>
+<li>Bugfix for <code>no_implicit_braces</code> causing errors in classes and other edge cases</li>
+<li>Bugfix for <code>ensure_comprehensions</code> where it failed if a nested loop had an equal sign</li>
+<li>Bugfix for <code>braces_spacing</code> failing over generated curly braces</li>
+<li>Several changes to <code>indentation</code> See <a href="https://github.com/coffeelint/coffeelint/commit/bffa2532efd8bcca5d9c1b3a9d3b5914e882dd5f">bffa25</a> for the full list of changes. However between the release of v1.12.0 and v1.13.0, a regression was caused by fixing one of the indentation requests and as a result the change was reverted. The revert will most likely not affect too many users</li>
+<li>Bugfix for <code>newlines_after_classes</code>, also fixed regressions caused between v1.12.0 and v1.13.0. If you have v1.12.x and are experiencing problems, please upgrade. Also note nested classes are now ignored completely</li>
+<li><code>no_this</code> is now compatible with <code>no_stand_alone_at</code> and will make checks against singular <code>this</code></li>
+<li>Bugfix for <code>missing_fat_arrows</code>, declaring a class prototype (via &#39;::&#39; operator) no longer fail if they don&#39;t use a fat arrow</li>
+<li>Bugfix for <code>eol_last</code>, it now fails if there are multiple newlines at the end of a file (thanks <a href="https://github.com/charlierudolph">charlierudolph</a>)-</li>
+<li>Bugfix for <code>arrow_spacing</code>, now ignores arrow spacing in empty functions (thanks <a href="https://github.com/sgentle">sgentle</a>)</li>
+</ul>
+<h2 id="1110-20150819"><a href="https://github.com/coffeelint/coffeelint/compare/v1.10.0...v1.11.0">1.11.0</a> (2015.08.19)</h2>
+<ul>
+<li>New config option <code>{ &quot;extends&quot;: &quot;coffeelint-config-myconfig&quot; }</code> based on <a href="http://eslint.org/docs/developer-guide/shareable-configs">eslint&#39;s shareable configs</a></li>
+<li>New rule <code>no_nested_string_interpolation</code></li>
+<li>New rule <code>no_private_function_fat_arrows</code></li>
+<li>New CLI option <code>--ext</code> to specify alternate file extensions to check</li>
+<li>Bugfixes including tracking nested string interpolation which eleminates some misleading warnings</li>
+</ul>
+<h2 id="1100-20150531"><a href="https://github.com/coffeelint/coffeelint/compare/v1.9.7...v1.10.0">1.10.0</a> (2015.05.31)</h2>
+<ul>
+<li><p>New option <code>--trimconfig</code>. shows the minimal config to implement your customizations.</p>
+</li>
+<li><p>New rule <code>eol_last</code></p>
+</li>
+<li><p>New rule <code>no_this</code> (prefer @ instead)</p>
+</li>
+<li><p>New option in <code>no_debugger</code> to flag console calls</p>
+</li>
+<li><p>Many small bug fixes</p>
+</li>
+</ul>
+<h2 id="196-20150505"><a href="https://github.com/coffeelint/coffeelint/compare/v1.9.4...v1.9.6">1.9.6</a> (2015.05.05)</h2>
+<ul>
+<li>Fix no_interpolation_in_single_quotes to only handle single quotes #400</li>
+<li>Avoid non-standard String.prototype.trimRight #401</li>
+<li>Strip comments from config file before parsing #407</li>
+<li>missing_fat_arrows: fix constructor checking in strict mode #409</li>
+<li>Use configfilter to expand module names</li>
+</ul>
+<h2 id="194-20150406"><a href="https://github.com/coffeelint/coffeelint/compare/v1.9.3...v1.9.4">1.9.4</a> (2015.04.06)</h2>
+<ul>
+<li>missing_fat_arrows: added strict-mode option, defaults to false</li>
+<li>Add &quot;empty_object_spaces&quot; to braces_spacing</li>
+</ul>
+<h2 id="193-20150329"><a href="https://github.com/coffeelint/coffeelint/compare/v1.9.1...v1.9.3">1.9.3</a> (2015.03.29)</h2>
+<ul>
+<li>Add fat arrow to <code>arrow_spacing</code></li>
+<li>Fix an exception when package.json can&#39;t be parsed.</li>
+</ul>
+<h2 id="191-20150222"><a href="https://github.com/coffeelint/coffeelint/compare/v1.9.0...v1.9.1">1.9.1</a> (2015.02.22)</h2>
+<ul>
+<li>Small change to make CoffeeLint compatible with atom.io</li>
+</ul>
+<h2 id="190-20150220"><a href="https://github.com/coffeelint/coffeelint/compare/v1.8.1...v1.9.0">1.9.0</a> (2015.02.20)</h2>
+<ul>
+<li>Updated to CoffeeScript 1.9.1 thanks to swang</li>
+<li>Fix <code>no_implicit_braces error</code> in class declarations</li>
+<li>New rule <code>braces_padding</code></li>
+</ul>
+<h2 id="181-20141220"><a href="https://github.com/coffeelint/coffeelint/compare/v1.7.1...v1.8.1">1.8.1</a> (2014.12.20)</h2>
+<ul>
+<li>New rule <code>ensure_comprehensions</code> (warn by default)</li>
+<li>Added options to <a href="https://github.com/coffeelint/coffeelint/blob/master/doc/user.md#how-do-i-use-jsx-reactjs">transform</a> code before processing it. (JSX support) or to use a different <a href="https://github.com/coffeelint/coffeelint/blob/master/doc/user.md#what-about-different-flavors-of-coffeescript-like-icedcoffeescript">flavor of CoffeeScript</a>.</li>
+<li>New rule <code>transform_messes_up_line_numbers</code>. This simply tells you if a transform you&#39;re using changes the total number of lines in the file.</li>
+</ul>
+<h2 id="171-20141215"><a href="https://github.com/coffeelint/coffeelint/compare/v1.7.0...v1.7.1">1.7.1</a> (2014.12.15)</h2>
+<ul>
+<li>Fix for <code>spacing_after_comma</code> so that newlines count as space after commas</li>
+</ul>
+<h2 id="170-20141212"><a href="https://github.com/coffeelint/coffeelint/compare/v1.6.0...v1.7.0">1.7.0</a> (2014.12.12)</h2>
+<ul>
+<li>New rule <code>spacing_after_comma</code></li>
+<li>Indentation improvements</li>
+<li>Fix Block RegExp triggering in <code>no_unnecessary_double_quotes</code></li>
+</ul>
+<h2 id="160-20140830"><a href="https://github.com/coffeelint/coffeelint/compare/v1.5.7...v1.6.0">1.6.0</a> (2014.08.30)</h2>
+<ul>
+<li>New rule <code>prefer_english_operator</code></li>
+<li>New behavior <code>.coffeelintignore</code> works just like a .gitignore</li>
+<li>Exposed <code>ErrorReporter</code> to 3rd parties so reporters can be used outside our CLI implementation. See <a href="https://github.com/clutchski/coffeelint/pull/330">#330</a> for details</li>
+<li>Linting from STDIN will look for config files.</li>
+<li><code>-f</code> option can specify a package.json that contains <code>coffeelintConfig</code></li>
+<li>Depricated <code>--no-color</code> in favor of new <code>--color=&lt;always/never/auto&gt;</code> option</li>
+<li>Fixed an indentation bug when you have a blank line in the middle of a chained call.</li>
+</ul>
+<h2 id="155-20140812"><a href="https://github.com/coffeelint/coffeelint/compare/v1.5.3...v1.5.5">1.5.5</a> (2014.08.12)</h2>
+<ul>
+<li><a href="https://github.com/clutchski/coffeelint/pull/317">#317</a> Change $HOME search priority to account for non-default windows users.</li>
+<li><a href="https://github.com/clutchski/coffeelint/pull/320">#320</a> Remove support for chaining calls using a dot at the end of a line.</li>
+<li>Removed extra messages that broke XML output.</li>
+</ul>
+<h2 id="153-20140808"><a href="https://github.com/coffeelint/coffeelint/compare/v1.5.2...v1.5.3">1.5.3</a> (2014.08.08)</h2>
+<ul>
+<li>Indentation improvements for chained calls. See <a href="https://github.com/clutchski/coffeelint/pull/285">#285</a></li>
+<li>Fixed some missing cases for <code>space_operators</code></li>
+<li>Fix for a last-line edge case in <code>no_implicit_parens</code></li>
+<li>Fixed trailing semicolons in multi-line strings with multiple embedded tokens</li>
+</ul>
+<h2 id="152-20140607"><a href="https://github.com/coffeelint/coffeelint/compare/v1.5.0...v1.5.2">1.5.2</a> (2014.06.07)</h2>
+<ul>
+<li><a href="https://github.com/clutchski/coffeelint/pull/280">#280</a> Fix for fat-arrow false positives. It was producing errors when the class is defined inside a function (AMD style)</li>
+<li>MANY indentation fixes. See <a href="https://github.com/clutchski/coffeelint/pull/282">#282</a>.</li>
+</ul>
+<h2 id="150-20140528"><a href="https://github.com/coffeelint/coffeelint/compare/v1.4.1...v1.5.0">1.5.0</a> (2014.05.28)</h2>
+<ul>
+<li>New: --cache and coffeelint.setCache(obj)</li>
+<li>Rule module loading is not limited to running from the commandline.  See <a href="https://github.com/clutchski/coffeelint/pull/279">#279</a></li>
+<li>Fix for <a href="https://github.com/clutchski/coffeelint/pull/173">#173</a>: Empty functions surrounded by parens don&#39;t require spacing.</li>
+<li>Fix for <a href="https://github.com/clutchski/coffeelint/pull/271">#271</a>: trailing semicolons multiline strings are ignored</li>
+<li>Fix for <a href="https://github.com/clutchski/coffeelint/pull/214">#214</a>: <code>no_unnecessary_fat_arrows</code> doesn&#39;t trigger if the function contains super.</li>
+</ul>
+<h2 id="140-20140516"><a href="https://github.com/coffeelint/coffeelint/compare/v1.3.0...v1.4.0">1.4.0</a> (2014.05.16)</h2>
+<ul>
+<li>Similar to grunt-cli, the coffeelint command will now load the project-specific version of coffeelint if there is one there.</li>
+<li>3rd party rules don&#39;t have to be globally installed any more.</li>
+<li>Added --reporter option that also supports 3rd party reporters. <a href="https://github.com/janraasch/coffeelint-stylish">coffeelint-stylish</a> is the first one available.</li>
+<li>Documentation for <a href="https://github.com/coffeelint/coffeelint/blob/master/doc/user.md">new users</a> and <a href="https://github.com/coffeelint/coffeelint/blob/master/doc/integration.md">3rd party developers</a>.</li>
+</ul>
+<h2 id="130-20140417"><a href="https://github.com/coffeelint/coffeelint/compare/v1.2.0...v1.3.0">1.3.0</a> (2014.04.17)</h2>
+<ul>
+<li>New rule <code>no_empty_functions</code></li>
+<li>Improved documentation on how to contribute in README.md</li>
+<li>Rules using the AST work with a minified version of CoffeeScript</li>
+<li>Fixed line length check to account for windows line endings</li>
+</ul>
+<h2 id="120-20140307"><a href="https://github.com/coffeelint/coffeelint/compare/v1.1.0...v1.2.0">1.2.0</a> (2014.03.07)</h2>
+<ul>
+<li>New rule <code>no_debugger</code></li>
+<li>New rule <code>no_interpolation_in_single_quotes</code></li>
+<li>New rule <code>no_unnecessary_double_quotes</code></li>
+<li>Strict mode for <code>no_implicit_parens</code>. Turning it off allows implicit parens when they span multiple lines.</li>
+</ul>
+<h2 id="110-20140222"><a href="https://github.com/coffeelint/coffeelint/compare/v1.0.8...v1.1.0">1.1.0</a> (2014.02.22)</h2>
+<ul>
+<li>CoffeeScript 1.7 support</li>
+<li>Dropped support for CoffeeScript 1.6. (Use ~1.0.0 if you still need it)</li>
+</ul>
+<h2 id="100-20131121"><a href="https://github.com/coffeelint/coffeelint/compare/v0.6.0...v1.0.0">1.0.0</a> (2013.11.21)</h2>
+<ul>
+<li>CoffeeLint will detect config files by default.</li>
+<li>New rule <code>colon_assignment_spacing</code></li>
+<li>New rule <code>no_unnecessary_fat_arrows</code></li>
+<li>New rule <code>missing_fat_arrows</code></li>
+<li>Added an option to <code>no_trailing_whitespace</code> to forbid trailing space on empty lines</li>
+<li>Added an option to <code>no_implicit_braces</code> to allow unambiguous implicit braces</li>
+<li>Fixed --makeconfig</li>
+<li>New option: --checkstyle</li>
+<li>Fixed invalid XML produced by --jslint</li>
+<li>Removed the need for the -r flag. It remains for backward compatibility but doesn&#39;t do anything now</li>
+</ul>
+<h2 id="060-20131010"><a href="https://github.com/coffeelint/coffeelint/compare/v0.5.7...v0.6.0">0.6.0</a> (2013.10.10)</h2>
+<ul>
+<li>New internal structure to support custom rules.</li>
+<li>Dropped support for NodeJS 0.6.</li>
+</ul>
+<h2 id="057-20130810"><a href="https://github.com/coffeelint/coffeelint/compare/v0.5.6...v0.5.7">0.5.7</a> (2013.08.10)</h2>
+<ul>
+<li>CSVReporter now has a column for last line to account for cyclomatic complexity spanning the length of the function</li>
+<li>Added support for literate CoffeeScript</li>
+<li>Dropped support for CoffeeScript 1.4 and 1.5</li>
+<li>Fixed <code>non_empty_constructor_needs_parens</code> for namespaced constructors</li>
+<li>Simplified the build process to allow installing direct from the git repo</li>
+<li>More fixes to indentation checking (continued <a href="https://github.com/clutchski/coffeelint/issues/107">https://github.com/clutchski/coffeelint/issues/107</a>)</li>
+<li>Fixed spacing error when returning negative numbers (<a href="https://github.com/clutchski/coffeelint/issues/129">https://github.com/clutchski/coffeelint/issues/129</a>)</li>
+<li>Fixed arrow spacing in callback parameters (<a href="https://github.com/clutchski/coffeelint/issues/131">https://github.com/clutchski/coffeelint/issues/131</a>)</li>
+<li>Added beginning and end line numbers for cyclomatic complexity (<a href="https://github.com/clutchski/coffeelint/pull/134">https://github.com/clutchski/coffeelint/pull/134</a>)</li>
+<li>Added header to CSVReporter</li>
+<li>Fixes for <code>space_operators</code>(<a href="https://github.com/clutchski/coffeelint/issues/137">https://github.com/clutchski/coffeelint/issues/137</a>)</li>
+</ul>
+<h2 id="056-20130607"><a href="https://github.com/coffeelint/coffeelint/compare/v0.5.4...v0.5.6">0.5.6</a> (2013.06.07)</h2>
+<ul>
+<li>Added <code>no_empty_param_list</code> rule.</li>
+<li>Added the <code>--makeconfig</code> option.</li>
+<li>CoffeeScript 1.5 and 1.6 compatibility</li>
+<li>Fixed indentation of chained functions. (<a href="https://github.com/clutchski/coffeelint/issues/107">https://github.com/clutchski/coffeelint/issues/107</a>, fixed 1/2 of <a href="https://github.com/clutchski/coffeelint/pull/4">#4</a>)</li>
+<li>Fixed bug in <code>no_stand_alone_at</code> (<a href="https://github.com/jashkenas/coffee-script/issues/1601">https://github.com/jashkenas/coffee-script/issues/1601</a>)</li>
+<li>Added <code>arrow_spacing</code> rule (require spaces around arrows)</li>
+<li>Added <code>empty_constructor_needs_parens</code></li>
+<li>Added <code>non_empty_constructor_needs_parens</code></li>
+<li>Added <code>duplicate_key</code> (<a href="http://jslinterrors.com/duplicate-key-a/">http://jslinterrors.com/duplicate-key-a/</a>)</li>
+<li>Added <code>no_trailing_whitespace.allowed_in_comments</code> rule option (Allow trailing space in comments. Created to allow markdown)</li>
+<li>Added <code>newlines_after_classes</code> rule</li>
+<li>Line length exception. Lines containing only a link are ignored.</li>
+</ul>
+<h2 id="054-20121106"><a href="https://github.com/coffeelint/coffeelint/compare/v0.5.3...v0.5.4">0.5.4</a> (2012.11.06)</h2>
+<ul>
+<li>Support for default configuration file using environment variable <code>COFFEELINT_CONFIG</code>.</li>
+</ul>
+<h2 id="053-20121106"><a href="https://github.com/coffeelint/coffeelint/compare/v0.5.2...v0.5.3">0.5.3</a> (2012.11.06)</h2>
+<ul>
+<li>Added <code>no_stand_alone_at</code> rule.</li>
+<li>Fixed correctly reporting line numbers of compilation errors after line 10.</li>
+<li>Fixed incomplete results output.</li>
+</ul>
+<h2 id="052-20120918"><a href="https://github.com/coffeelint/coffeelint/compare/v0.5.1...v0.5.2">0.5.2</a> (2012.09.18)</h2>
+<ul>
+<li>Added <code>--nocolor</code> option.</li>
+<li>My main man ruddzw fixed issue <a href="https://github.com/clutchski/coffeelint/pull/58">#58</a>, in which the <code>-q</code> option was suppressing information even when it was off.</li>
+<li>Fixed broken <code>jslint</code> option.</li>
+<li>The <code>no_trailing_semicolons</code> rule now works on Windows files.</li>
+</ul>
+<h2 id="051-20120915"><a href="https://github.com/coffeelint/coffeelint/compare/v0.5.0...v0.5.1">0.5.1</a> (2012.09.15)</h2>
+<ul>
+<li>Show CoffeeScript syntax errors in the same manner as lint errors.</li>
+<li>Brad Dunbar added the <code>-q</code> command line option, which only prints errors.</li>
+</ul>
+<h2 id="050-20120908"><a href="https://github.com/coffeelint/coffeelint/compare/v0.4.0...v0.5.0">0.5.0</a> (2012.09.08)</h2>
+<ul>
+<li>Lint code from stdin with the <code>--stdin</code> option, thanks to sjz.</li>
+<li>Added the <code>no_implicit_parens</code> rule.</li>
+<li>Leandro Ostera added the <code>--jslint</code> reporter, to allow CoffeeLint to integrate with the Jenkin&#39;s violations plugin.</li>
+<li>Implicit braces are always allowed in in class defiinitions, thanks to Omar Khan.</li>
+<li>CoffeeLint now requires CoffeeScript 1.3.3</li>
+</ul>
+<h2 id="040-20120406">0.4.0 (2012.04.06)</h2>
+<ul>
+<li>Added fancy coloured output and proper CSV output.</li>
+<li>Directories can be recursively linted.</li>
+<li>Added the <code>line endings</code> rule.</li>
+<li>Rewrote the command line tool in CoffeeScript.</li>
+</ul>
+<h2 id="030-20120313">0.3.0 (2012.03.13)</h2>
+<ul>
+<li>Added the <code>no_backticks</code> rule.</li>
+<li>Colorized the command line output.</li>
+<li>Added validation for the rule names.</li>
+<li>Allowed windows line endings, thanks to <a href="https://github.com/szinsli">szinsli</a>.</li>
+</ul>
+<h2 id="020-20120126">0.2.0 (2012.01.26)</h2>
+<ul>
+<li>Added warnings, which will be reported, but won&#39;t fail the command line tool.</li>
+</ul>
+<h2 id="010-20120122">0.1.0 (2012.01.22)</h2>
+<ul>
+<li>Initial CoffeeLint release.</li>
+</ul>
+
           </div>
-
-<pre><code>      &lt;div&gt; &lt;h3 class=&quot;changelog_header&quot;&gt;v3.1.3&lt;/h3&gt; &lt;small
-      class=&quot;changelog_date&quot;&gt;- &lt;a
-      href=&quot;https://github.com/coffeelint/coffeelint/compare/v3.1.2...v3.1.3&quot;&gt;2020.04.08&lt;a&gt;&lt;/a&gt;&lt;/small&gt;
-      &lt;p&gt;
-          Fix newlines_after_classes when there are blank lines before last line in class.
-      &lt;/p&gt;
-      &lt;ul class=&quot;changelog_history&quot;&gt;
-        &lt;li&gt;Fix newlines_after_classes
-            &lt;a href=&quot;https://github.com/coffeelint/coffeelint/pull/52&quot;&gt;#52&lt;/a&gt;&lt;/li&gt;
-        &lt;li&gt;Remove relics from coffeescript &amp;lt;= v1.10.0
-            &lt;a href=&quot;https://github.com/coffeelint/coffeelint/pull/53&quot;&gt;#53&lt;/a&gt;&lt;/li&gt;
-      &lt;/ul&gt;
-      &lt;/div&gt;
-
-      &lt;div&gt; &lt;h3 class=&quot;changelog_header&quot;&gt;v3.1.2&lt;/h3&gt; &lt;small
-      class=&quot;changelog_date&quot;&gt;- &lt;a
-      href=&quot;https://github.com/coffeelint/coffeelint/compare/v3.1.1...v3.1.2&quot;&gt;2020.04.05&lt;a&gt;&lt;/a&gt;&lt;/small&gt;
-      &lt;p&gt;
-          Update coffeescript dependency to v2.5.1.
-      &lt;/p&gt;
-      &lt;ul class=&quot;changelog_history&quot;&gt;
-        &lt;li&gt;Update coffeescript dependency.
-            &lt;a href=&quot;https://github.com/coffeelint/coffeelint/pull/50&quot;&gt;#50&lt;/a&gt;&lt;/li&gt;
-      &lt;/ul&gt;
-      &lt;/div&gt;
-
-      &lt;div&gt; &lt;h3 class=&quot;changelog_header&quot;&gt;v3.1.1&lt;/h3&gt; &lt;small
-      class=&quot;changelog_date&quot;&gt;- &lt;a
-      href=&quot;https://github.com/coffeelint/coffeelint/compare/v3.1.0...v3.1.1&quot;&gt;2020.03.22&lt;a&gt;&lt;/a&gt;&lt;/small&gt;
-      &lt;p&gt;
-          Update commandline dependency to maintained dependency.
-      &lt;/p&gt;
-      &lt;ul class=&quot;changelog_history&quot;&gt;
-        &lt;li&gt;Replace optimist with yargs.
-            &lt;a href=&quot;https://github.com/coffeelint/coffeelint/pull/46&quot;&gt;#46&lt;/a&gt;&lt;/li&gt;
-      &lt;/ul&gt;
-      &lt;/div&gt;
-
-      &lt;div&gt; &lt;h3 class=&quot;changelog_header&quot;&gt;v1.16.2&lt;/h3&gt; &lt;small
-      class=&quot;changelog_date&quot;&gt;- &lt;a
-      href=&quot;https://github.com/coffeelint/coffeelint/compare/v1.16.1...v1.16.2&quot;&gt;2020.02.06&lt;a&gt;&lt;/a&gt;&lt;/small&gt;
-      &lt;p&gt;
-          First 1.x release under new npm package; to use: `npm install -g @coffeelint/cli@old`
-      &lt;/p&gt;
-      &lt;ul class=&quot;changelog_history&quot;&gt;
-        &lt;li&gt;Don’t unnecessarily print “context:” at the end of some error messages
-            &lt;a href=&quot;https://github.com/coffeelint/coffeelint/pull/42&quot;&gt;#42&lt;/a&gt;&lt;/li&gt;
-      &lt;/ul&gt;
-      &lt;/div&gt;
-
-      &lt;div&gt; &lt;h3 class=&quot;changelog_header&quot;&gt;v3.1.0&lt;/h3&gt; &lt;small
-      class=&quot;changelog_date&quot;&gt;- &lt;a
-      href=&quot;https://github.com/coffeelint/coffeelint/compare/v3.0.2...v3.1.0&quot;&gt;2020.02.06&lt;a&gt;&lt;/a&gt;&lt;/small&gt;
-      &lt;p&gt;
-          Added a few rules and rules options. More bug fixes and internal updates to make developing easier.
-          We got through the backlog of pull requests. Now on to the issues...
-      &lt;/p&gt;
-      &lt;ul class=&quot;changelog_history&quot;&gt;
-        &lt;li&gt;Add `prefer_logical_operator` rule.
-            &lt;a href=&quot;https://github.com/coffeelint/coffeelint/pull/13&quot;&gt;#13&lt;/a&gt;&lt;/li&gt;
-        &lt;li&gt;Add `missing_parseint_radix` rule.
-            &lt;a href=&quot;https://github.com/coffeelint/coffeelint/pull/17&quot;&gt;#17&lt;/a&gt;&lt;/li&gt;
-        &lt;li&gt;Add `bracket_spacing` rule.
-            &lt;a href=&quot;https://github.com/coffeelint/coffeelint/pull/26&quot;&gt;#26&lt;/a&gt;&lt;/li&gt;
-        &lt;li&gt;`space_operators`: add `default_parameters` option.
-            &lt;a href=&quot;https://github.com/coffeelint/coffeelint/pull/16&quot;&gt;#16&lt;/a&gt;&lt;/li&gt;
-        &lt;li&gt;`colon_assignment_spacing`: add `min_left` and `min_right` option.
-            &lt;a href=&quot;https://github.com/coffeelint/coffeelint/pull/22&quot;&gt;#22&lt;/a&gt;&lt;/li&gt;
-        &lt;li&gt;`spacing_after_comma`: add `ignore_elision` option.
-            &lt;a href=&quot;https://github.com/coffeelint/coffeelint/pull/34&quot;&gt;#34&lt;/a&gt;&lt;/li&gt;
-        &lt;li&gt;`braces_spacing`: add `mono_object_spaces` option.
-            &lt;a href=&quot;https://github.com/coffeelint/coffeelint/pull/17&quot;&gt;#17&lt;/a&gt;&lt;/li&gt;
-        &lt;li&gt;Properly double quote fields in `csv` reporter.
-            &lt;a href=&quot;https://github.com/coffeelint/coffeelint/pull/14&quot;&gt;#14&lt;/a&gt;&lt;/li&gt;
-        &lt;li&gt;Stop printing empty context in `checkstyle` reporter.
-            &lt;a href=&quot;https://github.com/coffeelint/coffeelint/pull/12&quot;&gt;#12&lt;/a&gt;&lt;/li&gt;
-        &lt;li&gt;`no_tabs` rejects tabs at the end of the line.
-            &lt;a href=&quot;https://github.com/coffeelint/coffeelint/pull/20&quot;&gt;#20&lt;/a&gt;&lt;/li&gt;
-        &lt;li&gt;Prevent endless loop if lineNumber is negative.
-            &lt;a href=&quot;https://github.com/coffeelint/coffeelint/pull/10&quot;&gt;#10&lt;/a&gt;&lt;/li&gt;
-        &lt;li&gt;Update dependency `resolve` to v1.15.1&lt;/li&gt;
-      &lt;/ul&gt;
-      &lt;/div&gt;
-
-      &lt;div&gt; &lt;h3 class=&quot;changelog_header&quot;&gt;v3.0.2&lt;/h3&gt; &lt;small
-      class=&quot;changelog_date&quot;&gt;- &lt;a
-      href=&quot;https://github.com/coffeelint/coffeelint/compare/v3.0.1...v3.0.2&quot;&gt;2020.01.22&lt;a&gt;&lt;/a&gt;&lt;/small&gt;
-      &lt;p&gt;
-          small fixes
-      &lt;/p&gt;
-      &lt;ul class=&quot;changelog_history&quot;&gt;
-        &lt;li&gt;Bugfix for error message when a config file cannot be found.
-            &lt;a href=&quot;https://github.com/coffeelint/coffeelint/pull/38&quot;&gt;#38&lt;/a&gt;&lt;/li&gt;
-        &lt;li&gt;Update dependency `resolve` to v1.15.0&lt;/li&gt;
-        &lt;li&gt;Update documentation&lt;/li&gt;
-      &lt;/ul&gt;
-      &lt;/div&gt;
-
-      &lt;div&gt; &lt;h3 class=&quot;changelog_header&quot;&gt;v3.0.1&lt;/h3&gt; &lt;small
-      class=&quot;changelog_date&quot;&gt;- &lt;a
-      href=&quot;https://github.com/coffeelint/coffeelint/compare/v3.0.0...v3.0.1&quot;&gt;2020.01.22&lt;a&gt;&lt;/a&gt;&lt;/small&gt;
-      &lt;p&gt;
-          CoffeeLint has a new webpage at
-          &lt;a href=&quot;https://coffeelint.github.io&quot;&gt;https://coffeelint.github.io&lt;/a&gt;
-        &lt;/p&gt;
-      &lt;ul class=&quot;changelog_history&quot;&gt;
-        &lt;li&gt;Update dependencies and clean up documentation&lt;/li&gt;
-      &lt;/ul&gt;
-      &lt;/div&gt;
-
-      &lt;div&gt; &lt;h3 class=&quot;changelog_header&quot;&gt;v3.0.0&lt;/h3&gt; &lt;small
-      class=&quot;changelog_date&quot;&gt;- &lt;a
-      href=&quot;https://github.com/coffeelint/coffeelint/compare/v2.1.0...v3.0.0&quot;&gt;2020.01.14&lt;a&gt;&lt;/a&gt;&lt;/small&gt;
-      &lt;p&gt;
-          CoffeeLint has a new home at
-          &lt;a href=&quot;https://github.com/coffeelint/coffeelint&quot;&gt;https://github.com/coffeelint/coffeelint&lt;/a&gt;
-          and a new npm package &lt;a href=&quot;https://www.npmjs.com/package/@coffeelint/cli&quot;&gt;@coffeelint/cli&lt;/a&gt;.
-        &lt;/p&gt;
-      &lt;ul class=&quot;changelog_history&quot;&gt;
-        &lt;li&gt;Bugfix for error message when an unknown level is used.
-            &lt;a href=&quot;https://github.com/coffeelint/coffeelint/pull/4&quot;&gt;#4&lt;/a&gt;&lt;/li&gt;
-        &lt;li&gt;Bugfix for error &lt;tt&gt;duplicate_key&lt;/tt&gt; when keys are wrapped in quotes.
-            &lt;a href=&quot;https://github.com/coffeelint/coffeelint/pull/6&quot;&gt;#6&lt;/a&gt;&lt;/li&gt;
-        &lt;li&gt;Add &lt;tt&gt;no_spaces&lt;/tt&gt; rule to disallow spaces for indentation.
-            &lt;a href=&quot;https://github.com/coffeelint/coffeelint/pull/7&quot;&gt;#7&lt;/a&gt;&lt;/li&gt;
-        &lt;li&gt;Several enhancements, including CJSX fixes.
-            &lt;a href=&quot;https://github.com/coffeelint/coffeelint/pull/8&quot;&gt;#8&lt;/a&gt;&lt;/li&gt;
-        &lt;li&gt;Add rule name to default reporter.
-            &lt;a href=&quot;https://github.com/coffeelint/coffeelint/pull/11&quot;&gt;#11&lt;/a&gt;&lt;/li&gt;
-      &lt;/ul&gt;
-      &lt;/div&gt;
-
-      &lt;div&gt; &lt;h3 class=&quot;changelog_header&quot;&gt;v1.15.0&lt;/h3&gt; &lt;small
-      class=&quot;changelog_date&quot;&gt;- &lt;a
-      href=&quot;https://github.com/coffeelint/coffeelint/compare/v1.14.1...v1.15.0&quot;&gt;2015.11.18&lt;a&gt;&lt;/a&gt;&lt;/small&gt;
-      &lt;p&gt;
-          This version updates the enable/disable directives. In addition to
-          the existing &lt;tt&gt;# coffeelint: disable=rule_name&lt;/tt&gt; you can also
-          use &lt;tt&gt;# coffeelint: disable-line=rule_name&lt;/tt&gt;. The rule name is
-          still optional in both cases, and you can enable the rules using
-          the same syntax.
-        &lt;/p&gt;
-        &lt;p&gt;
-            You can also use &lt;tt&gt;# noqa&lt;/tt&gt; as a shortcut for &lt;tt&gt;# coffeelint: disable-line&lt;/tt&gt;
-        &lt;/p&gt;
-      &lt;ul class=&quot;changelog_history&quot;&gt;
-        &lt;li&gt;See &lt;a href=&quot;https://github.com/clutchski/coffeelint/pull/552&quot;&gt;#552&lt;/a&gt; for more details.&lt;/li&gt;
-      &lt;/ul&gt;
-      &lt;/div&gt;
-
-      &lt;div&gt;
-        &lt;h3 class=&quot;changelog_header&quot;&gt;v1.14.1&lt;/h3&gt;
-        &lt;small class=&quot;changelog_date&quot;&gt;- &lt;a
-        href=&quot;https://github.com/coffeelint/coffeelint/compare/v1.14.0...v1.14.1&quot;&gt;2015.11.18&lt;a&gt;&lt;/a&gt;&lt;/small&gt;
-        &lt;p&gt;Most of the changes are more for linting the development files of
-          coffeelint. The minor version increase is due to the change in
-          cyclomatic_complexity, which now ignores nested functions. I foresee
-          this change affecting very few people but probably still needs a minor
-          version increase.
-        &lt;/p&gt;
-      &lt;ul class=&quot;changelog_history&quot;&gt;
-        &lt;li&gt;&lt;tt&gt;cyclomatic_complexity&lt;/tt&gt; rule has been changed to ignore nested functions&lt;/li&gt;
-        &lt;li&gt;1.4.1: inlined rules not previously specified in JSON config now properly return a message&lt;/li&gt;
-      &lt;/ul&gt;
-      &lt;/div&gt;
-
-      &lt;div&gt;
-        &lt;h3 class=&quot;changelog_header&quot;&gt;v1.13.0&lt;/h3&gt;
-        &lt;small class=&quot;changelog_date&quot;&gt;- &lt;a
-        href=&quot;https://github.com/coffeelint/coffeelint/compare/v1.11.0...v1.13.0&quot;&gt;2015.10.7&lt;a&gt;&lt;/a&gt;&lt;/small&gt;
-        &lt;p&gt;The v1.12.x versions are considered buggy and you should upgrade to v1.13.x if you experience problems&lt;/p&gt;
-        &lt;strong&gt;These releases were largely for bugfixes!&lt;/strong&gt;
-      &lt;ul class=&quot;changelog_history&quot;&gt;
-        &lt;li&gt;Bugfix for &lt;tt&gt;no_implicit_braces&lt;/tt&gt; causing errors in classes and other edge cases&lt;/li&gt;
-        &lt;li&gt;Bugfix for &lt;tt&gt;ensure_comprehensions&lt;/tt&gt; where it failed if a nested loop had an equal sign&lt;/li&gt;
-        &lt;li&gt;Bugfix for &lt;tt&gt;braces_spacing&lt;/tt&gt; failing over generated curly braces&lt;/li&gt;
-        &lt;li&gt;Several changes to &lt;tt&gt;indentation&lt;/tt&gt; See &lt;a href=&quot;https://github.com/coffeelint/coffeelint/commit/bffa2532efd8bcca5d9c1b3a9d3b5914e882dd5f&quot;&gt;bffa25&lt;/a&gt;
-          for the full list of changes. However between the release of v1.12.0 and v1.13.0, a regression was caused by fixing one of the indentation requests and
-          as a result the change was reverted. The revert will most likely not affect too many users
-        &lt;li&gt;Bugfix for &lt;tt&gt;newlines_after_classes&lt;/tt&gt;, also fixed regressions caused between v1.12.0 and v1.13.0. If you have v1.12.x and are experiencing problems, please upgrade.
-          Also note nested classes are now ignored completely
-        &lt;/li&gt;
-        &lt;li&gt;&lt;tt&gt;no_this&lt;/tt&gt; is now compatible with &lt;tt&gt;no_stand_alone_at&lt;/tt&gt; and will make checks against singular `this`&lt;/li&gt;
-        &lt;li&gt;Bugfix for &lt;tt&gt;missing_fat_arrows&lt;/tt&gt;, declaring a class prototype (via &#39;::&#39; operator) no longer fail if they don&#39;t use a fat arrow&lt;/li&gt;
-        &lt;li&gt;Bugfix for &lt;tt&gt;eol_last&lt;/tt&gt;, it now fails if there are multiple newlines at the end of a file (thanks &lt;a href=&quot;https://github.com/charlierudolph&quot;&gt;charlierudolph&lt;/a&gt;)&lt;li&gt;
-        &lt;li&gt;Bugfix for &lt;tt&gt;arrow_spacing&lt;/tt&gt;, now ignores arrow spacing in empty functions (thanks &lt;a href=&quot;https://github.com/sgentle&quot;&gt;sgentle&lt;/a&gt;)&lt;/li&gt;
-      &lt;/ul&gt;
-      &lt;/div&gt;
-
-      &lt;div&gt;
-        &lt;h3 class=&quot;changelog_header&quot;&gt;v1.11.0&lt;/h3&gt;
-        &lt;small class=&quot;changelog_date&quot;&gt;- &lt;a
-        href=&quot;https://github.com/coffeelint/coffeelint/compare/v1.10.0...v1.11.0&quot;&gt;2015.8.19&lt;a&gt;&lt;/a&gt;&lt;/small&gt;
-      &lt;ul class=&quot;changelog_history&quot;&gt;
-        &lt;li&gt;New config option &lt;tt&gt;{ &quot;extends&quot;: &quot;coffeelint-config-myconfig&quot; } based on &lt;a href=&quot;http://eslint.org/docs/developer-guide/shareable-configs&quot;&gt;eslint&#39;s shareable configs&lt;/a&gt;&lt;/tt&gt;&lt;/li&gt;
-        &lt;li&gt;New rule &lt;tt&gt;no_nested_string_interpolation&lt;/tt&gt;&lt;/li&gt;
-        &lt;li&gt;New rule &lt;tt&gt;no_private_function_fat_arrows&lt;/tt&gt;&lt;/li&gt;
-        &lt;li&gt;New CLI option &lt;tt&gt;--ext&lt;/tt&gt; to specify alternate file extensions to check&lt;/li&gt;
-        &lt;li&gt;Bugfixes including tracking nested string interpolation which eleminates some misleading warnings&lt;/li&gt;
-      &lt;/ul&gt;
-      &lt;/div&gt;
-
-      &lt;div&gt;
-        &lt;h3 class=&quot;changelog_header&quot;&gt;v1.10.0&lt;/h3&gt;
-        &lt;small class=&quot;changelog_date&quot;&gt;- &lt;a
-        href=&quot;https://github.com/coffeelint/coffeelint/compare/v1.9.7...v1.10.0&quot;&gt;2015.5.31&lt;a&gt;&lt;/a&gt;&lt;/small&gt;
-      &lt;ul class=&quot;changelog_history&quot;&gt;
-        &lt;li&gt;New option &lt;tt&gt;--trimconfig&lt;/tt&gt;. shows the minimal config to implement your customizations.&lt;/li&gt;
-        &lt;li&gt;New rule &lt;tt&gt;eol_last&lt;/tt&gt;&lt;/li&gt;
-        &lt;li&gt;New rule &lt;tt&gt;no_this&lt;/tt&gt; (prefer @ instead)&lt;/li&gt;
-        &lt;li&gt;New option in &lt;tt&gt;no_debugger&lt;/tt&gt; to flag console calls&lt;/li&gt;
-
-        &lt;li&gt;Many small bug fixes&lt;/li&gt;
-      &lt;/ul&gt;
-      &lt;/div&gt;
-
-
-      &lt;div&gt;
-        &lt;h3 class=&quot;changelog_header&quot;&gt;v1.9.6&lt;/h3&gt;
-        &lt;small class=&quot;changelog_date&quot;&gt;- &lt;a
-        href=&quot;https://github.com/coffeelint/coffeelint/compare/v1.9.4...v1.9.6&quot;&gt;2015.5.5&lt;a&gt;&lt;/a&gt;&lt;/small&gt;
-      &lt;ul class=&quot;changelog_history&quot;&gt;
-          &lt;li&gt;Fix no_interpolation_in_single_quotes to only handle single quotes #400&lt;/li&gt;
-          &lt;li&gt;Avoid non-standard String.prototype.trimRight #401&lt;/li&gt;
-          &lt;li&gt;Strip comments from config file before parsing #407&lt;/li&gt;
-          &lt;li&gt;missing_fat_arrows: fix constructor checking in strict mode #409&lt;/li&gt;
-          &lt;li&gt;Use configfilter to expand module names&lt;/li&gt;
-      &lt;/ul&gt;
-      &lt;/div&gt;
-
-      &lt;div&gt;
-        &lt;h3 class=&quot;changelog_header&quot;&gt;v1.9.4&lt;/h3&gt;
-        &lt;small class=&quot;changelog_date&quot;&gt;- &lt;a
-        href=&quot;https://github.com/coffeelint/coffeelint/compare/v1.9.3...v1.9.4&quot;&gt;2015.4.6&lt;a&gt;&lt;/a&gt;&lt;/small&gt;
-      &lt;ul class=&quot;changelog_history&quot;&gt;
-          &lt;li&gt;missing_fat_arrows: added strict-mode option, defaults to false&lt;/li&gt;
-          &lt;li&gt;Add &quot;empty_object_spaces&quot; to braces_spacing&lt;/li&gt;
-      &lt;/ul&gt;
-      &lt;/div&gt;
-
-
-      &lt;div&gt;
-        &lt;h3 class=&quot;changelog_header&quot;&gt;v1.9.3&lt;/h3&gt;
-        &lt;small class=&quot;changelog_date&quot;&gt;- &lt;a
-        href=&quot;https://github.com/coffeelint/coffeelint/compare/v1.9.1...v1.9.3&quot;&gt;2015.3.29&lt;a&gt;&lt;/a&gt;&lt;/small&gt;
-      &lt;ul class=&quot;changelog_history&quot;&gt;
-          &lt;li&gt;Add fat arrow to `arrow_spacing`&lt;/li&gt;
-          &lt;li&gt;Fix an exception when package.json can&#39;t be parsed.&lt;/li&gt;
-      &lt;/ul&gt;
-      &lt;/div&gt;
-
-      &lt;div&gt;
-        &lt;h3 class=&quot;changelog_header&quot;&gt;v1.9.1&lt;/h3&gt;
-        &lt;small class=&quot;changelog_date&quot;&gt;- &lt;a
-        href=&quot;https://github.com/coffeelint/coffeelint/compare/v1.9.0...v1.9.1&quot;&gt;2015.2.22&lt;a&gt;&lt;/a&gt;&lt;/small&gt;
-      &lt;ul class=&quot;changelog_history&quot;&gt;
-          &lt;li&gt;Small change to make CoffeeLint compatible with atom.io&lt;/li&gt;
-      &lt;/ul&gt;
-      &lt;/div&gt;
-
-      &lt;div&gt;
-        &lt;h3 class=&quot;changelog_header&quot;&gt;v1.9.0&lt;/h3&gt;
-        &lt;small class=&quot;changelog_date&quot;&gt;- &lt;a
-        href=&quot;https://github.com/coffeelint/coffeelint/compare/v1.8.1...v1.9.0&quot;&gt;2015.2.20&lt;a&gt;&lt;/a&gt;&lt;/small&gt;
-      &lt;ul class=&quot;changelog_history&quot;&gt;
-          &lt;li&gt;Updated to CoffeeScript 1.9.1 thanks to swang&lt;/li&gt;
-          &lt;li&gt;Fix &lt;tt&gt;no_implicit_braces error&lt;/tt&gt; in class declarations&lt;/li&gt;
-          &lt;li&gt;New rule &lt;tt&gt;braces_padding&lt;/tt&gt;&lt;/li&gt;
-      &lt;/ul&gt;
-      &lt;/div&gt;
-
-      &lt;div&gt;
-        &lt;h3 class=&quot;changelog_header&quot;&gt;v1.8.1&lt;/h3&gt;
-        &lt;small class=&quot;changelog_date&quot;&gt;- &lt;a
-        href=&quot;https://github.com/coffeelint/coffeelint/compare/v1.7.1...v1.8.1&quot;&gt;2014.12.20&lt;a&gt;&lt;/a&gt;&lt;/small&gt;
-      &lt;ul class=&quot;changelog_history&quot;&gt;
-          &lt;li&gt;New rule &lt;tt&gt;ensure_comprehensions&lt;/tt&gt; (warn by default)&lt;/li&gt;
-          &lt;li&gt;Added options to
-              &lt;a href=&quot;https://github.com/coffeelint/coffeelint/blob/master/doc/user.md#how-do-i-use-jsx-reactjs&quot;&gt;
-                  transform
-              &lt;/a&gt;
-              code before processing it. (JSX support) or to use a different
-              &lt;a href=&quot;https://github.com/coffeelint/coffeelint/blob/master/doc/user.md#what-about-different-flavors-of-coffeescript-like-icedcoffeescript&quot;&gt;
-                  flavor of CoffeeScript
-              &lt;/a&gt;
-              .
-          &lt;/li&gt;
-          &lt;li&gt;New rule &lt;tt&gt;transform_messes_up_line_numbers&lt;/tt&gt;. This simply tells you if a transform you&#39;re using changes the total number of lines in the file.&lt;/li&gt;
-      &lt;/ul&gt;
-      &lt;/div&gt;
-
-      &lt;div&gt;
-        &lt;h3 class=&quot;changelog_header&quot;&gt;v1.7.1&lt;/h3&gt;
-        &lt;small class=&quot;changelog_date&quot;&gt;- &lt;a
-        href=&quot;https://github.com/coffeelint/coffeelint/compare/v1.7.0...v1.7.1&quot;&gt;2014.12.15&lt;a&gt;&lt;/a&gt;&lt;/small&gt;
-      &lt;ul class=&quot;changelog_history&quot;&gt;
-          &lt;li&gt;Fix for &lt;tt&gt;spacing_after_comma&lt;/tt&gt; so that newlines count as space after commas&lt;/li&gt;
-      &lt;/ul&gt;
-      &lt;/div&gt;
-
-      &lt;div&gt;
-        &lt;h3 class=&quot;changelog_header&quot;&gt;v1.7.0&lt;/h3&gt;
-        &lt;small class=&quot;changelog_date&quot;&gt;- &lt;a
-        href=&quot;https://github.com/coffeelint/coffeelint/compare/v1.6.0...v1.7.0&quot;&gt;2014.12.12&lt;a&gt;&lt;/a&gt;&lt;/small&gt;
-      &lt;ul class=&quot;changelog_history&quot;&gt;
-          &lt;li&gt;New rule &lt;tt&gt;spacing_after_comma&lt;/tt&gt;&lt;/li&gt;
-          &lt;li&gt;Indentation improvements&lt;/li&gt;
-          &lt;li&gt;Fix Block RegExp triggering in &lt;tt&gt;no_unnecessary_double_quotes&lt;/tt&gt;&lt;/li&gt;
-      &lt;/ul&gt;
-      &lt;/div&gt;
-
-      &lt;div&gt;
-        &lt;h3 class=&quot;changelog_header&quot;&gt;v1.6.0&lt;/h3&gt;
-        &lt;small class=&quot;changelog_date&quot;&gt;- &lt;a
-        href=&quot;https://github.com/coffeelint/coffeelint/compare/v1.5.7...v1.6.0&quot;&gt;2014.08.30&lt;a&gt;&lt;/a&gt;&lt;/small&gt;
-      &lt;ul class=&quot;changelog_history&quot;&gt;
-          &lt;li&gt;New rule &lt;tt&gt;prefer_english_operator&lt;/tt&gt;&lt;/li&gt;
-          &lt;li&gt;New behavior &lt;tt&gt;.coffeelintignore&lt;/tt&gt; works just like a .gitignore&lt;/li&gt;
-          &lt;li&gt;Exposed &lt;tt&gt;ErrorReporter&lt;/tt&gt; to 3rd parties so reporters can be used outside our CLI implementation. See &lt;a href=&quot;https://github.com/clutchski/coffeelint/pull/330&quot;&gt;#330&lt;/a&gt; for details&lt;/li&gt;
-          &lt;li&gt;Linting from STDIN will look for config files.&lt;/li&gt;
-          &lt;li&gt;&lt;tt&gt;-f&lt;/tt&gt; option can specify a package.json that contains &lt;tt&gt;coffeelintConfig&lt;/tt&gt;&lt;/li&gt;
-          &lt;li&gt;Depricated &lt;tt&gt;--no-color&lt;/tt&gt; in favor of new &lt;tt&gt;--color=&lt;always/never/auto&gt;&lt;/tt&gt; option&lt;/li&gt;
-          &lt;li&gt;Fixed an indentation bug when you have a blank line in the middle of a chained call.&lt;/li&gt;
-      &lt;/ul&gt;
-      &lt;/div&gt;
-
-      &lt;div&gt;
-        &lt;h3 class=&quot;changelog_header&quot;&gt;v1.5.5&lt;/h3&gt;
-        &lt;small class=&quot;changelog_date&quot;&gt;- &lt;a
-        href=&quot;https://github.com/coffeelint/coffeelint/compare/v1.5.3...v1.5.5&quot;&gt;2014.08.12&lt;a&gt;&lt;/a&gt;&lt;/small&gt;
-      &lt;ul class=&quot;changelog_history&quot;&gt;
-          &lt;li&gt;#317 Change $HOME search priority to account for non-default windows users.&lt;/li&gt;
-          &lt;li&gt;#320 Remove support for chaining calls using a dot at the end of a line.&lt;/li&gt;
-          &lt;li&gt;Removed extra messages that broke XML output.&lt;/li&gt;
-      &lt;/ul&gt;
-      &lt;/div&gt;
-
-      &lt;div&gt;
-        &lt;h3 class=&quot;changelog_header&quot;&gt;v1.5.3&lt;/h3&gt;
-        &lt;small class=&quot;changelog_date&quot;&gt;- &lt;a
-        href=&quot;https://github.com/coffeelint/coffeelint/compare/v1.5.2...v1.5.3&quot;&gt;2014.08.08&lt;a&gt;&lt;/a&gt;&lt;/small&gt;
-      &lt;ul class=&quot;changelog_history&quot;&gt;
-          &lt;li&gt;Indentation improvements for chained calls. See #285&lt;/li&gt;
-          &lt;li&gt;Fixed some missing cases for &lt;tt&gt;space_operators&lt;/tt&gt;&lt;/li&gt;
-          &lt;li&gt;Fix for a last-line edge case in &lt;tt&gt;no_implicit_parens&lt;/tt&gt;&lt;/li&gt;
-          &lt;li&gt;Fixed trailing semicolons in multi-line strings with multiple embedded tokens&lt;/li&gt;
-      &lt;/ul&gt;
-      &lt;/div&gt;
-
-      &lt;div&gt;
-        &lt;h3 class=&quot;changelog_header&quot;&gt;v1.5.2&lt;/h3&gt;
-        &lt;small class=&quot;changelog_date&quot;&gt;- &lt;a
-        href=&quot;https://github.com/coffeelint/coffeelint/compare/v1.5.0...v1.5.2&quot;&gt;2014.06.07&lt;a&gt;&lt;/a&gt;&lt;/small&gt;
-      &lt;ul class=&quot;changelog_history&quot;&gt;
-          &lt;li&gt;#280 Fix for fat-arrow false positives. It was producing errors when the class is defined inside a function (AMD style)&lt;/li&gt;
-          &lt;li&gt;MANY indentation fixes. See #282.&lt;/li&gt;
-      &lt;/ul&gt;
-      &lt;/div&gt;
-
-      &lt;div&gt;
-        &lt;h3 class=&quot;changelog_header&quot;&gt;v1.5.0&lt;/h3&gt;
-        &lt;small class=&quot;changelog_date&quot;&gt;- &lt;a
-        href=&quot;https://github.com/coffeelint/coffeelint/compare/v1.4.1...v1.5.0&quot;&gt;2014.05.28&lt;a&gt;&lt;/a&gt;&lt;/small&gt;
-      &lt;ul class=&quot;changelog_history&quot;&gt;
-          &lt;li&gt;New: --cache and coffeelint.setCache(obj)&lt;/li&gt;
-          &lt;li&gt;Rule module loading is not limited to running from the commandline.  See #279&lt;/li&gt;
-          &lt;li&gt;Fix for #173: Empty functions surrounded by parens don&#39;t require
-          spacing.&lt;/li&gt;
-          &lt;li&gt;Fix for #271: trailing semicolons multiline strings are ignored&lt;/li&gt;
-          &lt;li&gt;Fix for #214: &lt;tt&gt;no_unnecessary_fat_arrows&lt;/tt&gt; doesn&#39;t trigger if the function contains super.&lt;/li&gt;
-      &lt;/ul&gt;
-      &lt;/div&gt;
-
-      &lt;div&gt;
-        &lt;h3 class=&quot;changelog_header&quot;&gt;v1.4.0&lt;/h3&gt;
-        &lt;small class=&quot;changelog_date&quot;&gt;- &lt;a
-        href=&quot;https://github.com/coffeelint/coffeelint/compare/v1.3.0...v1.4.0&quot;&gt;2014.05.16&lt;a&gt;&lt;/a&gt;&lt;/small&gt;
-      &lt;ul class=&quot;changelog_history&quot;&gt;
-        &lt;li&gt;Similar to grunt-cli, the coffeelint command will now load the project-specific version of coffeelint if there is one there.&lt;/li&gt;
-        &lt;li&gt;3rd party rules don&#39;t have to be globally installed any more.&lt;/li&gt;
-        &lt;li&gt;Added --reporter option that also supports 3rd party reporters. &lt;a href=&quot;https://github.com/janraasch/coffeelint-stylish&quot;&gt;coffeelint-stylish&lt;/a&gt; is the first one available.&lt;/li&gt;
-
-        &lt;li&gt;Documentation for &lt;a href=&quot;https://github.com/coffeelint/coffeelint/blob/master/doc/user.md&quot;&gt;new users&lt;/a&gt; and &lt;a href=&quot;https://github.com/coffeelint/coffeelint/blob/master/doc/integration.md&quot;&gt;3rd party developers&lt;/a&gt;.&lt;/li&gt;
-      &lt;/ul&gt;
-      &lt;/div&gt;
-
-      &lt;div&gt;
-        &lt;h3 class=&quot;changelog_header&quot;&gt;v1.3.0&lt;/h3&gt;
-        &lt;small class=&quot;changelog_date&quot;&gt;- &lt;a
-        href=&quot;https://github.com/coffeelint/coffeelint/compare/v1.2.0...v1.3.0&quot;&gt;2014.04.17&lt;a&gt;&lt;/a&gt;&lt;/small&gt;
-      &lt;ul class=&quot;changelog_history&quot;&gt;
-        &lt;li&gt;New rule &lt;tt&gt;no_empty_functions&lt;/tt&gt;&lt;/li&gt;
-        &lt;li&gt;Improved documentation on how to contribute in README.md&lt;/li&gt;
-        &lt;li&gt;Rules using the AST work with a minified version of CoffeeScript&lt;/li&gt;
-        &lt;li&gt;Fixed line length check to account for windows line endings&lt;/li&gt;
-      &lt;/ul&gt;
-      &lt;/div&gt;
-
-      &lt;div&gt;
-        &lt;h3 class=&quot;changelog_header&quot;&gt;v1.2.0&lt;/h3&gt;
-        &lt;small class=&quot;changelog_date&quot;&gt;- &lt;a
-        href=&quot;https://github.com/coffeelint/coffeelint/compare/v1.1.0...v1.2.0&quot;&gt;2014.03.07&lt;a&gt;&lt;/a&gt;&lt;/small&gt;
-      &lt;ul class=&quot;changelog_history&quot;&gt;
-        &lt;li&gt;New rule &lt;tt&gt;no_debugger&lt;/tt&gt;&lt;/li&gt;
-        &lt;li&gt;New rule &lt;tt&gt;no_interpolation_in_single_quotes&lt;/tt&gt;&lt;/li&gt;
-        &lt;li&gt;New rule &lt;tt&gt;no_unnecessary_double_quotes&lt;/tt&gt;&lt;/li&gt;
-        &lt;li&gt;Strict mode for &lt;tt&gt;no_implicit_parens&lt;/tt&gt;. Turning it off allows implicit parens when they span multiple lines.&lt;/li&gt;
-      &lt;/ul&gt;
-      &lt;/div&gt;
-
-      &lt;div&gt;
-        &lt;h3 class=&quot;changelog_header&quot;&gt;v1.1.0&lt;/h3&gt;
-        &lt;small class=&quot;changelog_date&quot;&gt;- &lt;a
-        href=&quot;https://github.com/coffeelint/coffeelint/compare/v1.0.8...v1.1.0&quot;&gt;2014.02.22&lt;a&gt;&lt;/a&gt;&lt;/small&gt;
-      &lt;ul class=&quot;changelog_history&quot;&gt;
-        &lt;li&gt;CoffeeScript 1.7 support&lt;/li&gt;
-        &lt;li&gt;Dropped support for CoffeeScript 1.6. (Use ~1.0.0 if you still need it)&lt;/li&gt;
-      &lt;/ul&gt;
-      &lt;/div&gt;
-
-      &lt;div&gt;
-        &lt;h3 class=&quot;changelog_header&quot;&gt;v1.0.0&lt;/h3&gt;
-        &lt;small class=&quot;changelog_date&quot;&gt;- &lt;a
-        href=&quot;https://github.com/coffeelint/coffeelint/compare/v0.6.0...v1.0.0&quot;&gt;2013.11.21&lt;a&gt;&lt;/a&gt;&lt;/small&gt;
-      &lt;ul class=&quot;changelog_history&quot;&gt;
-
-        &lt;li&gt;CoffeeLint will detect config files by default.&lt;/li&gt;
-
-        &lt;li&gt;New rule &lt;tt&gt;colon_assignment_spacing&lt;/tt&gt;&lt;/li&gt;
-        &lt;li&gt;New rule &lt;tt&gt;no_unnecessary_fat_arrows&lt;/tt&gt;&lt;/li&gt;
-        &lt;li&gt;New rule &lt;tt&gt;missing_fat_arrows&lt;/tt&gt;&lt;/li&gt;
-        &lt;li&gt;Added an option to &lt;tt&gt;no_trailing_whitespace&lt;/tt&gt; to forbid trailing space on empty lines&lt;/li&gt;
-        &lt;li&gt;Added an option to &lt;tt&gt;no_implicit_braces&lt;/tt&gt; to allow unambiguous implicit braces&lt;/li&gt;
-        &lt;li&gt;Fixed --makeconfig&lt;/li&gt;
-        &lt;li&gt;New option: --checkstyle&lt;/li&gt;
-
-        &lt;li&gt;Fixed invalid XML produced by --jslint&lt;/li&gt;
-        &lt;li&gt;Removed the need for the -r flag. It remains for backward compatibility but doesn&#39;t do anything now&lt;/li&gt;
-
-      &lt;/ul&gt;
-      &lt;/div&gt;
-
-      &lt;div&gt;
-        &lt;h3 class=&quot;changelog_header&quot;&gt;v0.6.0&lt;/h3&gt;
-        &lt;small class=&quot;changelog_date&quot;&gt;- &lt;a
-        href=&quot;https://github.com/coffeelint/coffeelint/compare/v0.5.7...v0.6.0&quot;&gt;2013.10.10&lt;a&gt;&lt;/a&gt;&lt;/small&gt;
-      &lt;ul class=&quot;changelog_history&quot;&gt;
-        &lt;li&gt;New internal structure to support custom rules.&lt;/li&gt;
-        &lt;li&gt;Dropped support for NodeJS 0.6.&lt;/li&gt;
-      &lt;/ul&gt;
-      &lt;/div&gt;
-
-      &lt;div&gt;
-        &lt;h3 class=&quot;changelog_header&quot;&gt;v0.5.7&lt;/h3&gt;
-        &lt;small class=&quot;changelog_date&quot;&gt;- &lt;a
-        href=&quot;https://github.com/coffeelint/coffeelint/compare/v0.5.6...v0.5.7&quot;&gt;2013.08.10&lt;a&gt;&lt;/a&gt;&lt;/small&gt;
-      &lt;ul class=&quot;changelog_history&quot;&gt;
-        &lt;li&gt;CSVReporter now has a column for last line to account for cyclomatic complexity spanning the length of the function&lt;/li&gt;
-        &lt;li&gt;Added support for literate CoffeeScript&lt;/li&gt;
-        &lt;li&gt;Dropped support for CoffeeScript 1.4 and 1.5&lt;/li&gt;
-        &lt;li&gt;Fixed &lt;tt&gt;non_empty_constructor_needs_parens&lt;/tt&gt; for namespaced constructors&lt;/li&gt;
-        &lt;li&gt;Simplified the build process to allow installing direct from the git repo&lt;/li&gt;
-        &lt;li&gt;More fixes to indentation checking (continued https://github.com/clutchski/coffeelint/issues/107)&lt;/li&gt;
-        &lt;li&gt;Fixed spacing error when returning negative numbers (https://github.com/clutchski/coffeelint/issues/129)&lt;/li&gt;
-        &lt;li&gt;Fixed arrow spacing in callback parameters (https://github.com/clutchski/coffeelint/issues/131)&lt;/li&gt;
-        &lt;li&gt;Added beginning and end line numbers for cyclomatic complexity (https://github.com/clutchski/coffeelint/pull/134)&lt;/li&gt;
-        &lt;li&gt;Added header to CSVReporter&lt;/li&gt;
-        &lt;li&gt;Fixes for &lt;tt&gt;space_operators&lt;/tt&gt;(https://github.com/clutchski/coffeelint/issues/137)&lt;/li&gt;
-      &lt;/ul&gt;
-      &lt;/div&gt;
-
-      &lt;div&gt;
-        &lt;h3 class=&quot;changelog_header&quot;&gt;v0.5.6&lt;/h3&gt;
-        &lt;small class=&quot;changelog_date&quot;&gt;- &lt;a
-        href=&quot;https://github.com/coffeelint/coffeelint/compare/v0.5.4...v0.5.6&quot;&gt;2013.06.07&lt;a&gt;&lt;/a&gt;&lt;/small&gt;
-      &lt;ul class=&quot;changelog_history&quot;&gt;
-        &lt;li&gt;Added &lt;tt&gt;no_empty_param_list&lt;/tt&gt; rule.&lt;/li&gt;
-        &lt;li&gt;Added the &lt;tt&gt;--makeconfig&lt;/tt&gt; option.&lt;/li&gt;
-        &lt;li&gt;CoffeeScript 1.5 and 1.6 compatibility&lt;/li&gt;
-        &lt;li&gt;Fixed indentation of chained functions. (https://github.com/clutchski/coffeelint/issues/107, fixed 1/2 of #4)&lt;/li&gt;
-        &lt;li&gt;Fixed bug in &lt;tt&gt;no_stand_alone_at&lt;/tt&gt; (https://github.com/jashkenas/coffee-script/issues/1601)&lt;/li&gt;
-        &lt;li&gt;Added &lt;tt&gt;arrow_spacing&lt;/tt&gt; rule (require spaces around arrows)&lt;/li&gt;
-        &lt;li&gt;Added &lt;tt&gt;empty_constructor_needs_parens&lt;/tt&gt;&lt;/li&gt;
-        &lt;li&gt;Added &lt;tt&gt;non_empty_constructor_needs_parens&lt;/tt&gt;&lt;/li&gt;
-        &lt;li&gt;Added &lt;tt&gt;duplicate_key&lt;/tt&gt; (http://jslinterrors.com/duplicate-key-a/)&lt;/li&gt;
-        &lt;li&gt;Added &lt;tt&gt;no_trailing_whitespace.allowed_in_comments&lt;/tt&gt; rule option (Allow trailing space in comments. Created to allow markdown)&lt;/li&gt;
-        &lt;li&gt;Added &lt;tt&gt;newlines_after_classes&lt;/tt&gt; rule&lt;/li&gt;
-        &lt;li&gt;Line length exception. Lines containing only a link are ignored.&lt;/li&gt;
-      &lt;/ul&gt;
-      &lt;/div&gt;
-
-      &lt;div&gt;
-        &lt;h3 class=&quot;changelog_header&quot;&gt;0.5.4&lt;/h3&gt;
-        &lt;small class=&quot;changelog_date&quot;&gt;- &lt;a
-        href=&quot;https://github.com/coffeelint/coffeelint/compare/v0.5.3...v0.5.4&quot;&gt;2012.11.06&lt;a&gt;&lt;/a&gt;&lt;/small&gt;
-      &lt;ul class=&quot;changelog_history&quot;&gt;
-        &lt;li&gt;Support for default configuration file using environment variable &lt;tt&gt;COFFEELINT_CONFIG&lt;/tt&gt;.&lt;/li&gt;
-      &lt;/ul&gt;
-      &lt;/div&gt;
-
-      &lt;div&gt;
-        &lt;h3 class=&quot;changelog_header&quot;&gt;0.5.3&lt;/h3&gt;
-        &lt;small class=&quot;changelog_date&quot;&gt;- &lt;a
-        href=&quot;https://github.com/coffeelint/coffeelint/compare/v0.5.2...v0.5.3&quot;&gt;2012.11.06&lt;a&gt;&lt;/a&gt;&lt;/small&gt;
-      &lt;ul class=&quot;changelog_history&quot;&gt;
-        &lt;li&gt;Added &lt;tt&gt;no_stand_alone_at&lt;/tt&gt; rule.&lt;/li&gt;
-        &lt;li&gt;Fixed correctly reporting line numbers of compilation errors after line 10.&lt;/li&gt;
-        &lt;li&gt;Fixed incomplete results output.&lt;/li&gt;
-      &lt;/ul&gt;
-      &lt;/div&gt;
-
-      &lt;div&gt;
-        &lt;h3 class=&quot;changelog_header&quot;&gt;0.5.2&lt;/h3&gt;
-        &lt;small class=&quot;changelog_date&quot;&gt;- &lt;a
-        href=&quot;https://github.com/coffeelint/coffeelint/compare/v0.5.1...v0.5.2&quot;&gt;2012.09.18&lt;/a&gt;&lt;/small&gt;
-      &lt;/div&gt;
-      &lt;ul class=&quot;changelog_history&quot;&gt;
-        &lt;li&gt;Added &lt;tt&gt;--nocolor&lt;/tt&gt; option.&lt;/li&gt;
-        &lt;li&gt;My main man ruddzw fixed issue #58, in which the &lt;tt&gt;-q&lt;/tt&gt; option was
-        suppressing information even when it was off.&lt;/li&gt;
-        &lt;li&gt;Fixed broken &lt;tt&gt;jslint&lt;/tt&gt; option.&lt;/li&gt;
-        &lt;li&gt;The &lt;tt&gt;no_trailing_semicolons&lt;/tt&gt; rule now works on Windows
-        files.&lt;/li&gt;
-      &lt;/ul&gt;
-
-      &lt;div&gt;
-        &lt;h3 class=&quot;changelog_header&quot;&gt;0.5.1&lt;/h3&gt;
-        &lt;small class=&quot;changelog_date&quot;&gt;- &lt;a
-        href=&quot;https://github.com/coffeelint/coffeelint/compare/v0.5.0...v0.5.1&quot;&gt;2012.09.15&lt;/a&gt;&lt;/small&gt;
-      &lt;/div&gt;
-      &lt;ul class=&quot;changelog_history&quot;&gt;
-        &lt;li&gt;Show CoffeeScript syntax errors in the same manner as lint
-        errors.&lt;/li&gt;
-        &lt;li&gt;Brad Dunbar added the &lt;tt&gt;-q&lt;/tt&gt; command line option, which
-        only prints errors.&lt;/li&gt;
-      &lt;/ul&gt;
-
-      &lt;div&gt;
-        &lt;h3 class=&quot;changelog_header&quot;&gt;0.5.0&lt;/h3&gt;
-        &lt;small class=&quot;changelog_date&quot;&gt;- &lt;a
-        href=&quot;https://github.com/coffeelint/coffeelint/compare/v0.4.0...v0.5.0&quot;&gt;2012.09.08&lt;/a&gt;&lt;/small&gt;
-      &lt;/div&gt;
-      &lt;ul class=&quot;changelog_history&quot;&gt;
-        &lt;li&gt;Lint code from stdin with the &lt;tt&gt;--stdin&lt;/tt&gt; option, thanks
-        to sjz.&lt;/li&gt;
-        &lt;li&gt;Added the &lt;tt&gt;no_implicit_parens&lt;/tt&gt; rule.&lt;/li&gt;
-        &lt;li&gt;Leandro Ostera added the &lt;tt&gt;--jslint&lt;/tt&gt; reporter, to allow
-        CoffeeLint to integrate with the Jenkin&#39;s violations plugin.&lt;/li&gt;
-        &lt;li&gt;Implicit braces are always allowed in in class
-        defiinitions, thanks to Omar Khan.&lt;/li&gt;
-        &lt;li&gt;CoffeeLint now requires CoffeeScript 1.3.3&lt;/li&gt;
-      &lt;/ul&gt;
-
-      &lt;div&gt;
-        &lt;h3 class=&quot;changelog_header&quot;&gt;0.4.0&lt;/h3&gt;
-        &lt;small class=&quot;changelog_date&quot;&gt;- 2012.04.06&lt;/small&gt;
-      &lt;/div&gt;
-      &lt;ul class=&quot;changelog_history&quot;&gt;
-        &lt;li&gt;Added fancy coloured output and proper CSV output.&lt;/li&gt;
-        &lt;li&gt;Directories can be recursively linted.&lt;/li&gt;
-        &lt;li&gt;Added the &lt;tt&gt;line endings&lt;/tt&gt; rule.&lt;/li&gt;
-        &lt;li&gt;Rewrote the command line tool in CoffeeScript.&lt;/li&gt;
-      &lt;/ul&gt;
-
-      &lt;div&gt;
-        &lt;h3 class=&quot;changelog_header&quot;&gt;0.3.0&lt;/h3&gt;
-        &lt;small class=&quot;changelog_date&quot;&gt;- 2012.03.13&lt;/small&gt;
-      &lt;/div&gt;
-      &lt;ul class=&quot;changelog_history&quot;&gt;
-        &lt;li&gt;Added the &lt;tt&gt;no_backticks&lt;/tt&gt; rule.&lt;/li&gt;
-        &lt;li&gt;Colorized the command line output.&lt;/li&gt;
-        &lt;li&gt;Added validation for the rule names.&lt;/li&gt;
-        &lt;li&gt;Allowed windows line endings, thanks to &lt;a
-          href=&quot;https://github.com/szinsli&quot;&gt;szinsli&lt;/a&gt;.&lt;/li&gt;
-      &lt;/ul&gt;
-
-      &lt;div&gt;
-        &lt;h3 class=&quot;changelog_header&quot;&gt;0.2.0&lt;/h3&gt;
-        &lt;small class=&quot;changelog_date&quot;&gt;- 2012.01.26&lt;/small&gt;
-      &lt;/div&gt;
-      &lt;ul class=&quot;changelog_history&quot;&gt;
-        &lt;li&gt;Added warnings, which will be reported, but won&#39;t fail
-        the command line tool.
-        &lt;/li&gt;
-      &lt;/ul&gt;
-
-      &lt;div&gt;
-        &lt;h3 class=&quot;changelog_header&quot;&gt;0.1.0&lt;/h3&gt;
-        &lt;small class=&quot;changelog_date&quot;&gt;- 2012.01.22&lt;/small&gt;
-      &lt;/div&gt;
-      &lt;ul class=&quot;changelog_history&quot;&gt;
-        &lt;li&gt;Initial CoffeeLint release.&lt;/li&gt;
-      &lt;/ul&gt;</code></pre>
 
       </div>
     </div>
