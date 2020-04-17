@@ -2,12 +2,12 @@
   "name": "coffeelint.github.io",
   "private": true,
   "scripts": {
-    "build": "npm run compile",
-    "compile": "npm update && cake compile"
+    "build": "cake compile"
   },
   "homepage": "https://coffeelint.github.io/",
   "dependencies": {
     "@coffeelint/cli": "^3.2.0",
-    "coffeescript": "2.5.1"
+    "coffeescript": "^2.5.1",
+    "marked": "^0.8.2"
   }
 }
