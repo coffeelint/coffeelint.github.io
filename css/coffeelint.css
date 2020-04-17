@@ -8,6 +8,7 @@ html {
 }
 
 body {
+	display: none;
 	background: -webkit-radial-gradient(circle, #eee, #555);
 	background: -moz-radial-gradient(circle, #eee, #555);
 	font-family: monospace;
@@ -93,7 +94,7 @@ body {
 }
 
 .row.doc_row .options pre {
-	overflow-x: scroll;
+	overflow-x: auto;
 	max-width: 400px;
 }
 

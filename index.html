@@ -34,19 +34,20 @@
       <!-- EDITOR -->
       <div class="row editor_row configuration_row">
         <div class="run">Run</div>
-<textarea class="editor run_editor" spellcheck="false"># Lint your CoffeeScript!
+        <textarea class="editor run_editor" spellcheck="false">
+          # Lint your CoffeeScript!
 
-class Gangster
+          class Gangster
 
-  wasItAGoodDay : () ->
-    yes
-</textarea>
+            wasItAGoodDay : () ->
+              yes
+        </textarea>
       </div>
       <div class="row editor_row">
         <div class="configuration">Configuration</div>
         <div class="config_editor_toggle">
-<textarea class="editor config_editor" spellcheck="false"></textarea>
-</div>
+          <textarea class="editor config_editor" spellcheck="false"></textarea>
+        </div>
       </div>
 
       <!-- LINT REPORT -->
@@ -61,6 +62,8 @@ class Gangster
 
       <!-- DOCUMENTATION -->
       <div class="row doc_row">
+
+
         <h2 class="section_title" id="overview">Overview</h2>
         <p>
           CoffeeLint is a style checker that helps keep
@@ -76,6 +79,7 @@ class Gangster
           <a href="http://github.com/coffeelint/coffeelint/issues">issues page</a>.
         </p>
 
+
         <h2 class="section_title" id="install">Installation</h2>
         <p>
           To install, make sure you have a working version of the latest
@@ -83,20 +87,20 @@ class Gangster
           <a href="http://npmjs.org/">NPM</a> (the Node Package Manager) and then
           run:
         </p>
-        <code>
-        npm install -g @coffeelint/cli
-        </code>
+        <code>npm install -g @coffeelint/cli</code>
         <p>Leave off the <tt>g</tt> if you do not want to install globally.</p>
+
 
         <h2 class="section_title">Getting Started</h2>
         <ul>
-            <li>
-                <a href="https://github.com/coffeelint/coffeelint/blob/master/doc/user.md">Users</a>
-            </li>
-            <li>
-                <a href="https://github.com/coffeelint/coffeelint/blob/master/doc/integration.md">Plugin Developers</a>
-            </li>
+          <li>
+              <a href="https://github.com/coffeelint/coffeelint/blob/master/doc/user.md">Users</a>
+          </li>
+          <li>
+              <a href="https://github.com/coffeelint/coffeelint/blob/master/doc/integration.md">Plugin Developers</a>
+          </li>
         </ul>
+
 
         <h2 class="section_title" id="usage">Usage</h2>
         <p>
@@ -125,8 +129,9 @@ class Gangster
           linting from stdin it will check your home for a coffeelint.json
           file.
         </p>
+
+
         <h2 class="section_title" id="options">Options</h2>
-        </p>
         <p>
           By default, CoffeeLint will help ensure you are writing idiomatic
           CoffeeScript, but every rule is optional and configurable so it can
@@ -140,17 +145,18 @@ class Gangster
         <p>
           To disable a rule inline use the following:
         </p>
-        <pre><code># coffeelint: disable=max_line_length
-foo = "some/huge/line/string/with/embed/#{values}.that/surpasses/the/max/column/width"
-# coffeelint: enable=max_line_length</code></pre>
-
+        <pre><code>
+          # coffeelint: disable=max_line_length
+          foo = "some/huge/line/string/with/embed/#{values}.that/surpasses/the/max/column/width"
+          # coffeelint: enable=max_line_length
+        </code></pre>
         <p>
-          You can also disable all checks for a single line by appending <tt>#
-          noqa</tt> at the end of the line:
+          You can also disable all checks for a single line by appending
+          <tt># noqa</tt> at the end of the line:
         </p>
 
         <code>
-throw "I should be an Error not a string but YOLO" # noqa
+          throw "I should be an Error not a string but YOLO" # noqa
         </code>
         <p>Here's a rundown of CoffeeLint's rules:</p>
         <table class="options">
@@ -774,214 +780,231 @@ and warns that line numbers are probably incorrect.
           </tbody>
         </table>
 
-          <h2 class="section_title" id="api">API</h2>
-          <p>
-            If you'd like to run CoffeeScript in the browser or any other
-            Javascript runtime, include
-            <a href="http://coffeescript.org/extras/coffee-script.js">coffee-script.js</a>
-            and
-            <a href="https://coffeelint.github.io/coffeelint/js/coffeelint.js">
-              coffeelint.js
-            </a>
-            and you're off to the races. Then you can call CoffeeLint directly
-            with the following API:
-          </p>
-          <h3 class="api_call">coffeelint.lint(source, configuration)</h3>
-          <p>
-            Lints the CoffeeScript source with the given configuration
-            and returns an array of lint errors and warnings. If the array is
-            empty, all is well.  Compile time errors will be thrown.
-            An error is a Javascript object with the following properties:
-          </p>
-<pre><code>{
-    rule :      'Name of the violated rule',
-    lineNumber: 'Number of the line that caused the violation',
-    level:      'The severity level of the violated rule',
-    message:    'Information about the violated rule',
-    context:    'Optional details about why the rule was violated'
-}</code></pre>
+        <h2 class="section_title" id="api">API</h2>
+        <p>
+          If you'd like to run CoffeeScript in the browser or any other
+          Javascript runtime, include
+          <a href="http://coffeescript.org/extras/coffee-script.js">coffee-script.js</a>
+          and
+          <a href="https://coffeelint.github.io/coffeelint/js/coffeelint.js">coffeelint.js</a>
+          and you're off to the races. Then you can call CoffeeLint directly
+          with the following API:
+        </p>
 
-          <h3 class="api_call">coffeelint.registerRule(RuleConstructor)</h3>
-          <p>
-            Registers a custom rule that may be run by CoffeeLint. If the rule
-            is ignored by default it will still require overriding it's level
-            just like the default rules. They have actually all be
-            re-implemented as pluggable rules that come bundled in CoffeeLint.
-          </p>
+        <h3 class="api_call">coffeelint.lint(source, configuration)</h3>
+        <p>
+          Lints the CoffeeScript source with the given configuration
+          and returns an array of lint errors and warnings. If the array is
+          empty, all is well.  Compile time errors will be thrown.
+          An error is a Javascript object with the following properties:
+        </p>
+        <pre><code>
+          {
+            rule :      'Name of the violated rule',
+            lineNumber: 'Number of the line that caused the violation',
+            level:      'The severity level of the violated rule',
+            message:    'Information about the violated rule',
+            context:    'Optional details about why the rule was violated'
+          }
+        </code></pre>
 
-          <h2 class="section_title" id="loading-custom-rules">Loading Custom Rules</h2>
-          <p>
-            Not every possible rule will be included in the CoffeeLint project.
-            Maybe it's very specific to your project, or it's not specific to
-            CoffeeScript.
-          </p>
-          <p>
-            By convention rule authors add the keyword <tt>coffeelintrule</tt> to their npm package.json so custom rules can be found easily. Click <a href="https://npmjs.org/search?q=coffeelintrule">here</a> to list all currently available custom rules on npm.
-          </p>
-          <p>
-            For example, maybe you want to get a warning if you don't have a
-            newline at the end of your files. We'll imagine you globally
-            installed the package <a
-            href="https://github.com/Dreamscapes/coffeelint-newline-at-eof">"coffeelint-newline-eof"</a>.
-          </p>
-          <!-- Found this example at https://github.com/clutchski/coffeelint/pull/79 -->
-<pre><code>{
-    // This name MUST match the default configuration of the rule being loaded.
-    "newline_at_eof": {
-        // NodeJS module to load. It can also be a path to the rule (useful for devleopment)
-        "module": "coffeelint-newline-at-eof",
-        // Maybe the rule author set it to error by default and you only want a warning.
-        "level": "warn"
-    }
-}</code></pre>
-          <p>
-            Now every time you run CoffeeLint it will load that rule and
-            override it's default level to "warn".
-          </p>
+        <h3 class="api_call">coffeelint.registerRule(RuleConstructor)</h3>
+        <p>
+          Registers a custom rule that may be run by CoffeeLint. If the rule
+          is ignored by default it will still require overriding it's level
+          just like the default rules. They have actually all be
+          re-implemented as pluggable rules that come bundled in CoffeeLint.
+        </p>
 
-          <h2 class="section_title" id="building-custom-rules">Building Custom Rules</h2>
-          <p>
-              CoffeeLint has three types of linters that run. In no particular order they are.
+        <h2 class="section_title" id="loading-custom-rules">Loading Custom Rules</h2>
+        <p>
+          Not every possible rule will be included in the CoffeeLint project.
+          Maybe it's very specific to your project, or it's not specific to
+          CoffeeScript.
+        </p>
+        <p>
+          By convention rule authors add the keyword <tt>coffeelintrule</tt> to their
+          npm package.json so custom rules can be found easily. Click
+          <a href="https://npmjs.org/search?q=coffeelintrule">here</a> to list all currently
+          available custom rules on npm.
+        </p>
+        <p>
+          For example, maybe you want to get a warning if you don't have a
+          newline at the end of your files. We'll imagine you globally
+          installed the package
+          <a href="https://github.com/Dreamscapes/coffeelint-newline-at-eof">"coffeelint-newline-eof"</a>.
+        </p>
+        <!-- Found this example at https://github.com/clutchski/coffeelint/pull/79 -->
+        <pre><code>
+          {
+            // This name MUST match the default configuration of the rule being loaded.
+            "newline_at_eof": {
+              // NodeJS module to load. It can also be a path to the rule (useful for devleopment)
+              "module": "coffeelint-newline-at-eof",
+              // Maybe the rule author set it to error by default and you only want a warning.
+              "level": "warn"
+            }
+          }
+        </code></pre>
+        <p>
+          Now every time you run CoffeeLint it will load that rule and
+          override it's default level to "warn".
+        </p>
 
-              <ul>
-                  <li>LineLinter: processes one line at a time, usually with regular expressions</li>
-                  <li>TokenLinter: processes the token stream generated by CoffeeScript.</li>
-                  <li>ASTLinter: Processes the Abstract Syntax Tree. AST rules are
-                  only called with the root node and it is up to the rule to
-                  recurse the tree.</li>
-              </ul>
-          </p>
 
-          <p>
-              Rules may be loaded using <pre><code>--rules /path/to/rules/</code></pre> or
-              <pre><code>coffeelint.registerRule(RuleConstructor)</code></pre> when
-              outside of the CLI.
-          </p>
+        <h2 class="section_title" id="building-custom-rules">Building Custom Rules</h2>
+        <p>
+          CoffeeLint has three types of linters that run. In no particular order they are.
 
-          <p>
-            Rules do not have to be written in CoffeeScript. A new instance of
-            each rule is constructed for each file, so the RuleConstructor must
-            be a constructor function that generates a new clean instance of
-            your rule when the new operator is used.
-          </p>
+          <ul>
+            <li>LineLinter: processes one line at a time, usually with regular expressions</li>
+            <li>TokenLinter: processes the token stream generated by CoffeeScript.</li>
+            <li>
+              ASTLinter: Processes the Abstract Syntax Tree. AST rules are only called with
+              the root node and it is up to the rule to recurse the tree.
+            </li>
+          </ul>
+        </p>
 
-          <p>
-              Your rule instance must have a .rule attribute with it's default
-              configuration. "name", "level" "message", and "description" are
-              all required. "level" must be one of 'ignore', 'warn', or
-              'error'. Once you have a valid rule configuration CoffeeLint
-              requires you to implement one function depending on which type of
-              linter your rule needs.
+        <p>
+          Rules may be loaded using
+          <code>--rules /path/to/rules/</code>
+          or
+          <code>coffeelint.registerRule(RuleConstructor)</code>
+          when outside of the CLI.
+        </p>
 
-              <code>
-                  lintLine(line, lineApi)<br/>
-                  lintToken(token, tokenApi)<br>
-                  lintAST(ast, astApi)
-              </code>
+        <p>
+          Rules do not have to be written in CoffeeScript. A new instance of
+          each rule is constructed for each file, so the RuleConstructor must
+          be a constructor function that generates a new clean instance of
+          your rule when the new operator is used.
+        </p>
 
-              The second parameter of each is an object with helper functions.
-              It's best to just check the source or look at how other plugins
-              are using those.
-          </p>
+        <p>
+          Your rule instance must have a .rule attribute with it's default
+          configuration. "name", "level" "message", and "description" are
+          all required. "level" must be one of 'ignore', 'warn', or
+          'error'. Once you have a valid rule configuration CoffeeLint
+          requires you to implement one function depending on which type of
+          linter your rule needs.
 
-          <p>
-              If your function returns true it will generate an error. If you
-              need override how the error is generated, maybe providing a
-              context attribute, you can return an object that will get mixed
-              into the generated error. The NoPlusPlus is a simple example of
-              this.
-          </p>
+          <pre><code>
+            lintLine(line, lineApi)
+            lintToken(token, tokenApi)
+            lintAST(ast, astApi)
+          </code></pre>
 
-          <p>
-            The core rules have been rewritten as stand alone rules both to
-            prove the system and provide examples of how to write rules.
-            To get started no_plus_plus is a Token rule, no_tabs is a Line rule,
-            and cyclomatic_complexity is an AST rule.
-          </p>
+          The second parameter of each is an object with helper functions.
+          It's best to just check the source or look at how other plugins
+          are using those.
+        </p>
 
-          <p>
-              The <pre>--rules</pre> option will load every .js or .coffee file
-              it finds and assume they export the RuleConstructor. Since the
-              browser doesn't have a standard export system it's up to you to
-              determine how you'll load your plugin and register it with
-              <pre>coffeelint.registerRule</pre>
-          </p>
+        <p>
+          If your function returns true it will generate an error. If you
+          need override how the error is generated, maybe providing a
+          context attribute, you can return an object that will get mixed
+          into the generated error. The NoPlusPlus is a simple example of
+          this.
+        </p>
 
-          <h2 class="section_title" id="plugins">Plugins</h2>
-          <p>
-            Some nice folks have coded up some cool CoffeeLint plugins for editors and
-            build systems. Check them out:
-            <ul class="plugin_list">
-              <li>The aptly named
-        <a href="https://github.com/kchmck/vim-coffee-script">vim-coffee-script</a>
-                by Mick Koch. </li>
-              <li>
-                <a href="https://github.com/purcell/flymake-coffee">flymake-coffee</a>, en emacs flymake plugin by Steve Purcell.
-              <li>
-        <a href="https://github.com/ajkavanagh/coffeelintnode">CoffeeLintNode</a>,
-        an emacs plugin, by Alex Kavanagh.</li>
-              <li><a href="https://github.com/ilkosta/coffeelint-brunch">CoffeeLint-brunch</a>
-              is a plugin for <a
-              href="http://brunch.io">Brunch.io</a>, by Costantino Giuliodori.
-              </li>
-              <li><a href="https://github.com/vojtajina/grunt-coffeelint">Grunt-CoffeeLint</a>
-              is a plugin for <a
-              href="http://gruntjs.com">Grunt.js</a>, by Vojta Jina.
-              </li>
-              <li><a href="https://github.com/scrooloose/syntastic">Syntastic</a>
+        <p>
+          The core rules have been rewritten as stand alone rules both to
+          prove the system and provide examples of how to write rules.
+          To get started no_plus_plus is a Token rule, no_tabs is a Line rule,
+          and cyclomatic_complexity is an AST rule.
+        </p>
+
+        <p>
+          The <tt>--rules</tt> option will load every .js or .coffee file
+          it finds and assume they export the RuleConstructor. Since the
+          browser doesn't have a standard export system it's up to you to
+          determine how you'll load your plugin and register it with
+          <tt>coffeelint.registerRule</tt>
+        </p>
+
+        <h2 class="section_title" id="plugins">Plugins</h2>
+        <p>
+          Some nice folks have coded up some cool CoffeeLint plugins for editors and
+          build systems. Check them out:
+          <ul class="plugin_list">
+            <li>
+              The aptly named
+              <a href="https://github.com/kchmck/vim-coffee-script">vim-coffee-script</a>
+              by Mick Koch.
+            </li>
+            <li>
+              <a href="https://github.com/purcell/flymake-coffee">flymake-coffee</a>,
+              en emacs flymake plugin by Steve Purcell.
+            <li>
+              <a href="https://github.com/ajkavanagh/coffeelintnode">CoffeeLintNode</a>,
+              an emacs plugin, by Alex Kavanagh.</li>
+            <li>
+              <a href="https://github.com/ilkosta/coffeelint-brunch">CoffeeLint-brunch</a>
+              is a plugin for
+              <a href="http://brunch.io">Brunch.io</a>, by Costantino Giuliodori.
+            </li>
+            <li>
+              <a href="https://github.com/vojtajina/grunt-coffeelint">Grunt-CoffeeLint</a>
+              is a plugin for <a href="http://gruntjs.com">Grunt.js</a>, by Vojta Jina.
+            </li>
+            <li>
+              <a href="https://github.com/scrooloose/syntastic">Syntastic</a>
               a Vim syntax checker, now support CoffeeLint.
-              </li>
-              <li><a href="https://github.com/dbashford/mimosa-coffeelint">mimosa-coffeelint</a>
-              is a plugin for <a
-              href="http://mimosa.io">Mimosa</a>, by David Bashford.
-              </li>
-              <li><a href="https://github.com/synaway/arcanist-coffee-lib">arcanist-coffee-lib</a>
+            </li>
+            <li>
+              <a href="https://github.com/dbashford/mimosa-coffeelint">mimosa-coffeelint</a>
+              is a plugin for <a href="http://mimosa.io">Mimosa</a>, by David Bashford.
+            </li>
+            <li>
+              <a href="https://github.com/synaway/arcanist-coffee-lib">arcanist-coffee-lib</a>
               is a set of <a href="https://github.com/facebook/arcanist">Arcanist</a> extensions,
               including a wrapper for CoffeeLint.
-              </li>
-              <li>
-                  <a href="https://github.com/janraasch/gulp-coffeelint">gulp-coffeelint</a>
-                  is a plugin for
-                  <a href="https://github.com/wearefractal/gulp">gulp</a>, by Jan Raasch.
-              </li>
-              <li>
-                <a href="https://github.com/zipcodeman/coffeelint-ruby">coffeelint-ruby</a>
-                is a set of bindings for ruby, by Zachary Bush
-              </li>
-              <li>
-                <a href="https://github.com/brigade/overcommit">overcommit</a>
-                is a fully configurable and extendable Git hook manager
-                including support for CoffeeLint.
-              </li>
-              <li>
-                <a href="https://github.com/codacy/codacy-coffeelint">codacy-coffeelint</a>
-                is a docker container that runs CoffeeLint at
-                <a href="https://www.codacy.com">Codacy</a>, by Ryan Delaney.
-              </li>
-            </ul>
-          </p>
+            </li>
+            <li>
+              <a href="https://github.com/janraasch/gulp-coffeelint">gulp-coffeelint</a>
+              is a plugin for
+              <a href="https://github.com/wearefractal/gulp">gulp</a>, by Jan Raasch.
+            </li>
+            <li>
+              <a href="https://github.com/zipcodeman/coffeelint-ruby">coffeelint-ruby</a>
+              is a set of bindings for ruby, by Zachary Bush
+            </li>
+            <li>
+              <a href="https://github.com/brigade/overcommit">overcommit</a>
+              is a fully configurable and extendable Git hook manager
+              including support for CoffeeLint.
+            </li>
+            <li>
+              <a href="https://github.com/codacy/codacy-coffeelint">codacy-coffeelint</a>
+              is a docker container that runs CoffeeLint at
+              <a href="https://www.codacy.com">Codacy</a>, by Ryan Delaney.
+            </li>
+          </ul>
+        </p>
 
-          <h2 class="section_title" id="about">About</h2>
-          <p>
+
+        <h2 class="section_title" id="about">About</h2>
+        <p>
           CoffeeLint is open sourced under the MIT License. If you want to
           hack on the code, report a bug or suggest a new feature, head on
           over <a href="http://github.com/coffeelint/coffeelint">here</a>.
-          </p>
-          <p>
-            Thanks to CoffeeScript's
-            <a href="https://github.com/jashkenas/coffee-script/contributors">developers</a>
-            for a great language (and a re-usable Lexer). Thanks to the creators of
-            <a href="http://www.jslint.com/">JSLint</a>,
-            <a href="http://www.jshint.com/">JSHint</a>,
-            <a href="http://www.logilab.org/857">Pylint</a>,
-            <a href="http://en.wikipedia.org/wiki/Lint_(software)">lint</a>
-            and my mother for inspiration.
-          </p>
+        </p>
+        <p>
+          Thanks to CoffeeScript's
+          <a href="https://github.com/jashkenas/coffee-script/contributors">developers</a>
+          for a great language (and a re-usable Lexer). Thanks to the creators of
+          <a href="http://www.jslint.com/">JSLint</a>,
+          <a href="http://www.jshint.com/">JSHint</a>,
+          <a href="http://www.logilab.org/857">Pylint</a>,
+          <a href="http://en.wikipedia.org/wiki/Lint_(software)">lint</a>
+          and my mother for inspiration.
+        </p>
 
-          <h2 class="section_title" id="changelog">Change Log</h2>
 
-          <div class="changelog_history">
-            <h2 id="322-2020-04-17"><a href="https://github.com/coffeelint/coffeelint/compare/v3.2.1...v3.2.2">3.2.2</a> (2020-04-17)</h2>
+        <h2 class="section_title" id="changelog">Change Log</h2>
+        <div class="changelog_history">
+          <h2 id="322-2020-04-17"><a href="https://github.com/coffeelint/coffeelint/compare/v3.2.1...v3.2.2">3.2.2</a> (2020-04-17)</h2>
 <h3 id="bug-fixes">Bug Fixes</h3>
 <ul>
 <li><strong>deps:</strong> update dependency resolve to ^1.16.0 (<a href="https://github.com/coffeelint/coffeelint/issues/56">#56</a>) (<a href="https://github.com/coffeelint/coffeelint/commit/f16af4d81aa4a9dfd3106d15bc94d49a8af24d2b">f16af4d</a>)</li>
@@ -1316,15 +1339,12 @@ version increase.</p>
 <li>Initial CoffeeLint release.</li>
 </ul>
 
-          </div>
-
+        </div>
       </div>
     </div>
 
     <a href="http://github.com/coffeelint/coffeelint">
-      <img class="forkme"
-             src="http://s3.amazonaws.com/github/ribbons/forkme_right_red_aa0000.png"
-             alt="Fork me on GitHub"/>
+      <img class="forkme" src="http://s3.amazonaws.com/github/ribbons/forkme_right_red_aa0000.png" alt="Fork me on GitHub"/>
     </a>
 
     <script type="text/javascript" src="./js/jquery-3.4.1.min.js"></script>

@@ -1,6 +1,6 @@
-(function () {
+;(function () {
 
-    var buildReportTable = function (errors) {
+    function buildReportTable (errors) {
 
         var table = $('<div class="error_report">');
         $.each(errors, function (index, error) {
@@ -15,14 +15,14 @@
     };
 
 
-    var update = function (title, status_, content) {
+    function update (title, status_, content) {
         $('.report .section_body').empty().append(content || "").show();
         $('.report .section_title').text(title);
         $('.report_row').removeClass('success failure').addClass(status_).slideDown();
 
     };
 
-    var displayReport = function (errors) {
+    function displayReport (errors) {
 
         var title = 'Your code is lint free!';
         var status_ = 'success';
@@ -37,13 +37,13 @@
         update(title, status_, body);
     };
 
-    var displayError = function (error) {
+    function displayError (error) {
         var body = $('<div class="error_report"></div>');
         body.append(error.toString());
         update('Your code has an error', 'failure', body);
     };
 
-    var runLinter = function () {
+    function runLinter () {
         var source = $('.run_editor').val();
         var config = $('.config_editor').val();
         var errors = [];
@@ -66,11 +66,11 @@
         }
     };
 
-    var toggleConfiguration = function () {
+    function toggleConfiguration () {
         $('.config_editor_toggle').slideToggle();
     };
 
-    var generateInitialConfig = function () {
+    function generateInitialConfig () {
         var config = JSON.parse(JSON.stringify(coffeelint.getRules()));
         for (const prop in config) {
             delete config[prop].name;
@@ -80,7 +80,25 @@
         $('.config_editor').val(JSON.stringify(config, null, 2) + '\n');
     }
 
-    $(document).ready(function () {
+    $(function () {
+        $('pre > code, .run_editor').each(function () {
+          var lines = this.textContent.replace(/^\s*\n|\n\s*$/g, '').split('\n');
+          var spaces = Infinity;
+          for (var i = 0; i < lines.length; i++) {
+            var s = lines[i].match(/^ +/);
+            if (s && s[0].length < spaces) {
+              spaces = s[0].length;
+            }
+          }
+
+          if (spaces < Infinity) {
+            for (var i = 0; i < lines.length; i++) {
+              lines[i] = lines[i].substring(spaces);
+            }
+          }
+
+          this.textContent = lines.join('\n');
+        });
         generateInitialConfig();
         $('.configuration').click(toggleConfiguration)
         $('.version').text('v' + coffeelint.VERSION);
@@ -88,6 +106,8 @@
         $('.editor').keyup(runLinter);
         $('.run_editor').focus();
         $('.run').click(runLinter);
+
+        $('body').show();
 
         if (location.hash) {
             $([document.documentElement, document.body]).scrollTop($(location.hash).offset().top);
