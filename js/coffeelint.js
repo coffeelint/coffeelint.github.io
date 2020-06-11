@@ -2,7 +2,7 @@
 module.exports={
   "name": "@coffeelint/cli",
   "description": "Lint your CoffeeScript",
-  "version": "3.2.6",
+  "version": "3.2.7",
   "homepage": "https://coffeelint.github.io/",
   "keywords": [
     "lint",
@@ -24,7 +24,7 @@ module.exports={
   "dependencies": {
     "coffeescript": "2.5.1",
     "glob": "^7.1.6",
-    "ignore": "^5.1.6",
+    "ignore": "^5.1.8",
     "resolve": "^1.17.0",
     "strip-json-comments": "^3.1.0",
     "yargs": "^15.3.1"
@@ -33,12 +33,12 @@ module.exports={
     "@semantic-release/changelog": "^5.0.1",
     "@semantic-release/commit-analyzer": "^8.0.1",
     "@semantic-release/git": "^9.0.0",
-    "@semantic-release/github": "^7.0.6",
+    "@semantic-release/github": "^7.0.7",
     "@semantic-release/npm": "^7.0.5",
     "@semantic-release/release-notes-generator": "^9.0.1",
     "browserify": "^16.5.1",
     "coffeeify": "^3.0.1",
-    "semantic-release": "^17.0.7",
+    "semantic-release": "^17.0.8",
     "underscore": "^1.10.2",
     "vows": "^0.8.3"
   },
@@ -2428,9 +2428,11 @@ module.exports = LineEndings = (function() {
 var MaxLineLength, regexes;
 
 regexes = {
-  literateComment: /^\#\s/, // This is prefixed on MarkDown lines.
-  longUrlComment: /^\s*\#\s*http[^\s]+$/ // indentation, up to comment
-// Link that takes up the rest of the line without spaces.
+  literateComment: /^\s*\#\s/, // indentation, up to comment followed by at least one space.
+  longUrlComment: /^\s*\#\s.*http[^\s]+.*$/ // indentation, up to comment followed by at least one space.
+// Any string may precedes url
+// Actual link
+// Line may end by other things
 };
 
 module.exports = MaxLineLength = (function() {
