@@ -23,7 +23,7 @@ jobs:
       startsWith(github.event.pull_request.title, 'chore(deps-dev):')
     steps:
       - name: '@dependabot merge'
-        uses: actions/github-script@v2
+        uses: actions/github-script@v3
         with:
           github-token: ${{secrets.GH_TOKEN}}
           script: |
