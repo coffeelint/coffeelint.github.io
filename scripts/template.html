@@ -67,7 +67,7 @@
         <h2 class="section_title" id="overview">Overview</h2>
         <p>
           CoffeeLint is a style checker that helps keep
-          <a href="http://coffeescript.org">CoffeeScript</a>
+          <a href="https://coffeescript.org">CoffeeScript</a>
           code clean and consistent. CoffeeScript does a great job at
           insulating programmers from many of
           JavaScript's bad parts, but it won't help enforce a consistent style
@@ -76,19 +76,19 @@
         <p>
           If you have an idea, a bug report or anything else to say, reach out
           on the
-          <a href="http://github.com/coffeelint/coffeelint/issues">issues page</a>.
+          <a href="https://github.com/coffeelint/coffeelint/issues">issues page</a>.
         </p>
 
 
         <h2 class="section_title" id="install">Installation</h2>
         <p>
           To install, make sure you have a working version of the latest
-          stable version of <a href="http://nodejs.org/">Node</a> and
-          <a href="http://npmjs.org/">NPM</a> (the Node Package Manager) and then
+          stable version of <a href="https://nodejs.org/">Node</a> and
+          <a href="https://npmjs.org/">NPM</a> (the Node Package Manager) and then
           run:
         </p>
         <code>npm install -g @coffeelint/cli</code>
-        <p>Leave off the <tt>g</tt> if you do not want to install globally.</p>
+        <p>Remove the <tt>-g</tt> if you do not want to install globally.</p>
 
 
         <h2 class="section_title">Getting Started</h2>
@@ -175,9 +175,9 @@
         <p>
           If you'd like to run CoffeeScript in the browser or any other
           Javascript runtime, include
-          <a href="http://coffeescript.org/extras/coffee-script.js">coffee-script.js</a>
+          <a href="https://coffeescript.org/browser-compiler-legacy/coffeescript.js">coffee-script.js</a>
           and
-          <a href="https://coffeelint.github.io/coffeelint/js/coffeelint.js">coffeelint.js</a>
+          <a href="https://coffeelint.github.io/js/coffeelint.js">coffeelint.js</a>
           and you're off to the races. Then you can call CoffeeLint directly
           with the following API:
         </p>
@@ -223,7 +223,7 @@
           For example, maybe you want to get a warning if you don't have a
           newline at the end of your files. We'll imagine you globally
           installed the package
-          <a href="https://github.com/Dreamscapes/coffeelint-newline-at-eof">"coffeelint-newline-eof"</a>.
+          <a href="https://www.npmjs.com/package/coffeelint-newline-at-eof">"coffeelint-newline-eof"</a>.
         </p>
         <!-- Found this example at https://github.com/clutchski/coffeelint/pull/79 -->
         <pre><code>
@@ -293,17 +293,23 @@
 
         <p>
           If your function returns true it will generate an error. If you
-          need override how the error is generated, maybe providing a
+          need to override how the error is generated, maybe providing a
           context attribute, you can return an object that will get mixed
-          into the generated error. The NoPlusPlus is a simple example of
-          this.
+          into the generated error. The
+          <a href="https://github.com/coffeelint/coffeelint/blob/master/src/rules/no_plusplus.coffee">No_PlusPlus</a>
+          rule is a simple example of this.
         </p>
 
         <p>
           The core rules have been rewritten as stand alone rules both to
           prove the system and provide examples of how to write rules.
-          To get started no_plus_plus is a Token rule, no_tabs is a Line rule,
-          and cyclomatic_complexity is an AST rule.
+          To get started
+          <a href="https://github.com/coffeelint/coffeelint/blob/master/src/rules/no_plusplus.coffee">no_plusplus</a>
+          is a Token rule,
+          <a href="https://github.com/coffeelint/coffeelint/blob/master/src/rules/no_tabs.coffee">no_tabs</a>
+          is a Line rule, and
+          <a href="https://github.com/coffeelint/coffeelint/blob/master/src/rules/cyclomatic_complexity.coffee">cyclomatic_complexity</a>
+          is an AST rule.
         </p>
 
         <p>
@@ -331,38 +337,38 @@
               <a href="https://github.com/ajkavanagh/coffeelintnode">CoffeeLintNode</a>,
               an emacs plugin, by Alex Kavanagh.</li>
             <li>
-              <a href="https://github.com/ilkosta/coffeelint-brunch">CoffeeLint-brunch</a>
+              <a href="https://github.com/brunch/coffeelint-brunch">CoffeeLint-brunch</a>
               is a plugin for
-              <a href="http://brunch.io">Brunch.io</a>, by Costantino Giuliodori.
+              <a href="https://brunch.io/">Brunch.io</a>, by Costantino Giuliodori.
             </li>
             <li>
               <a href="https://github.com/vojtajina/grunt-coffeelint">Grunt-CoffeeLint</a>
-              is a plugin for <a href="http://gruntjs.com">Grunt.js</a>, by Vojta Jina.
+              is a plugin for <a href="https://gruntjs.com">Grunt.js</a>, by Vojta Jina.
             </li>
             <li>
-              <a href="https://github.com/scrooloose/syntastic">Syntastic</a>
+              <a href="https://github.com/vim-syntastic/syntastic">Syntastic</a>
               a Vim syntax checker, now support CoffeeLint.
             </li>
             <li>
               <a href="https://github.com/dbashford/mimosa-coffeelint">mimosa-coffeelint</a>
-              is a plugin for <a href="http://mimosa.io">Mimosa</a>, by David Bashford.
+              is a plugin for <a href="https://mimosa.io">Mimosa</a>, by David Bashford.
             </li>
             <li>
               <a href="https://github.com/synaway/arcanist-coffee-lib">arcanist-coffee-lib</a>
-              is a set of <a href="https://github.com/facebook/arcanist">Arcanist</a> extensions,
+              is a set of <a href="https://github.com/phacility/arcanist">Arcanist</a> extensions,
               including a wrapper for CoffeeLint.
             </li>
             <li>
               <a href="https://github.com/janraasch/gulp-coffeelint">gulp-coffeelint</a>
               is a plugin for
-              <a href="https://github.com/wearefractal/gulp">gulp</a>, by Jan Raasch.
+              <a href="https://github.com/gulpjs/gulp">gulp</a>, by Jan Raasch.
             </li>
             <li>
-              <a href="https://github.com/zipcodeman/coffeelint-ruby">coffeelint-ruby</a>
+              <a href="https://github.com/zmbush/coffeelint-ruby">coffeelint-ruby</a>
               is a set of bindings for ruby, by Zachary Bush
             </li>
             <li>
-              <a href="https://github.com/brigade/overcommit">overcommit</a>
+              <a href="https://github.com/sds/overcommit">overcommit</a>
               is a fully configurable and extendable Git hook manager
               including support for CoffeeLint.
             </li>
@@ -370,6 +376,16 @@
               <a href="https://github.com/codacy/codacy-coffeelint">codacy-coffeelint</a>
               is a docker container that runs CoffeeLint at
               <a href="https://www.codacy.com">Codacy</a>, by Ryan Delaney.
+            </li>
+            <li>
+              <a href="https://github.com/AtomLinter/linter-coffeelint/">linter-coffeelint</a>
+              is a plugin for
+              <a href="https://atom.io">Atom</a>.
+            </li>
+            <li>
+              <a href="https://marketplace.visualstudio.com/items?itemName=lkytal.coffeelinter">Coffee Lint</a>
+              is a plugin for
+              <a href="https://code.visualstudio.com/">Visual Studio Code</a>, by Kaiyuan Liu.
             </li>
           </ul>
         </p>
@@ -379,16 +395,16 @@
         <p>
           CoffeeLint is open sourced under the MIT License. If you want to
           hack on the code, report a bug or suggest a new feature, head on
-          over <a href="http://github.com/coffeelint/coffeelint">here</a>.
+          over <a href="https://github.com/coffeelint/coffeelint">to the repo</a>.
         </p>
         <p>
           Thanks to CoffeeScript's
-          <a href="https://github.com/jashkenas/coffee-script/contributors">developers</a>
+          <a href="https://github.com/jashkenas/coffeescript/graphs/contributors">developers</a>
           for a great language (and a re-usable Lexer). Thanks to the creators of
-          <a href="http://www.jslint.com/">JSLint</a>,
-          <a href="http://www.jshint.com/">JSHint</a>,
-          <a href="http://www.logilab.org/857">Pylint</a>,
-          <a href="http://en.wikipedia.org/wiki/Lint_(software)">lint</a>
+          <a href="https://www.jslint.com/">JSLint</a>,
+          <a href="https://www.jshint.com/">JSHint</a>,
+          <a href="https://www.logilab.org/857">Pylint</a>,
+          <a href="https://wikipedia.org/wiki/Lint_(software)">lint</a>
           and my mother for inspiration.
         </p>
 
@@ -400,11 +416,11 @@
       </div>
     </div>
 
-    <a href="http://github.com/coffeelint/coffeelint">
-      <img class="forkme" src="http://s3.amazonaws.com/github/ribbons/forkme_right_red_aa0000.png" alt="Fork me on GitHub"/>
+    <a href="https://github.com/coffeelint/coffeelint">
+      <img class="forkme" src="https://s3.amazonaws.com/github/ribbons/forkme_right_red_aa0000.png" alt="Fork me on GitHub"/>
     </a>
 
-    <script type="text/javascript" src="./js/jquery-3.4.1.min.js"></script>
+    <script type="text/javascript" src="./js/jquery-3.5.1.min.js"></script>
     <script type="text/javascript" src="./js/coffeescript.js"></script>
     <script type="text/javascript" src="./js/coffeelint.js"></script>
     <script type="text/javascript" src="./js/trycoffeelint.js"></script>

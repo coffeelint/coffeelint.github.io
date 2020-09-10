@@ -24,6 +24,10 @@ jobs:
           if ! git diff --quiet; then
             git config --global user.email "<>"
             git config --global user.name "GitHub Actions"
-            git commit -am "v${COFFEELINT_VERSION}"
+            if [ -z "$COFFEELINT_VERSION" ]; then
+              git commit -am "build"
+            else
+              git commit -am "v${COFFEELINT_VERSION}"
+            fi
             git push "https://${GITHUB_ACTOR}:${GITHUB_TOKEN}@github.com/coffeelint/coffeelint.github.io.git" HEAD:master
           fi
