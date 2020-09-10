@@ -2,7 +2,8 @@
   "name": "coffeelint.github.io",
   "private": true,
   "scripts": {
-    "build": "cake compile"
+    "build": "npm run format && cake compile",
+    "format": "npx prettier js/trycoffeelint.js css/coffeelint.css -w"
   },
   "homepage": "https://coffeelint.github.io/",
   "dependencies": {
