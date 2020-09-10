@@ -4,7 +4,7 @@
   "scripts": {
     "build": "npm run format && npm run compile",
     "compile": "cake compile",
-    "format": "npx prettier js/trycoffeelint.js css/coffeelint.css -w"
+    "format": "npx prettier js/trycoffeelint.js css/coffeelint.css scripts/template.html -w"
   },
   "homepage": "https://coffeelint.github.io/",
   "dependencies": {
