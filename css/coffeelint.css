@@ -104,7 +104,7 @@ body {
   padding-bottom: 20px;
 }
 
-section {
+.paragraph {
   margin-bottom: 10px;
 }
 
@@ -136,6 +136,7 @@ code {
   font-family: monospace;
   border: 1px dotted black;
   display: block;
+  min-width: fit-content;
   padding: 10px;
   margin-top: 10px;
   margin-bottom: 10px;
@@ -283,6 +284,7 @@ tt {
   font-family: monospace;
   border: 1px dotted black;
   display: block;
+  min-width: fit-content;
   padding: 10px;
   margin-top: 10px;
   margin-bottom: 10px;

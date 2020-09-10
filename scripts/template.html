@@ -61,33 +61,33 @@
       <!-- DOCUMENTATION -->
       <div class="row doc_row">
         <h2 class="section_title" id="overview">Overview</h2>
-        <section>
+        <div class="paragraph">
           CoffeeLint is a style checker that helps keep
           <a href="https://coffeescript.org">CoffeeScript</a>
           code clean and consistent. CoffeeScript does a great job at insulating
           programmers from many of JavaScript's bad parts, but it won't help
           enforce a consistent style across a code base. CoffeeLint can help
           with that.
-        </section>
-        <section>
+        </div>
+        <div class="paragraph">
           If you have an idea, a bug report or anything else to say, reach out
           on the
           <a href="https://github.com/coffeelint/coffeelint/issues"
             >issues page</a
           >.
-        </section>
+        </div>
 
         <h2 class="section_title" id="install">Installation</h2>
-        <section>
+        <div class="paragraph">
           To install, make sure you have a working version of the latest stable
           version of <a href="https://nodejs.org/">Node</a> and
           <a href="https://npmjs.org/">NPM</a> (the Node Package Manager) and
           then run:
-        </section>
+        </div>
         <code>npm install -g @coffeelint/cli</code>
-        <section>
+        <div class="paragraph">
           Remove the <tt>-g</tt> if you do not want to install globally.
-        </section>
+        </div>
 
         <h2 class="section_title">Getting Started</h2>
         <ul>
@@ -106,30 +106,32 @@
         </ul>
 
         <h2 class="section_title" id="usage">Usage</h2>
-        <section>
+        <div class="paragraph">
           Once you have Coffeelint installed, to lint your scripts, run:
-        </section>
+        </div>
         <code>coffeelint application.coffee</code>
-        <section>
+        <div class="paragraph">
           To specify your own configuration file, do the following:
-        </section>
+        </div>
         <code>coffeelint -f coffeelint.json application.coffee</code>
-        <section>
+        <div class="paragraph">
           If any errors were found, a non-zero code will be returned.
-        </section>
-        <section>To generate a configuration file, do</section>
+        </div>
+        <div class="paragraph">To generate a configuration file, do</div>
         <code>coffeelint --makeconfig &gt; coffeelint.json</code>
-        <section>You can then configure the rules to your liking.</section>
-        <section>
+        <div class="paragraph">
+          You can then configure the rules to your liking.
+        </div>
+        <div class="paragraph">
           New in 1.0: CoffeeLint will automatically pick up config files. When
           linting a file (as opposed to stdin) it will walk up the directory
           tree looking for a coffeelint.json or a package.json that has a
           "coffeelintConfig" object. If neither of those are found or you're
           linting from stdin it will check your home for a coffeelint.json file.
-        </section>
+        </div>
 
         <h2 class="section_title" id="options">Options</h2>
-        <section>
+        <div class="paragraph">
           By default, CoffeeLint will help ensure you are writing idiomatic
           CoffeeScript, but every rule is optional and configurable so it can be
           tuned to fit your preferred coding style. To override any of
@@ -139,20 +141,20 @@
           disable an option, set its level to <tt>ignore</tt>. If you set the
           level to <tt>warn</tt>, violations will be reported, but won't cause a
           non-zero exit code.
-        </section>
-        <section>To disable a rule inline use the following:</section>
+        </div>
+        <div class="paragraph">To disable a rule inline use the following:</div>
         <pre><code>
           # coffeelint: disable=max_line_length
           foo = "some/huge/line/string/with/embed/#{values}.that/surpasses/the/max/column/width"
           # coffeelint: enable=max_line_length
         </code></pre>
-        <section>
+        <div class="paragraph">
           You can also disable all checks for a single line by appending
           <tt># noqa</tt> at the end of the line:
-        </section>
+        </div>
 
         <code> throw "I should be an Error not a string but YOLO" # noqa </code>
-        <section>Here's a rundown of CoffeeLint's rules:</section>
+        <div class="paragraph">Here's a rundown of CoffeeLint's rules:</div>
         <table class="options">
           <thead>
             <tr>
@@ -166,7 +168,7 @@
         </table>
 
         <h2 class="section_title" id="api">API</h2>
-        <section>
+        <div class="paragraph">
           If you'd like to run CoffeeScript in the browser or any other
           Javascript runtime, include
           <a
@@ -179,15 +181,15 @@
           >
           and you're off to the races. Then you can call CoffeeLint directly
           with the following API:
-        </section>
+        </div>
 
         <h3 class="api_call">coffeelint.lint(source, configuration)</h3>
-        <section>
+        <div class="paragraph">
           Lints the CoffeeScript source with the given configuration and returns
           an array of lint errors and warnings. If the array is empty, all is
           well. Compile time errors will be thrown. An error is a Javascript
           object with the following properties:
-        </section>
+        </div>
         <pre><code>
           {
             rule :      'Name of the violated rule',
@@ -199,35 +201,35 @@
         </code></pre>
 
         <h3 class="api_call">coffeelint.registerRule(RuleConstructor)</h3>
-        <section>
+        <div class="paragraph">
           Registers a custom rule that may be run by CoffeeLint. If the rule is
           ignored by default it will still require overriding it's level just
           like the default rules. They have actually all be re-implemented as
           pluggable rules that come bundled in CoffeeLint.
-        </section>
+        </div>
 
         <h2 class="section_title" id="loading-custom-rules">
           Loading Custom Rules
         </h2>
-        <section>
+        <div class="paragraph">
           Not every possible rule will be included in the CoffeeLint project.
           Maybe it's very specific to your project, or it's not specific to
           CoffeeScript.
-        </section>
-        <section>
+        </div>
+        <div class="paragraph">
           By convention rule authors add the keyword <tt>coffeelintrule</tt> to
           their npm package.json so custom rules can be found easily. Click
           <a href="https://npmjs.org/search?q=coffeelintrule">here</a> to list
           all currently available custom rules on npm.
-        </section>
-        <section>
+        </div>
+        <div class="paragraph">
           For example, maybe you want to get a warning if you don't have a
           newline at the end of your files. We'll imagine you globally installed
           the package
           <a href="https://www.npmjs.com/package/coffeelint-newline-at-eof"
             >"coffeelint-newline-eof"</a
           >.
-        </section>
+        </div>
         <!-- Found this example at https://github.com/clutchski/coffeelint/pull/79 -->
         <pre><code>
           {
@@ -240,15 +242,15 @@
             }
           }
         </code></pre>
-        <section>
+        <div class="paragraph">
           Now every time you run CoffeeLint it will load that rule and override
           it's default level to "warn".
-        </section>
+        </div>
 
         <h2 class="section_title" id="building-custom-rules">
           Building Custom Rules
         </h2>
-        <section>
+        <div class="paragraph">
           CoffeeLint has three types of linters that run. In no particular order
           they are.
 
@@ -266,24 +268,24 @@
               tree.
             </li>
           </ul>
-        </section>
+        </div>
 
-        <section>
+        <div class="paragraph">
           Rules may be loaded using
           <code>--rules /path/to/rules/</code>
           or
           <code>coffeelint.registerRule(RuleConstructor)</code>
           when outside of the CLI.
-        </section>
+        </div>
 
-        <section>
+        <div class="paragraph">
           Rules do not have to be written in CoffeeScript. A new instance of
           each rule is constructed for each file, so the RuleConstructor must be
           a constructor function that generates a new clean instance of your
           rule when the new operator is used.
-        </section>
+        </div>
 
-        <section>
+        <div class="paragraph">
           Your rule instance must have a .rule attribute with it's default
           configuration. "name", "level" "message", and "description" are all
           required. "level" must be one of 'ignore', 'warn', or 'error'. Once
@@ -300,9 +302,9 @@
           The second parameter of each is an object with helper functions. It's
           best to just check the source or look at how other plugins are using
           those.
-        </section>
+        </div>
 
-        <section>
+        <div class="paragraph">
           If your function returns true it will generate an error. If you need
           to override how the error is generated, maybe providing a context
           attribute, you can return an object that will get mixed into the
@@ -312,9 +314,9 @@
             >No_PlusPlus</a
           >
           rule is a simple example of this.
-        </section>
+        </div>
 
-        <section>
+        <div class="paragraph">
           The core rules have been rewritten as stand alone rules both to prove
           the system and provide examples of how to write rules. To get started
           <a
@@ -332,18 +334,18 @@
             >cyclomatic_complexity</a
           >
           is an AST rule.
-        </section>
+        </div>
 
-        <section>
+        <div class="paragraph">
           The <tt>--rules</tt> option will load every .js or .coffee file it
           finds and assume they export the RuleConstructor. Since the browser
           doesn't have a standard export system it's up to you to determine how
           you'll load your plugin and register it with
           <tt>coffeelint.registerRule</tt>
-        </section>
+        </div>
 
         <h2 class="section_title" id="plugins">Plugins</h2>
-        <section>
+        <div class="paragraph">
           Some nice folks have coded up some cool CoffeeLint plugins for editors
           and build systems. Check them out:
           <ul class="plugin_list">
@@ -441,15 +443,15 @@
               by Kaiyuan Liu.
             </li>
           </ul>
-        </section>
+        </div>
 
         <h2 class="section_title" id="about">About</h2>
-        <section>
+        <div class="paragraph">
           CoffeeLint is open sourced under the MIT License. If you want to hack
           on the code, report a bug or suggest a new feature, head on over
           <a href="https://github.com/coffeelint/coffeelint">to the repo</a>.
-        </section>
-        <section>
+        </div>
+        <div class="paragraph">
           Thanks to CoffeeScript's
           <a
             href="https://github.com/jashkenas/coffeescript/graphs/contributors"
@@ -462,7 +464,7 @@
           <a href="https://www.logilab.org/857">Pylint</a>,
           <a href="https://wikipedia.org/wiki/Lint_(software)">lint</a>
           and my mother for inspiration.
-        </section>
+        </div>
 
         <h2 class="section_title" id="changelog">Change Log</h2>
         <div class="changelog_history">{{{changelog}}}</div>
