@@ -8,6 +8,7 @@
   "dependencies": {
     "@coffeelint/cli": "^4.0.0",
     "coffeescript": "^2.5.1",
+    "jquery": "^3.5.1",
     "marked": "^1.1.1"
   }
 }
