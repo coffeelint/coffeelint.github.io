@@ -406,7 +406,7 @@ Two space indentation is enabled by default.
 <td class="rule">max_line_length</td>
 <td class="description">
     This rule imposes a maximum line length on your code. <a
-href="http://www.python.org/dev/peps/pep-0008/">Python's style
+href="https://www.python.org/dev/peps/pep-0008/">Python's style
 guide</a> does a good job explaining why you might want to limit the
 length of your lines, though this is a matter of taste.
 
@@ -728,6 +728,22 @@ is not used within the function.
 <td class="rule">non_empty_constructor_needs_parens</td>
 <td class="description">
     Requires constructors with parameters to include the parens
+    <p><em>default level: ignore</em></p>
+</td>
+</tr>
+<tr>
+<td class="rule">object_shorthand</td>
+<td class="description">
+    <p>Use property value shorthand in objects, when explicit braces are used.</p>
+<pre><code>test = "value"
+
+# Good
+{test}
+test: test
+
+# Bad
+{test: test}
+</code></pre>
     <p><em>default level: ignore</em></p>
 </td>
 </tr>
@@ -1109,7 +1125,12 @@ and warns that line numbers are probably incorrect.
 
         <section>
           <h2 class="section_title" id="changelog">Change Log</h2>
-          <div class="changelog_history"><h1 id="400-2020-09-10"><a href="https://github.com/coffeelint/coffeelint/compare/v3.2.10...v4.0.0">4.0.0</a> (2020-09-10)</h1>
+          <div class="changelog_history"><h1 id="410-2020-09-23"><a href="https://github.com/coffeelint/coffeelint/compare/v4.0.0...v4.1.0">4.1.0</a> (2020-09-23)</h1>
+<h3 id="features">Features</h3>
+<ul>
+<li>Add rule object_shorthand (<a href="https://github.com/coffeelint/coffeelint/issues/90">#90</a>) (<a href="https://github.com/coffeelint/coffeelint/commit/d586228214fccf110c3d044e9a75ad825f5518c7">d586228</a>)</li>
+</ul>
+<h1 id="400-2020-09-10"><a href="https://github.com/coffeelint/coffeelint/compare/v3.2.10...v4.0.0">4.0.0</a> (2020-09-10)</h1>
 <h3 id="bug-fixes">Bug Fixes</h3>
 <ul>
 <li>update deps (<a href="https://github.com/coffeelint/coffeelint/commit/3dde492531cd209b3c568346a0f08638a4cd69f4">3dde492</a>)</li>
@@ -1270,7 +1291,7 @@ version increase.</p>
 </ul>
 <h2 id="1110-2015-08-19"><a href="https://github.com/coffeelint/coffeelint/compare/v1.10.0...v1.11.0">1.11.0</a> (2015-08-19)</h2>
 <ul>
-<li>New config option <code>{ &quot;extends&quot;: &quot;coffeelint-config-myconfig&quot; }</code> based on <a href="http://eslint.org/docs/developer-guide/shareable-configs">eslint&#39;s shareable configs</a></li>
+<li>New config option <code>{ &quot;extends&quot;: &quot;coffeelint-config-myconfig&quot; }</code> based on <a href="https://eslint.org/docs/developer-guide/shareable-configs">eslint&#39;s shareable configs</a></li>
 <li>New rule <code>no_nested_string_interpolation</code></li>
 <li>New rule <code>no_private_function_fat_arrows</code></li>
 <li>New CLI option <code>--ext</code> to specify alternate file extensions to check</li>
@@ -1437,7 +1458,7 @@ version increase.</p>
 <li>Added <code>arrow_spacing</code> rule (require spaces around arrows)</li>
 <li>Added <code>empty_constructor_needs_parens</code></li>
 <li>Added <code>non_empty_constructor_needs_parens</code></li>
-<li>Added <code>duplicate_key</code> (<a href="http://jslinterrors.com/duplicate-key-a/">http://jslinterrors.com/duplicate-key-a/</a>)</li>
+<li>Added <code>duplicate_key</code> (<a href="https://jslinterrors.com/duplicate-key-a/">https://jslinterrors.com/duplicate-key-a/</a>)</li>
 <li>Added <code>no_trailing_whitespace.allowed_in_comments</code> rule option (Allow trailing space in comments. Created to allow markdown)</li>
 <li>Added <code>newlines_after_classes</code> rule</li>
 <li>Line length exception. Lines containing only a link are ignored.</li>

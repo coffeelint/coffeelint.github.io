@@ -2,7 +2,7 @@
 module.exports={
   "name": "@coffeelint/cli",
   "description": "Lint your CoffeeScript",
-  "version": "4.0.0",
+  "version": "4.1.0",
   "homepage": "https://coffeelint.github.io/",
   "keywords": [
     "lint",
@@ -620,6 +620,8 @@ coffeelint.registerRule(require('./rules/no_private_function_fat_arrows.coffee')
 
 coffeelint.registerRule(require('./rules/missing_parseint_radix.coffee'));
 
+coffeelint.registerRule(require('./rules/object_shorthand.coffee'));
+
 getTokens = function(source) {
   try {
     // If there are syntax errors this will abort the lexical and line
@@ -825,7 +827,7 @@ coffeelint.setCache = function(obj) {
 };
 
 
-},{"./../package.json":1,"./ast_linter.coffee":2,"./error_report.coffee":5,"./lexical_linter.coffee":6,"./line_linter.coffee":7,"./rules.coffee":8,"./rules/arrow_spacing.coffee":9,"./rules/braces_spacing.coffee":10,"./rules/bracket_spacing.coffee":11,"./rules/camel_case_classes.coffee":12,"./rules/colon_assignment_spacing.coffee":13,"./rules/cyclomatic_complexity.coffee":14,"./rules/duplicate_key.coffee":15,"./rules/empty_constructor_needs_parens.coffee":16,"./rules/ensure_comprehensions.coffee":17,"./rules/eol_last.coffee":18,"./rules/indentation.coffee":19,"./rules/line_endings.coffee":20,"./rules/max_line_length.coffee":21,"./rules/missing_fat_arrows.coffee":22,"./rules/missing_parseint_radix.coffee":23,"./rules/newlines_after_classes.coffee":24,"./rules/no_backticks.coffee":25,"./rules/no_debugger.coffee":26,"./rules/no_empty_functions.coffee":27,"./rules/no_empty_param_list.coffee":28,"./rules/no_implicit_braces.coffee":29,"./rules/no_implicit_parens.coffee":30,"./rules/no_interpolation_in_single_quotes.coffee":31,"./rules/no_nested_string_interpolation.coffee":32,"./rules/no_plusplus.coffee":33,"./rules/no_private_function_fat_arrows.coffee":34,"./rules/no_spaces.coffee":35,"./rules/no_stand_alone_at.coffee":36,"./rules/no_tabs.coffee":37,"./rules/no_this.coffee":38,"./rules/no_throwing_strings.coffee":39,"./rules/no_trailing_semicolons.coffee":40,"./rules/no_trailing_whitespace.coffee":41,"./rules/no_unnecessary_double_quotes.coffee":42,"./rules/no_unnecessary_fat_arrows.coffee":43,"./rules/non_empty_constructor_needs_parens.coffee":44,"./rules/prefer_english_operator.coffee":45,"./rules/prefer_fat_arrows_in_methods.coffee":46,"./rules/prefer_logical_operator.coffee":47,"./rules/space_operators.coffee":48,"./rules/spacing_after_comma.coffee":49,"./rules/transform_messes_up_line_numbers.coffee":50}],5:[function(require,module,exports){
+},{"./../package.json":1,"./ast_linter.coffee":2,"./error_report.coffee":5,"./lexical_linter.coffee":6,"./line_linter.coffee":7,"./rules.coffee":8,"./rules/arrow_spacing.coffee":9,"./rules/braces_spacing.coffee":10,"./rules/bracket_spacing.coffee":11,"./rules/camel_case_classes.coffee":12,"./rules/colon_assignment_spacing.coffee":13,"./rules/cyclomatic_complexity.coffee":14,"./rules/duplicate_key.coffee":15,"./rules/empty_constructor_needs_parens.coffee":16,"./rules/ensure_comprehensions.coffee":17,"./rules/eol_last.coffee":18,"./rules/indentation.coffee":19,"./rules/line_endings.coffee":20,"./rules/max_line_length.coffee":21,"./rules/missing_fat_arrows.coffee":22,"./rules/missing_parseint_radix.coffee":23,"./rules/newlines_after_classes.coffee":24,"./rules/no_backticks.coffee":25,"./rules/no_debugger.coffee":26,"./rules/no_empty_functions.coffee":27,"./rules/no_empty_param_list.coffee":28,"./rules/no_implicit_braces.coffee":29,"./rules/no_implicit_parens.coffee":30,"./rules/no_interpolation_in_single_quotes.coffee":31,"./rules/no_nested_string_interpolation.coffee":32,"./rules/no_plusplus.coffee":33,"./rules/no_private_function_fat_arrows.coffee":34,"./rules/no_spaces.coffee":35,"./rules/no_stand_alone_at.coffee":36,"./rules/no_tabs.coffee":37,"./rules/no_this.coffee":38,"./rules/no_throwing_strings.coffee":39,"./rules/no_trailing_semicolons.coffee":40,"./rules/no_trailing_whitespace.coffee":41,"./rules/no_unnecessary_double_quotes.coffee":42,"./rules/no_unnecessary_fat_arrows.coffee":43,"./rules/non_empty_constructor_needs_parens.coffee":44,"./rules/object_shorthand.coffee":45,"./rules/prefer_english_operator.coffee":46,"./rules/prefer_fat_arrows_in_methods.coffee":47,"./rules/prefer_logical_operator.coffee":48,"./rules/space_operators.coffee":49,"./rules/spacing_after_comma.coffee":50,"./rules/transform_messes_up_line_numbers.coffee":51}],5:[function(require,module,exports){
 // A summary of errors in a CoffeeLint run.
 var ErrorReport;
 
@@ -1884,7 +1886,7 @@ module.exports = DuplicateKey = (function() {
     // I don't know of any legitimate reason to define duplicate keys in an
     // object. It seems to always be a mistake, it's also a syntax error in
     // strict mode.
-    // See http://jslinterrors.com/duplicate-key-a/
+    // See https://jslinterrors.com/duplicate-key-a/
     name: 'duplicate_key',
     level: 'error',
     message: 'Duplicate key defined in object or class',
@@ -2468,7 +2470,7 @@ module.exports = MaxLineLength = (function() {
     limitComments: true,
     message: 'Line exceeds maximum allowed length',
     description: `This rule imposes a maximum line length on your code. <a
-href="http://www.python.org/dev/peps/pep-0008/">Python's style
+href="https://www.python.org/dev/peps/pep-0008/">Python's style
 guide</a> does a good job explaining why you might want to limit the
 length of your lines, though this is a matter of taste.
 
@@ -3945,6 +3947,60 @@ module.exports = NonEmptyConstructorNeedsParens = (function() {
 
 
 },{"./empty_constructor_needs_parens.coffee":16}],45:[function(require,module,exports){
+var ObjectShorthand;
+
+module.exports = ObjectShorthand = (function() {
+  class ObjectShorthand {
+    lintToken(token, tokenApi) {
+      var checkExplicit, explicit, property, value;
+      checkExplicit = function() {
+        var current;
+        current = -2;
+        while (tokenApi.peek(current)[0] !== '{') {
+          current--;
+        }
+        return !tokenApi.peek(current).generated;
+      };
+      // Get the property name and the value
+      property = tokenApi.peek(-1);
+      value = tokenApi.peek(1);
+      // Check if we have explicit {}
+      explicit = checkExplicit();
+      if (explicit && property[1] === value[1]) {
+        return {
+          context: `Use '{${property[1]}}'`
+        };
+      } else {
+        return null;
+      }
+    }
+
+  };
+
+  ObjectShorthand.prototype.rule = {
+    name: 'object_shorthand',
+    level: 'ignore',
+    message: 'Use property-value shorthand when using explicit braces',
+    description: `<p>Use property value shorthand in objects, when explicit braces are used.</p>
+<pre><code>test = "value"
+
+# Good
+{test}
+test: test
+
+# Bad
+{test: test}
+</code></pre>`
+  };
+
+  ObjectShorthand.prototype.tokens = [':'];
+
+  return ObjectShorthand;
+
+}).call(this);
+
+
+},{}],46:[function(require,module,exports){
 var PreferEnglishOperator,
   indexOf = [].indexOf;
 
@@ -4011,7 +4067,7 @@ Use and, or, is, isnt, and not instead.
 }).call(this);
 
 
-},{}],46:[function(require,module,exports){
+},{}],47:[function(require,module,exports){
 var MissingFatArrows,
   indexOf = [].indexOf;
 
@@ -4113,7 +4169,7 @@ method's object inside the code block of a method.`
 }).call(this);
 
 
-},{}],47:[function(require,module,exports){
+},{}],48:[function(require,module,exports){
 var PreferLogicalOperator;
 
 module.exports = PreferLogicalOperator = (function() {
@@ -4174,7 +4230,7 @@ Use ==, !=, !, &&, ||, true, false instead.`
 }).call(this);
 
 
-},{}],48:[function(require,module,exports){
+},{}],49:[function(require,module,exports){
 var SpaceOperators,
   indexOf = [].indexOf;
 
@@ -4324,7 +4380,7 @@ require no space around \`=\` when used to define default paramaters.`,
 }).call(this);
 
 
-},{}],49:[function(require,module,exports){
+},{}],50:[function(require,module,exports){
 var SpacingAfterComma,
   indexOf = [].indexOf;
 
@@ -4411,7 +4467,7 @@ if "ignore_elision" is true.
 }).call(this);
 
 
-},{}],50:[function(require,module,exports){
+},{}],51:[function(require,module,exports){
 var TransformMessesUpLineNumbers;
 
 module.exports = TransformMessesUpLineNumbers = (function() {
