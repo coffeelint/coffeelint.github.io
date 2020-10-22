@@ -19,8 +19,7 @@ jobs:
     runs-on: ubuntu-latest
     if: |
       github.actor == 'dependabot[bot]' &&
-      github.event_name == 'pull_request' &&
-      startsWith(github.event.pull_request.title, 'chore(deps-dev):')
+      github.event_name == 'pull_request'
     steps:
       - name: '@dependabot merge'
         uses: actions/github-script@v3
