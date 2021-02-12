@@ -2,7 +2,7 @@
 module.exports={
   "name": "@coffeelint/cli",
   "description": "Lint your CoffeeScript",
-  "version": "4.1.2",
+  "version": "4.1.3",
   "homepage": "https://coffeelint.github.io/",
   "keywords": [
     "lint",
