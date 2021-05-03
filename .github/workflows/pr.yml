@@ -1,0 +1,29 @@
+name: PR
+
+on:
+  pull_request:
+
+jobs:
+
+  Test:
+    runs-on: ubuntu-latest
+    # if: |
+    #   github.actor == 'dependabot[bot]' &&
+    #   github.event_name == 'pull_request'
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v2
+      - name: Install Dependencies
+        run: npm ci
+      - name: Build 🗜️
+        run: npm run build
+
+      # - name: Save PR number
+      #   run: |
+      #     mkdir -p ./pr
+      #     echo ${{ github.event.number }} > ./pr/NR
+      # - name: Upload PR Number
+      #   uses: actions/upload-artifact@v2
+      #   with:
+      #     name: pr
+      #     path: pr/
