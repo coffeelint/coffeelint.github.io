@@ -21,9 +21,8 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            await github.issues.createComment({
+            await github.pulls.merge({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              issue_number: process.env.PR_NUMBER,
-              body: '@dependabot merge'
+              pull_number: process.env.PR_NUMBER,
             });
