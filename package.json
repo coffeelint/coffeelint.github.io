@@ -8,7 +8,7 @@
   },
   "homepage": "https://coffeelint.github.io/",
   "dependencies": {
-    "@coffeelint/cli": "^5.0.4",
+    "@coffeelint/cli": "^5.0.5",
     "coffeescript": "^2.6.1",
     "jquery": "^3.6.0",
     "marked": "^3.0.7"
