@@ -1,5 +1,5 @@
 child_process = require 'child_process'
-marked = require 'marked'
+{ marked } = require 'marked'
 fs = require 'fs'
 
 task 'compile', 'Compiles index.html', ->
