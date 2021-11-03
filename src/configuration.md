@@ -1,11 +1,10 @@
 
-There are over 40 [rules](#rules) built into CoffeeLint.
+CoffeeLint will automatically walk up the directory tree looking for a config file, or a "package.json", that has a `coffeelintConfig` property. If neither of those are found, or you're linting from STDIN, it will check your home directory.
 
-Starting from the current working directory, CoffeeLint looks for the following possible sources:
+Possible names for the config file:
 
-- a `coffeelintConfig` property in "package.json"
-- a "coffeelint.json" file
-- a ".coffeelintrc.json" file
+- "coffeelint.json"
+- ".coffeelintrc.json"
 
 The configuration can be extended by the `extends` property.
 

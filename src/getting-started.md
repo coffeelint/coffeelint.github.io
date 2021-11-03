@@ -1,4 +1,10 @@
 
+CoffeeLint is a configurable linter tool, that helps you avoid bugs and enforce conventions in your [CoffeeScript](https://coffeescript.org/) code. It makes your code more clean and consistent. It can be tuned to fit your preferred coding style.
+
+There are over 40 [rules](#rules) built into CoffeeLint.
+
+If you have a bug report, or any ideas, reach out on the [issues page](https://github.com/coffeelint/coffeelint/issues).
+
 You can install CoffeeLint for your current project by using npm (requires an official [Node.js](https://nodejs.org/en/) distribution):
 
 ```sh
@@ -11,7 +17,7 @@ Or install it globally:
 npm install @coffeelint/cli --global
 ```
 
-Once you have CoffeeLint installed, you can generate a new configuration file:
+Then you can generate a new configuration file:
 
 ```sh
 coffeelint --makeconfig > .coffeelintrc.json
@@ -28,5 +34,3 @@ To specify your own configuration file, do:
 ```sh
 coffeelint app.coffee --file path/to/your/.coffeelintrc.json
 ```
-
-CoffeeLint will automatically walk up the directory tree looking for a config file, or a "package.json", that has a "coffeelintConfig" object. If neither of those are found, or you're linting from STDIN, it will check your home dir.
