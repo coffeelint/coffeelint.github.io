@@ -1,16 +1,17 @@
 {
-  "name": "coffeelint.github.io",
-  "private": true,
-  "scripts": {
-    "build": "npm run format && npm run compile",
-    "compile": "cake compile",
-    "format": "npx prettier js/trycoffeelint.js css/coffeelint.css scripts/template.html -w"
-  },
-  "homepage": "https://coffeelint.github.io/",
-  "dependencies": {
-    "@coffeelint/cli": "^5.1.0",
-    "coffeescript": "^2.6.1",
-    "jquery": "^3.6.0",
-    "marked": "^3.0.8"
-  }
+    "name": "coffeelint.github.io",
+    "description": "The source of the CoffeeLint website",
+    "homepage": "https://coffeelint.github.io/",
+    "type": "module",
+    "author": "DopustimVladimir",
+    "license": "MIT",
+    "scripts": {
+        "build": "cake clean && cake create:assets && cake create:html"
+    },
+    "devDependencies": {
+        "@coffeelint/cli": "^5.1.0",
+        "coffeescript": "^2.6.1",
+        "marked": "^3.0.8",
+        "sync-directory": "^4.0.5"
+    }
 }

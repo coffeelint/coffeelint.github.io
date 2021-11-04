@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+
+    <title>Plugins | CoffeeLint</title>
+
+    <meta name="description" content="Configurable linter tool. Find and fix problems in your CoffeeScript code">
+    <meta name="keywords" content="">
+
+    <link rel="icon" type="image/svg" href="./assets/img/favicon/favicon.svg">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,400;0,700;1,400;1,700&display=swap">
+
+    <link rel="stylesheet" href="./assets/css/main.css">
+
+    <script src="./assets/js/coffeescript.js"></script>
+    <script src="./assets/js/coffeelint.js"></script>
+    <script src="./assets/js/main.js"></script>
+    <script src="./assets/js/demo.js"></script>
+</head>
+<body>
+
+    <div class="header">
+        <div class="container">
+
+            <div class="header__title">
+                <a href="./index.html">
+                    <img class="img-responsive" src="./assets/img/coffeelint-logo.svg" alt="CoffeeLint logo">
+                </a>
+                <code id="version"></code>
+            </div>
+
+            <ul class="header__menu menu">
+                <li class="menu__item">
+                    <a href="./get-started.html">Get started</a>
+                </li>
+                <li class="menu__item">
+                    <a href="./configuration.html">Configuration</a>
+                </li>
+                <li class="menu__item">
+                    <a href="./rules.html">Rules</a>
+                </li>
+                <li class="menu__item">
+                    <a href="./custom-rules.html">Custom Rules</a>
+                </li>
+                <li class="menu__item">
+                    <a href="./api.html">API</a>
+                </li>
+                <li class="menu__item">
+                    <a href="./plugins.html">Plugins</a>
+                </li>
+                <li class="menu__item">
+                    <a href="https://github.com/coffeelint/coffeelint/blob/master/doc/integration.md" target="_blank">FAQ <svg width="13.5" height="13.5" viewBox="0 0 24 24" aria-hidden="true" focusable="false" class="icon"><use xlink:href="#icon-link-external" /></svg></a>
+                </li>
+                <li class="menu__item">
+                    <a href="https://github.com/coffeelint/coffeelint/blob/master/CHANGELOG.md" target="_blank">Changelog <svg width="13.5" height="13.5" viewBox="0 0 24 24" aria-hidden="true" focusable="false" class="icon"><use xlink:href="#icon-link-external" /></svg></a>
+                </li>
+            </ul>
+
+        </div>
+    </div>
+
+    <div class="main">
+        <div class="container">
+            <div class="main__content">
+<h1 id="plugins">Plugins</h1>
+<p>There are some cool CoffeeLint plugins.</p>
+<h3 id="editors">Editors</h3>
+<ul>
+<li><a href="https://marketplace.visualstudio.com/items?itemName=slb235.vscode-coffeelint">vscode-coffeelint</a> is a plugin for <a href="https://code.visualstudio.com/">Visual Studio Code</a>;</li>
+<li><a href="https://atom.io/packages/linter-coffeelint">linter-coffeelint</a> is a plugin for <a href="https://atom.io/">Atom</a>;</li>
+<li><a href="https://packagecontrol.io/packages/SublimeLinter-coffeelint">SublimeLinter-coffeelint</a> is a plugin for <a href="https://www.sublimetext.com/">Sublime Text</a>;</li>
+<li><a href="https://github.com/kchmck/vim-coffee-script">vim-coffee-script</a> is a plugin for <a href="https://www.vim.org/">Vim</a> (supports CoffeeLint);</li>
+<li><a href="https://github.com/vim-syntastic/syntastic">Syntastic</a> is a plugin for <a href="https://www.vim.org/">Vim</a> (support CoffeeLint);</li>
+<li><a href="https://github.com/ajkavanagh/coffeelintnode">CoffeeLintNode</a> is a plugin for <a href="https://www.gnu.org/software/emacs/">Emacs</a>;</li>
+<li><a href="https://github.com/purcell/flymake-coffee">flymake-coffee</a> is a plugin for <a href="https://www.gnu.org/software/emacs/manual/html_node/flymake/index.html">Emacs Flymake</a>.</li>
+</ul>
+<h3 id="build-tools">Build tools</h3>
+<ul>
+<li><a href="https://www.npmjs.com/package/grunt-coffeelint">grunt-coffeelint</a> is a plugin for <a href="https://gruntjs.com/">Grunt</a>;</li>
+<li><a href="https://www.npmjs.com/package/gulp-coffeelint">gulp-coffeelint</a> is a plugin for <a href="https://gulpjs.com/">Gulp</a>;</li>
+<li><a href="https://www.npmjs.com/package/coffeelint-loader">coffeelint-loader</a> is a plugin for <a href="https://webpack.js.org/">Webpack</a>;</li>
+<li><a href="https://www.npmjs.com/package/coffeelint-brunch">coffeelint-brunch</a> is a plugin for <a href="https://brunch.io/">Brunch.io</a>.</li>
+</ul>
+<h3 id="source-control">Source Control</h3>
+<ul>
+<li><a href="https://github.com/sds/overcommit">overcommit</a> is a configurable and extendable Git hook manager (supports CoffeeLint).</li>
+</ul>
+<h3 id="other">Other</h3>
+<ul>
+<li><a href="https://rubygems.org/gems/coffeelint">coffeelint-ruby</a> is a set of bindings for <a href="https://www.ruby-lang.org/">Ruby</a>;</li>
+<li><a href="https://github.com/codacy/codacy-coffeelint">codacy-coffeelint</a> is a docker container for <a href="https://www.codacy.com/">Codacy</a>, that runs CoffeeLint;</li>
+<li><a href="https://github.com/synaway/arcanist-coffee-lib">arcanist-coffee-lib</a> is a set of <a href="https://github.com/phacility/arcanist">Arcanist</a> extensions, including a wrapper for CoffeeLint;</li>
+<li><a href="https://github.com/dbashford/mimosa-coffeelint">mimosa-coffeelint</a> is a plugin for <a href="https://mimosa.io/">Mimosa</a>.</li>
+</ul>
+
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        <div class="container">
+
+            <div style="padding: 20px;">
+                <a href="https://github.com/coffeelint/coffeelint" target="_blank">CoffeeLint on GitHub <svg width="13.5" height="13.5" viewBox="0 0 24 24" aria-hidden="true" focusable="false" class="icon"><use xlink:href="#icon-link-external" /></svg></a>
+            </div>
+
+        </div>
+    </div>
+
+    <svg aria-hidden="true" focusable="false" style="display: none;">
+        <symbol id="icon-link-external">
+            <path fill="currentColor" d="M21 13v10h-21v-19h12v2h-10v15h17v-8h2zm3-12h-10.988l4.035 4-6.977 7.07 2.828 2.828 6.977-7.07 4.125 4.172v-11z"></path>
+        </symbol>
+    </svg>
+
+</body>
+</html>

@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+
+    <title>API | CoffeeLint</title>
+
+    <meta name="description" content="Configurable linter tool. Find and fix problems in your CoffeeScript code">
+    <meta name="keywords" content="">
+
+    <link rel="icon" type="image/svg" href="./assets/img/favicon/favicon.svg">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,400;0,700;1,400;1,700&display=swap">
+
+    <link rel="stylesheet" href="./assets/css/main.css">
+
+    <script src="./assets/js/coffeescript.js"></script>
+    <script src="./assets/js/coffeelint.js"></script>
+    <script src="./assets/js/main.js"></script>
+    <script src="./assets/js/demo.js"></script>
+</head>
+<body>
+
+    <div class="header">
+        <div class="container">
+
+            <div class="header__title">
+                <a href="./index.html">
+                    <img class="img-responsive" src="./assets/img/coffeelint-logo.svg" alt="CoffeeLint logo">
+                </a>
+                <code id="version"></code>
+            </div>
+
+            <ul class="header__menu menu">
+                <li class="menu__item">
+                    <a href="./get-started.html">Get started</a>
+                </li>
+                <li class="menu__item">
+                    <a href="./configuration.html">Configuration</a>
+                </li>
+                <li class="menu__item">
+                    <a href="./rules.html">Rules</a>
+                </li>
+                <li class="menu__item">
+                    <a href="./custom-rules.html">Custom Rules</a>
+                </li>
+                <li class="menu__item">
+                    <a href="./api.html">API</a>
+                </li>
+                <li class="menu__item">
+                    <a href="./plugins.html">Plugins</a>
+                </li>
+                <li class="menu__item">
+                    <a href="https://github.com/coffeelint/coffeelint/blob/master/doc/integration.md" target="_blank">FAQ <svg width="13.5" height="13.5" viewBox="0 0 24 24" aria-hidden="true" focusable="false" class="icon"><use xlink:href="#icon-link-external" /></svg></a>
+                </li>
+                <li class="menu__item">
+                    <a href="https://github.com/coffeelint/coffeelint/blob/master/CHANGELOG.md" target="_blank">Changelog <svg width="13.5" height="13.5" viewBox="0 0 24 24" aria-hidden="true" focusable="false" class="icon"><use xlink:href="#icon-link-external" /></svg></a>
+                </li>
+            </ul>
+
+        </div>
+    </div>
+
+    <div class="main">
+        <div class="container">
+            <div class="main__content">
+<h1 id="api">API</h1>
+<p>If you&#39;d like to run CoffeeScript in the browser or any other Javascript runtime, include <a href="https://coffeescript.org/browser-compiler-legacy/coffeescript.js">coffee-script.js</a> and <a href="https://coffeelint.github.io/js/coffeelint.js">coffeelint.js</a>. Then you can call CoffeeLint directly using the API.</p>
+<h3 id="coffeelintlint">coffeelint.lint()</h3>
+<p><code>coffeelint.lint(source, configuration)</code></p>
+<p>Lints the CoffeeScript source with the given configuration and returns an array of lint errors and warnings. If the array is empty, all is well. Compile time errors will be thrown. An error is a Javascript object with the following properties:</p>
+<ul>
+<li><code>rule</code> — name of the violated rule;</li>
+<li><code>lineNumber</code> — number of the line that caused the violation;</li>
+<li><code>level</code> — the severity level of the violated rule;</li>
+<li><code>message</code> — information about the violated rule;</li>
+<li><code>context</code> — optional details about why the rule was violated.</li>
+</ul>
+<h3 id="coffeelintregisterrule">coffeelint.registerRule()</h3>
+<p><code>coffeelint.registerRule(RuleConstructor)</code></p>
+<p>Registers a custom rule that may be run by CoffeeLint. If the rule is ignored by default it will still require overriding it&#39;s level just like the default rules. They have actually all be re-implemented as pluggable rules that come bundled in CoffeeLint.</p>
+
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        <div class="container">
+
+            <div style="padding: 20px;">
+                <a href="https://github.com/coffeelint/coffeelint" target="_blank">CoffeeLint on GitHub <svg width="13.5" height="13.5" viewBox="0 0 24 24" aria-hidden="true" focusable="false" class="icon"><use xlink:href="#icon-link-external" /></svg></a>
+            </div>
+
+        </div>
+    </div>
+
+    <svg aria-hidden="true" focusable="false" style="display: none;">
+        <symbol id="icon-link-external">
+            <path fill="currentColor" d="M21 13v10h-21v-19h12v2h-10v15h17v-8h2zm3-12h-10.988l4.035 4-6.977 7.07 2.828 2.828 6.977-7.07 4.125 4.172v-11z"></path>
+        </symbol>
+    </svg>
+
+</body>
+</html>

@@ -1,29 +1,66 @@
-child_process = require 'child_process'
+path = require 'node:path'
+fs = require 'node:fs'
+coffeelint = require '@coffeelint/cli'
 marked = require 'marked'
-fs = require 'fs'
+syncDirectory = require 'sync-directory'
+config = require './config.json'
 
-task 'compile', 'Compiles index.html', ->
-    invoke 'update'
+compileTemplate = (source, data) ->
+    return source.replace /\{\{[ ]?(\w*)[ ]?\}\}/gm, (m, v) ->
+        if not data[v]
+            throw new Error "Cannot find #{v}"
+        return data[v]
 
-    changelog = fs.readFileSync('./node_modules/@coffeelint/cli/CHANGELOG.md').toString()
-    template = fs.readFileSync('./scripts/template.html').toString()
-    template = template.replace '{{{changelog}}}', marked changelog
-    template = template.replace '{{{rules}}}', require './scripts/rules.coffee'
+task 'clean', 'Clean target directory', ->
 
-    fs.writeFileSync './index.html', template
+    fs.rmSync "#{config.dist}", { recursive: true, force: true }
+    fs.mkdirSync "#{config.dist}/rules", { recursive: true, mode: 0o755 }
 
-task 'update', 'Update coffeelint.js and coffeescript.js and jquery.js', ->
-    child_process.execSync "npm install @coffeelint/cli@#{process.COFFEELINT_VERSION ? 'latest'}"
-    coffeelintPackage = require './node_modules/@coffeelint/cli/package.json'
-    coffeescriptVersion = coffeelintPackage.dependencies.coffeescript
-    child_process.execSync "npm install coffeescript@#{coffeescriptVersion}"
-    child_process.execSync 'npm install jquery'
+task 'create:assets', 'Create assets directory', ->
 
-    coffeelintFile = './node_modules/@coffeelint/cli/lib/coffeelint.js'
-    coffeescriptFile =
-        './node_modules/coffeescript/lib/coffeescript-browser-compiler-legacy/coffeescript.js'
-    jqueryFile = './node_modules/jquery/dist/jquery.min.js'
+    syncDirectory(
+        path.resolve("#{config.src}/assets"),
+        path.resolve("#{config.dist}/assets"))
 
-    fs.copyFileSync coffeelintFile, './js/coffeelint.js'
-    fs.copyFileSync coffeescriptFile, './js/coffeescript.js'
-    fs.copyFileSync jqueryFile, './js/jquery.min.js'
+    fs.copyFileSync(
+        './node_modules/coffeescript/lib/coffeescript-browser-compiler-legacy/coffeescript.js',
+        "#{config.dist}/assets/js/coffeescript.js")
+
+    fs.copyFileSync(
+        './node_modules/@coffeelint/cli/lib/coffeelint.js',
+        "#{config.dist}/assets/js/coffeelint.js")
+
+task 'create:html', 'Create HTML files', ->
+
+    baseTemplateHTML = fs.readFileSync "#{config.src}/templates/base.html", 'utf8'
+
+    for pageName of config.pages
+        page = config.pages[pageName]
+        # Skip unsuitable
+        if not page.title
+            continue
+        # Create an HTML file
+        pageHTML = compileTemplate baseTemplateHTML, {
+            homepage: '.'
+            title: page.title
+            content: marked(fs.readFileSync "#{config.src}/pages/#{pageName}.md", 'utf8')
+        }
+        fs.writeFileSync "#{config.dist}/#{pageName}.html", pageHTML
+
+    for ruleName of coffeelint.RULES
+        rule = coffeelint.RULES[ruleName]
+        # Skip unsuitable
+        if not rule.name or not rule.level or not rule.message or not rule.description
+            continue
+        # Create an HTML file
+        ruleHTML = compileTemplate baseTemplateHTML, {
+            homepage: '..'
+            title: "Rule \"#{rule.name}\" | CoffeeLint"
+            content: """
+            <h1>Rule "#{rule.name}"</h1>
+            <p>#{rule.message}</p>
+            <p><em>default level:</em> <code class="bg-#{rule.level}">#{rule.level}</code></p>
+            #{marked rule.description}
+            """
+        }
+        fs.writeFileSync "#{config.dist}/rules/#{rule.name}.html", ruleHTML
