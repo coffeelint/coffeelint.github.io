@@ -1,0 +1,27 @@
+{
+    "src": "./src",
+    "dist": "./build",
+    "pages": {
+        "index": {
+            "title": "CoffeeLint - Lint your CoffeeScript code"
+        },
+        "rules": {
+            "title": "Rules | CoffeeLint"
+        },
+        "get-started": {
+            "title": "Get started | CoffeeLint"
+        },
+        "configuration": {
+            "title": "Configuration | CoffeeLint"
+        },
+        "custom-rules": {
+            "title": "Custom Rules | CoffeeLint"
+        },
+        "api": {
+            "title": "API | CoffeeLint"
+        },
+        "plugins": {
+            "title": "Plugins | CoffeeLint"
+        }
+    }
+}
