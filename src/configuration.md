@@ -1,4 +1,6 @@
 
+# Configuration
+
 CoffeeLint will automatically walk up the directory tree looking for a config file, or a "package.json", that has a `coffeelintConfig` property. If neither of those are found, or you're linting from STDIN, it will check your home directory.
 
 Possible names for the config file:

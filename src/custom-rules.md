@@ -1,4 +1,6 @@
 
+# Custom Rules
+
 By convention rule authors add the keyword `coffeelintrule` to their "package.json", so custom rules can be found easily. Click [here](https://npmjs.com/search?q=coffeelintrule) to list all currently available custom rules on npm.
 
 For example, maybe you want to get a warning if you don't have a newline at the end of your files. We'll imagine you globally installed the package [coffeelint-newline-eof](https://npmjs.com/package/coffeelint-newline-at-eof).

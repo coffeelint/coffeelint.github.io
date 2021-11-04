@@ -1,4 +1,6 @@
 
+# API
+
 If you'd like to run CoffeeScript in the browser or any other Javascript runtime, include [coffee-script.js](https://coffeescript.org/browser-compiler-legacy/coffeescript.js) and [coffeelint.js](https://coffeelint.github.io/js/coffeelint.js). Then you can call CoffeeLint directly using the API.
 
 ### coffeelint.lint()

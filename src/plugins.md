@@ -1,4 +1,6 @@
 
+# Plugins
+
 There are some cool CoffeeLint plugins.
 
 ### Editors
