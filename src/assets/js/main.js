@@ -7,8 +7,15 @@
             return false
         // console.log(`CoffeeScript ${CoffeeScript.VERSION} & CoffeeLint ${coffeelint.VERSION}`)
 
-        document.querySelector("#version").textContent = coffeelint.VERSION
-        document.querySelector("#year").textContent = new Date().getUTCFullYear()
+        const version = document.querySelector("#version")
+
+        if (version)
+            version.textContent = coffeelint.VERSION
+
+        const year = document.querySelector("#year")
+
+        if (year)
+            year.textContent = new Date().getUTCFullYear()
 
         return true
     })
