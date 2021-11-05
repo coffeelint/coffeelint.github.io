@@ -17,6 +17,18 @@
         if (year)
             year.textContent = new Date().getUTCFullYear()
 
+        const rules = document.querySelector("#rules-table")
+
+        if (rules) {
+            rules.innerHTML+= "<tr><td>Rule name<td>Rule message"
+
+            const coffeelintRules = JSON.parse(JSON.stringify(coffeelint.getRules()))
+
+            for (const ruleName in coffeelintRules) {
+                const rule = coffeelintRules[ruleName]
+                rules.innerHTML+= `<tr><td>${rule.name}<td>${rule.message}`
+            }
+        }
         return true
     })
 
