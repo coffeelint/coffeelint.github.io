@@ -16,6 +16,13 @@ task 'clean', 'Clean target directory', ->
     fs.rmSync "#{config.dist}", { recursive: true, force: true }
     fs.mkdirSync "#{config.dist}/rules", { recursive: true, mode: 0o755 }
 
+task 'update', 'Update dependencies', ->
+
+    child_process = require 'node:child_process'
+    child_process.execSync "npm install @coffeelint/cli@#{process.COFFEELINT_VERSION ? 'latest'}"
+    coffeelintPackage = require './node_modules/@coffeelint/cli/package.json'
+    child_process.execSync "npm install coffeescript@#{coffeelintPackage.dependencies.coffeescript}"
+
 task 'create:assets', 'Create assets directory', ->
 
     syncDirectory(
