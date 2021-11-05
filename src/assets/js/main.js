@@ -26,7 +26,11 @@
 
             for (const ruleName in coffeelintRules) {
                 const rule = coffeelintRules[ruleName]
-                rules.innerHTML+= `<tr><td>${rule.name}<td>${rule.message}`
+                rules.innerHTML+= `
+                <tr>
+                    <td><a href="./rules/${rule.name}.html">${rule.name}</a>
+                    <td>${rule.message}
+                `
             }
         }
         return true
