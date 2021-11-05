@@ -9,7 +9,7 @@
         "build": "cake clean && cake update && cake create:assets && cake create:html"
     },
     "devDependencies": {
-        "@coffeelint/cli": "^5.1.0",
+        "@coffeelint/cli": "^5.1.1",
         "coffeescript": "^2.6.1",
         "marked": "^3.0.8",
         "sync-directory": "^4.0.5"
