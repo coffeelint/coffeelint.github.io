@@ -1,7 +1,7 @@
 path = require 'node:path'
 fs = require 'node:fs'
 coffeelint = require '@coffeelint/cli'
-marked = require 'marked'
+{ marked } = require 'marked'
 syncDirectory = require 'sync-directory'
 config = require './config.json'
 

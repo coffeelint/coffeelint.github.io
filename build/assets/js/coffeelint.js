@@ -2,7 +2,7 @@
 module.exports={
   "name": "@coffeelint/cli",
   "description": "Lint your CoffeeScript",
-  "version": "5.1.1",
+  "version": "5.2.0",
   "homepage": "https://coffeelint.github.io/",
   "keywords": [
     "lint",
@@ -1298,6 +1298,7 @@ module.exports = ArrowSpacing = (function() {
   };
 
   ArrowSpacing.prototype.rule = {
+    type: 'style',
     name: 'arrow_spacing',
     level: 'ignore',
     message: 'Function arrows (-> and =>) must be spaced properly',
@@ -1403,6 +1404,7 @@ module.exports = BracesSpacing = (function() {
   };
 
   BracesSpacing.prototype.rule = {
+    type: 'style',
     name: 'braces_spacing',
     level: 'ignore',
     spaces: 0,
@@ -1538,6 +1540,7 @@ module.exports = BracketSpacing = (function() {
   };
 
   BracketSpacing.prototype.rule = {
+    type: 'style',
     name: 'bracket_spacing',
     level: 'ignore',
     spaces: 0,
@@ -1638,6 +1641,7 @@ module.exports = CamelCaseClasses = (function() {
   };
 
   CamelCaseClasses.prototype.rule = {
+    type: 'style',
     name: 'camel_case_classes',
     level: 'error',
     message: 'Class name should be UpperCamelCased',
@@ -1712,6 +1716,7 @@ module.exports = ColonAssignmentSpacing = (function() {
   };
 
   ColonAssignmentSpacing.prototype.rule = {
+    type: 'style',
     name: 'colon_assignment_spacing',
     level: 'ignore',
     message: 'Colon assignment without proper spacing',
@@ -1804,6 +1809,7 @@ module.exports = CyclomaticComplexity = (function() {
   };
 
   CyclomaticComplexity.prototype.rule = {
+    type: 'problem',
     name: 'cyclomatic_complexity',
     level: 'ignore',
     message: 'The cyclomatic complexity is too damn high',
@@ -1887,6 +1893,7 @@ module.exports = DuplicateKey = (function() {
     // object. It seems to always be a mistake, it's also a syntax error in
     // strict mode.
     // See https://jslinterrors.com/duplicate-key-a/
+    type: 'problem',
     name: 'duplicate_key',
     level: 'error',
     message: 'Duplicate key defined in object or class',
@@ -1950,6 +1957,7 @@ module.exports = EmptyConstructorNeedsParens = (function() {
   };
 
   EmptyConstructorNeedsParens.prototype.rule = {
+    type: 'style',
     name: 'empty_constructor_needs_parens',
     level: 'ignore',
     message: 'Invoking a constructor without parens and without arguments',
@@ -2061,6 +2069,7 @@ module.exports = EnsureComprehensions = (function() {
   };
 
   EnsureComprehensions.prototype.rule = {
+    type: 'style',
     name: 'ensure_comprehensions',
     level: 'warn',
     message: 'Comprehensions must have parentheses around them',
@@ -2096,6 +2105,7 @@ module.exports = EOLLast = (function() {
   };
 
   EOLLast.prototype.rule = {
+    type: 'style',
     name: 'eol_last',
     level: 'ignore',
     message: 'File does not end with a single newline',
@@ -2350,6 +2360,7 @@ module.exports = Indentation = (function() {
   };
 
   Indentation.prototype.rule = {
+    type: 'problem',
     name: 'indentation',
     value: 2,
     level: 'error',
@@ -2413,6 +2424,7 @@ module.exports = LineEndings = (function() {
   };
 
   LineEndings.prototype.rule = {
+    type: 'problem',
     name: 'line_endings',
     level: 'ignore',
     value: 'unix', // or 'windows'
@@ -2464,6 +2476,7 @@ module.exports = MaxLineLength = (function() {
   };
 
   MaxLineLength.prototype.rule = {
+    type: 'style',
     name: 'max_line_length',
     value: 80,
     level: 'error',
@@ -2621,6 +2634,7 @@ module.exports = MissingFatArrows = (function() {
   };
 
   MissingFatArrows.prototype.rule = {
+    type: 'problem',
     name: 'missing_fat_arrows',
     level: 'ignore',
     is_strict: false,
@@ -2661,6 +2675,7 @@ module.exports = ParseintRadix = (function() {
   };
 
   ParseintRadix.prototype.rule = {
+    type: 'problem',
     name: 'missing_parseint_radix',
     level: 'warn',
     message: 'parseInt is missing the radix argument',
@@ -2742,6 +2757,7 @@ module.exports = NewlinesAfterClasses = (function() {
   };
 
   NewlinesAfterClasses.prototype.rule = {
+    type: 'style',
     name: 'newlines_after_classes',
     value: 3,
     level: 'ignore',
@@ -2778,6 +2794,7 @@ module.exports = NoBackticks = (function() {
   };
 
   NoBackticks.prototype.rule = {
+    type: 'problem',
     name: 'no_backticks',
     level: 'error',
     message: 'Backticks are forbidden',
@@ -2823,6 +2840,7 @@ module.exports = NoDebugger = (function() {
   };
 
   NoDebugger.prototype.rule = {
+    type: 'problem',
     name: 'no_debugger',
     level: 'warn',
     message: 'Found debugging code',
@@ -2871,6 +2889,7 @@ module.exports = NoEmptyFunctions = (function() {
   };
 
   NoEmptyFunctions.prototype.rule = {
+    type: 'problem',
     name: 'no_empty_functions',
     level: 'ignore',
     message: 'Empty function',
@@ -2919,6 +2938,7 @@ module.exports = NoEmptyParamList = (function() {
   };
 
   NoEmptyParamList.prototype.rule = {
+    type: 'style',
     name: 'no_empty_param_list',
     level: 'ignore',
     message: 'Empty parameter list is forbidden',
@@ -3035,6 +3055,7 @@ module.exports = NoImplicitBraces = (function() {
   };
 
   NoImplicitBraces.prototype.rule = {
+    type: 'style',
     name: 'no_implicit_braces',
     level: 'ignore',
     message: 'Implicit braces are forbidden',
@@ -3103,6 +3124,7 @@ module.exports = NoImplicitParens = (function() {
   };
 
   NoImplicitParens.prototype.rule = {
+    type: 'style',
     name: 'no_implicit_parens',
     level: 'ignore',
     message: 'Implicit parens are forbidden',
@@ -3144,6 +3166,7 @@ module.exports = NoInterpolationInSingleQuotes = (function() {
   };
 
   NoInterpolationInSingleQuotes.prototype.rule = {
+    type: 'problem',
     name: 'no_interpolation_in_single_quotes',
     level: 'ignore',
     message: 'Interpolation in single quoted strings is forbidden',
@@ -3220,6 +3243,7 @@ module.exports = NoNestedStringInterpolation = (function() {
   };
 
   NoNestedStringInterpolation.prototype.rule = {
+    type: 'problem',
     name: 'no_nested_string_interpolation',
     level: 'warn',
     message: 'Nested string interpolation is forbidden',
@@ -3257,6 +3281,7 @@ module.exports = NoPlusPlus = (function() {
   };
 
   NoPlusPlus.prototype.rule = {
+    type: 'style',
     name: 'no_plusplus',
     level: 'ignore',
     message: 'The increment and decrement operators are forbidden',
@@ -3361,6 +3386,7 @@ module.exports = NoPrivateFunctionFatArrows = (function() {
   };
 
   NoPrivateFunctionFatArrows.prototype.rule = {
+    type: 'style',
     name: 'no_private_function_fat_arrows',
     level: 'warn',
     message: 'Used the fat arrow for a private function',
@@ -3399,6 +3425,7 @@ module.exports = NoSpaces = (function() {
   };
 
   NoSpaces.prototype.rule = {
+    type: 'style',
     name: 'no_spaces',
     level: 'ignore',
     message: 'Line contains space indentation',
@@ -3440,6 +3467,7 @@ module.exports = NoStandAloneAt = (function() {
   };
 
   NoStandAloneAt.prototype.rule = {
+    type: 'style',
     name: 'no_stand_alone_at',
     level: 'ignore',
     message: '@ must not be used stand alone',
@@ -3487,6 +3515,7 @@ module.exports = NoTabs = (function() {
   };
 
   NoTabs.prototype.rule = {
+    type: 'style',
     name: 'no_tabs',
     level: 'error',
     message: 'Line contains tab indentation',
@@ -3520,6 +3549,7 @@ module.exports = NoThis = (function() {
   };
 
   NoThis.prototype.rule = {
+    type: 'style',
     name: 'no_this',
     level: 'ignore',
     message: "Don't use 'this', use '@' instead",
@@ -3552,6 +3582,7 @@ module.exports = NoThrowingStrings = (function() {
   };
 
   NoThrowingStrings.prototype.rule = {
+    type: 'problem',
     name: 'no_throwing_strings',
     level: 'error',
     message: 'Throwing strings is forbidden',
@@ -3637,6 +3668,7 @@ module.exports = NoTrailingSemicolons = (function() {
   };
 
   NoTrailingSemicolons.prototype.rule = {
+    type: 'style',
     name: 'no_trailing_semicolons',
     level: 'error',
     message: 'Line contains a trailing semicolon',
@@ -3719,6 +3751,7 @@ module.exports = NoTrailingWhitespace = (function() {
   };
 
   NoTrailingWhitespace.prototype.rule = {
+    type: 'style',
     name: 'no_trailing_whitespace',
     level: 'error',
     message: 'Line ends with trailing whitespace',
@@ -3810,6 +3843,7 @@ module.exports = NoUnnecessaryDoubleQuotes = (function() {
   };
 
   NoUnnecessaryDoubleQuotes.prototype.rule = {
+    type: 'style',
     name: 'no_unnecessary_double_quotes',
     level: 'ignore',
     message: 'Unnecessary double quotes are forbidden',
@@ -3905,6 +3939,7 @@ module.exports = NoUnnecessaryFatArrows = (function() {
   };
 
   NoUnnecessaryFatArrows.prototype.rule = {
+    type: 'style',
     name: 'no_unnecessary_fat_arrows',
     level: 'warn',
     message: 'Unnecessary fat arrow',
@@ -3935,6 +3970,7 @@ module.exports = NonEmptyConstructorNeedsParens = (function() {
   };
 
   NonEmptyConstructorNeedsParens.prototype.rule = {
+    type: 'style',
     name: 'non_empty_constructor_needs_parens',
     level: 'ignore',
     message: 'Invoking a constructor without parens and with arguments',
@@ -3978,6 +4014,7 @@ module.exports = ObjectShorthand = (function() {
   };
 
   ObjectShorthand.prototype.rule = {
+    type: 'style',
     name: 'object_shorthand',
     level: 'ignore',
     message: 'Use property-value shorthand when using explicit braces',
@@ -4050,6 +4087,7 @@ module.exports = PreferEnglishOperator = (function() {
   };
 
   PreferEnglishOperator.prototype.rule = {
+    type: 'style',
     name: 'prefer_english_operator',
     level: 'ignore',
     message: 'Don\'t use &&, ||, ==, !=, or !',
@@ -4156,6 +4194,7 @@ module.exports = MissingFatArrows = (function() {
   };
 
   MissingFatArrows.prototype.rule = {
+    type: 'style',
     name: 'prefer_fat_arrows_in_methods',
     level: 'ignore',
     message: 'Require fat arrows inside method bodies',
@@ -4215,6 +4254,7 @@ module.exports = PreferLogicalOperator = (function() {
   };
 
   PreferLogicalOperator.prototype.rule = {
+    type: 'style',
     name: 'prefer_logical_operator',
     level: 'ignore',
     message: 'Don\'t use is, isnt, not, and, or, yes, on, no, off',
@@ -4364,6 +4404,7 @@ module.exports = SpaceOperators = (function() {
   };
 
   SpaceOperators.prototype.rule = {
+    type: 'style',
     name: 'space_operators',
     level: 'ignore',
     message: 'Operators must be spaced properly',
@@ -4447,6 +4488,7 @@ module.exports = SpacingAfterComma = (function() {
   };
 
   SpacingAfterComma.prototype.rule = {
+    type: 'style',
     name: 'spacing_after_comma',
     level: 'ignore',
     ignore_elision: false,
@@ -4477,6 +4519,7 @@ module.exports = TransformMessesUpLineNumbers = (function() {
   };
 
   TransformMessesUpLineNumbers.prototype.rule = {
+    type: 'style',
     name: 'transform_messes_up_line_numbers',
     level: 'warn',
     message: 'Transforming source messes up line numbers',
