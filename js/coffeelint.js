@@ -2,7 +2,7 @@
 module.exports={
   "name": "@coffeelint/cli",
   "description": "Lint your CoffeeScript",
-  "version": "5.2.4",
+  "version": "5.2.5",
   "homepage": "https://coffeelint.github.io/",
   "keywords": [
     "lint",
@@ -34,7 +34,7 @@ module.exports={
     "@semantic-release/commit-analyzer": "^9.0.2",
     "@semantic-release/git": "^10.0.1",
     "@semantic-release/github": "^8.0.2",
-    "@semantic-release/npm": "^8.0.3",
+    "@semantic-release/npm": "^9.0.0",
     "@semantic-release/release-notes-generator": "^10.0.3",
     "browserify": "^17.0.0",
     "coffeeify": "^3.0.1",
