@@ -2,7 +2,7 @@
 module.exports={
   "name": "@coffeelint/cli",
   "description": "Lint your CoffeeScript",
-  "version": "5.2.7",
+  "version": "5.2.8",
   "homepage": "https://coffeelint.github.io/",
   "keywords": [
     "lint",
@@ -22,7 +22,7 @@ module.exports={
     "coffeelint": "./bin/coffeelint"
   },
   "dependencies": {
-    "coffeescript": "2.6.1",
+    "coffeescript": "2.7.0",
     "glob": "^8.0.1",
     "ignore": "^5.2.0",
     "resolve": "^1.21.0",
