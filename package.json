@@ -11,6 +11,6 @@
     "@coffeelint/cli": "^5.2.11",
     "coffeescript": "^2.7.0",
     "jquery": "^3.7.0",
-    "marked": "^5.0.5"
+    "marked": "^5.1.0"
   }
 }
