@@ -4,7 +4,7 @@
     $.each(errors, function (index, error) {
       var row = $("<div></div>");
       var lc = $('<span class="lineNumber"></span>').html(
-        "Line #" + error.lineNumber + ":"
+        "Line #" + error.lineNumber + ":",
       );
       var rc = $('<span class="reason"></span>').html(error.message);
       row.append(lc, rc);
@@ -113,7 +113,7 @@
 
     if (location.hash) {
       $([document.documentElement, document.body]).scrollTop(
-        $(location.hash).offset().top
+        $(location.hash).offset().top,
       );
     }
   });
