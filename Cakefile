@@ -1,13 +1,16 @@
 child_process = require 'child_process'
 { marked } = require 'marked'
+{ gfmHeadingId } = require 'marked-gfm-heading-id'
 fs = require 'fs'
+
+marked.use gfmHeadingId()
 
 task 'compile', 'Compiles index.html', ->
     invoke 'update'
 
     changelog = fs.readFileSync('./node_modules/@coffeelint/cli/CHANGELOG.md').toString()
     template = fs.readFileSync('./scripts/template.html').toString()
-    template = template.replace '{{{changelog}}}', marked changelog
+    template = template.replace '{{{changelog}}}', marked.parse changelog
     template = template.replace '{{{rules}}}', require './scripts/rules.coffee'
 
     fs.writeFileSync './index.html', template

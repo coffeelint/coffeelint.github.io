@@ -4,13 +4,15 @@
   "scripts": {
     "build": "npm run format && npm run compile",
     "compile": "cake compile",
-    "format": "npx prettier js/trycoffeelint.js css/coffeelint.css scripts/template.html -w"
+    "format": "prettier js/trycoffeelint.js css/coffeelint.css scripts/template.html -w"
   },
   "homepage": "https://coffeelint.github.io/",
   "dependencies": {
     "@coffeelint/cli": "^5.2.11",
     "coffeescript": "^2.7.0",
     "jquery": "^3.7.1",
-    "marked": "^15.0.3"
+    "marked": "^15.0.3",
+    "marked-gfm-heading-id": "^4.1.1",
+    "prettier": "^3.4.1"
   }
 }
