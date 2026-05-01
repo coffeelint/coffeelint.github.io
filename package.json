@@ -11,7 +11,7 @@
     "@coffeelint/cli": "^5.2.11",
     "coffeescript": "^2.7.0",
     "jquery": "^4.0.0",
-    "marked": "^18.0.2",
+    "marked": "^18.0.3",
     "marked-gfm-heading-id": "^4.1.4",
     "prettier": "^3.8.3"
   }
