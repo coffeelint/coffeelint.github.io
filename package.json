@@ -10,7 +10,7 @@
   "dependencies": {
     "@coffeelint/cli": "^5.2.15",
     "coffeescript": "^2.7.1",
-    "jquery": "^4.0.0",
+    "jquery": "^4.1.0",
     "marked": "^18.2.1",
     "marked-gfm-heading-id": "^4.1.4",
     "prettier": "^3.10.1"
